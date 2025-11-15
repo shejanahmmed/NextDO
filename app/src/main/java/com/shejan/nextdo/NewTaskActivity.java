@@ -5,9 +5,12 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
@@ -28,6 +31,7 @@ public class NewTaskActivity extends AppCompatActivity {
     public static final String EXTRA_PRIORITY = "com.shejan.nextdo.PRIORITY";
     public static final String EXTRA_REMINDER_TIME = "com.shejan.nextdo.REMINDER_TIME";
     public static final String EXTRA_REPEAT = "com.shejan.nextdo.REPEAT";
+    public static final int RESULT_DELETE = 2;
 
     private ActivityNewTaskBinding binding;
     private Calendar calendar = Calendar.getInstance();
@@ -80,6 +84,10 @@ public class NewTaskActivity extends AppCompatActivity {
                 calendar.setTimeInMillis(reminderTime);
                 updateReminderTimeText();
             }
+        } else {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("Add Todo");
+            }
         }
 
         binding.buttonSetReminder.setOnClickListener(v -> showDateTimePicker());
@@ -112,6 +120,26 @@ public class NewTaskActivity extends AppCompatActivity {
             }
             finish();
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (taskId != -1) {
+            getMenuInflater().inflate(R.menu.menu_edit_task, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_delete) {
+            Intent replyIntent = new Intent();
+            replyIntent.putExtra(EXTRA_ID, taskId);
+            setResult(RESULT_DELETE, replyIntent);
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

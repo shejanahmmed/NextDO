@@ -11,12 +11,12 @@ public class NotificationHelper {
 
     public static void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "NextDO Reminder";
-            String description = "Channel for NextDO reminders";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            CharSequence name = "NextDO Reminders";
+            String description = "Channel for NextDO task reminders";
+            int importance = NotificationManager.IMPORTANCE_HIGH; // DEFINITIVE FIX: Use HIGH importance for reminders.
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
-            
+
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }

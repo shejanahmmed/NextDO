@@ -1,9 +1,14 @@
 package com.shejan.nextdo;
 
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -15,6 +20,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.shejan.nextdo.databinding.ActivityMainBinding;
 
 import java.util.Objects;
@@ -44,10 +50,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
                     taskViewModel.insert(task);
                 } else {
-                    Toast.makeText(
-                            getApplicationContext(),
-                            R.string.empty_not_saved,
-                            Toast.LENGTH_LONG).show();
+                    // No toast message on cancel
                 }
             });
 
@@ -77,72 +80,103 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                     task.repeat = repeat != null ? repeat : "";
 
                     taskViewModel.update(task);
+                } else if (result.getResultCode() == NewTaskActivity.RESULT_DELETE && result.getData() != null) {
+                    Intent data = result.getData();
+                    int id = data.getIntExtra(NewTaskActivity.EXTRA_ID, -1);
+                    if (id == -1) {
+                        Toast.makeText(this, "Task can\'t be deleted", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Task task = new Task();
+                    task.id = id;
+                    taskViewModel.delete(task);
                 } else {
-                    Toast.makeText(
-                            getApplicationContext(),
-                            R.string.empty_not_saved,
-                            Toast.LENGTH_LONG).show();
+                    // No toast message on cancel
                 }
             });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        try {
-            ThemeManager.applyTheme(this);
-        } catch (Exception e) {
-            // Continue with default theme if theme application fails
-        }
+        ThemeManager.applyTheme(this);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        if (binding.toolbar != null) {
-            setSupportActionBar(binding.toolbar);
-        }
+        setSupportActionBar(binding.toolbar);
 
         final TaskListAdapter adapter = new TaskListAdapter(new TaskListAdapter.TaskDiff(), this);
-        if (binding.recyclerview != null) {
-            binding.recyclerview.setAdapter(adapter);
-            binding.recyclerview.setLayoutManager(new LinearLayoutManager(this));
-        }
+        binding.recyclerview.setAdapter(adapter);
+        binding.recyclerview.setLayoutManager(new LinearLayoutManager(this));
 
         taskViewModel = new ViewModelProvider(this).get(TaskViewModel.class);
         taskViewModel.getAllTasks().observe(this, tasks -> {
-            if (tasks != null) {
-                adapter.submitList(tasks);
+            adapter.submitList(tasks);
+            if (tasks.isEmpty()) {
+                binding.emptyView.setVisibility(View.VISIBLE);
+                binding.recyclerview.setVisibility(View.GONE);
+            } else {
+                binding.emptyView.setVisibility(View.GONE);
+                binding.recyclerview.setVisibility(View.VISIBLE);
             }
         });
 
-        if (binding.fab != null) {
-            binding.fab.setOnClickListener(view -> {
-                Intent intent = new Intent(MainActivity.this, NewTaskActivity.class);
-                newTaskActivityLauncher.launch(intent);
-            });
-        }
+        binding.fab.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, NewTaskActivity.class);
+            newTaskActivityLauncher.launch(intent);
+        });
 
-        ItemTouchHelper helper = new ItemTouchHelper(
-                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-                    @Override
-                    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                        return false;
-                    }
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            private final Paint textPaint = new Paint();
+            private final ColorDrawable background = new ColorDrawable();
 
-                    @Override
-                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                        int position = viewHolder.getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            Task myTask = adapter.getTaskAt(position);
-                            if (myTask != null) {
-                                taskViewModel.delete(myTask);
-                            }
-                        }
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    Task taskToDelete = adapter.getTaskAt(position);
+                    if (taskToDelete != null) {
+                        taskViewModel.delete(taskToDelete);
+
+                        Snackbar.make(binding.getRoot(), "Task deleted", Snackbar.LENGTH_LONG)
+                                .setAction("Undo", v -> taskViewModel.insert(taskToDelete))
+                                .show();
                     }
-                });
-        if (binding.recyclerview != null) {
-            helper.attachToRecyclerView(binding.recyclerview);
-        }
+                }
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                View itemView = viewHolder.itemView;
+
+                if (dX < 0) { // Swiping to the left
+                    // Draw red background
+                    background.setColor(Color.RED);
+                    background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
+                    background.draw(c);
+
+                    // Prepare paint for text
+                    textPaint.setColor(Color.WHITE);
+                    textPaint.setTextSize(getResources().getDimension(R.dimen.swipe_text_size));
+                    textPaint.setAntiAlias(true);
+                    textPaint.setTextAlign(Paint.Align.RIGHT);
+
+                    // Calculate position and draw text
+                    String deleteText = "Delete";
+                    float textMargin = getResources().getDimension(R.dimen.swipe_text_margin);
+                    float textX = itemView.getRight() - textMargin;
+                    float textY = itemView.getTop() + (itemView.getHeight() / 2f) - ((textPaint.descent() + textPaint.ascent()) / 2f);
+
+                    c.drawText(deleteText, textX, textY, textPaint);
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        }).attachToRecyclerView(binding.recyclerview);
     }
 
     @Override

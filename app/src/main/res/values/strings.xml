@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">NextDO</string>
+    <string name="action_settings">Settings</string>
+    <string name="empty_not_saved">Task not saved because it is empty.</string>
+    <string-array name="priority_array">
+        <item>NONE</item>
+        <item>LOW</item>
+        <item>MEDIUM</item>
+        <item>HIGH</item>
+    </string-array>
+    <string-array name="repeat_array">
+        <item>NONE</item>
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+        <item>Yearly</item>
+    </string-array>
+    <string-array name="theme_entries">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>System Default</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>light</item>
+        <item>dark</item>
+        <item>system</item>
+    </string-array>
+</resources>

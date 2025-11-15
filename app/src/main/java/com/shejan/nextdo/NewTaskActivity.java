@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.work.Data;
@@ -31,44 +32,32 @@ public class NewTaskActivity extends AppCompatActivity {
     private ActivityNewTaskBinding binding;
     private Calendar calendar = Calendar.getInstance();
     private int taskId = -1;
-    private ArrayAdapter<CharSequence> priorityAdapter;
-    private ArrayAdapter<CharSequence> repeatAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        try {
-            ThemeManager.applyTheme(this);
-        } catch (Exception e) {
-            // Continue with default theme if theme application fails
-        }
+        ThemeManager.applyTheme(this);
 
         binding = ActivityNewTaskBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        try {
-            priorityAdapter = ArrayAdapter.createFromResource(this,
-                    R.array.priority_array, android.R.layout.simple_spinner_item);
-            priorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            if (binding.spinnerPriority != null) {
-                binding.spinnerPriority.setAdapter(priorityAdapter);
-            }
-
-            repeatAdapter = ArrayAdapter.createFromResource(this,
-                    R.array.repeat_array, android.R.layout.simple_spinner_item);
-            repeatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            if (binding.spinnerRepeat != null) {
-                binding.spinnerRepeat.setAdapter(repeatAdapter);
-            }
-        } catch (Exception e) {
-            // Handle adapter creation failure
-            finish();
-            return;
+        setSupportActionBar(binding.toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, getResources().getStringArray(R.array.priority_array));
+        ((AutoCompleteTextView) binding.priorityAutoCompleteTextView).setAdapter(priorityAdapter);
+
+        ArrayAdapter<String> repeatAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, getResources().getStringArray(R.array.repeat_array));
+        ((AutoCompleteTextView) binding.repeatAutoCompleteTextView).setAdapter(repeatAdapter);
+
 
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_ID)) {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("Edit Todo");
+            }
             taskId = intent.getIntExtra(EXTRA_ID, -1);
             String title = intent.getStringExtra(EXTRA_TITLE);
             String description = intent.getStringExtra(EXTRA_DESCRIPTION);
@@ -77,19 +66,13 @@ public class NewTaskActivity extends AppCompatActivity {
             binding.editDescription.setText(description != null ? description : "");
 
             String priority = intent.getStringExtra(EXTRA_PRIORITY);
-            if (priority != null && priorityAdapter != null) {
-                int spinnerPosition = priorityAdapter.getPosition(priority);
-                if (spinnerPosition >= 0) {
-                    binding.spinnerPriority.setSelection(spinnerPosition);
-                }
+            if (priority != null) {
+                ((AutoCompleteTextView) binding.priorityAutoCompleteTextView).setText(priority, false);
             }
 
             String repeat = intent.getStringExtra(EXTRA_REPEAT);
-            if (repeat != null && repeatAdapter != null) {
-                int spinnerPosition = repeatAdapter.getPosition(repeat);
-                if (spinnerPosition >= 0) {
-                    binding.spinnerRepeat.setSelection(spinnerPosition);
-                }
+            if (repeat != null) {
+                ((AutoCompleteTextView) binding.repeatAutoCompleteTextView).setText(repeat, false);
             }
 
             long reminderTime = intent.getLongExtra(EXTRA_REMINDER_TIME, 0);
@@ -101,42 +84,40 @@ public class NewTaskActivity extends AppCompatActivity {
 
         binding.buttonSetReminder.setOnClickListener(v -> showDateTimePicker());
 
-        if (binding.buttonSave != null) {
-            binding.buttonSave.setOnClickListener(view -> {
-                Intent replyIntent = new Intent();
-                if (binding.editTitle == null || TextUtils.isEmpty(binding.editTitle.getText())) {
-                    setResult(RESULT_CANCELED, replyIntent);
-                } else {
-                    try {
-                        String title = binding.editTitle.getText().toString();
-                        String description = binding.editDescription != null ? binding.editDescription.getText().toString() : "";
-                        String priority = binding.spinnerPriority != null && binding.spinnerPriority.getSelectedItem() != null ? 
-                                binding.spinnerPriority.getSelectedItem().toString() : "NONE";
-                        long reminderTime = calendar.getTimeInMillis();
-                        String repeat = binding.spinnerRepeat != null && binding.spinnerRepeat.getSelectedItem() != null ? 
-                                binding.spinnerRepeat.getSelectedItem().toString() : "NONE";
+        binding.buttonSave.setOnClickListener(view -> {
+            Intent replyIntent = new Intent();
+            if (TextUtils.isEmpty(binding.editTitle.getText())) {
+                setResult(RESULT_CANCELED, replyIntent);
+            } else {
+                String title = binding.editTitle.getText().toString();
+                String description = binding.editDescription.getText().toString();
+                String priority = ((AutoCompleteTextView) binding.priorityAutoCompleteTextView).getText().toString();
+                String repeat = ((AutoCompleteTextView) binding.repeatAutoCompleteTextView).getText().toString();
+                long reminderTime = calendar.getTimeInMillis();
 
-                        if (taskId != -1) {
-                            replyIntent.putExtra(EXTRA_ID, taskId);
-                        }
-                        replyIntent.putExtra(EXTRA_TITLE, title);
-                        replyIntent.putExtra(EXTRA_DESCRIPTION, description);
-                        replyIntent.putExtra(EXTRA_PRIORITY, priority);
-                        replyIntent.putExtra(EXTRA_REMINDER_TIME, reminderTime);
-                        replyIntent.putExtra(EXTRA_REPEAT, repeat);
-
-                        if (reminderTime > System.currentTimeMillis()) {
-                            scheduleReminder(title, reminderTime, taskId != -1 ? taskId : (int) System.currentTimeMillis());
-                        }
-
-                        setResult(RESULT_OK, replyIntent);
-                    } catch (Exception e) {
-                        setResult(RESULT_CANCELED, replyIntent);
-                    }
+                if (taskId != -1) {
+                    replyIntent.putExtra(EXTRA_ID, taskId);
                 }
-                finish();
-            });
-        }
+                replyIntent.putExtra(EXTRA_TITLE, title);
+                replyIntent.putExtra(EXTRA_DESCRIPTION, description);
+                replyIntent.putExtra(EXTRA_PRIORITY, priority);
+                replyIntent.putExtra(EXTRA_REMINDER_TIME, reminderTime);
+                replyIntent.putExtra(EXTRA_REPEAT, repeat);
+
+                if (reminderTime > System.currentTimeMillis()) {
+                    scheduleReminder(title, reminderTime, taskId != -1 ? taskId : (int) System.currentTimeMillis());
+                }
+
+                setResult(RESULT_OK, replyIntent);
+            }
+            finish();
+        });
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 
     private void showDateTimePicker() {

@@ -4,6 +4,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
+import androidx.core.app.NotificationCompat;
 
 public class NotificationHelper {
 
@@ -12,13 +13,19 @@ public class NotificationHelper {
     public static void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "NextDO Reminders";
-            String description = "Channel for NextDO task reminders";
-            int importance = NotificationManager.IMPORTANCE_HIGH; // DEFINITIVE FIX: Use HIGH importance for reminders.
+            String description = "Notifications for task reminders";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
-
+            channel.enableLights(true);
+            channel.enableVibration(true);
+            channel.setShowBadge(true);
+            channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+            
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
         }
     }
 }

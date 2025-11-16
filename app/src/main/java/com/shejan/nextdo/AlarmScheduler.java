@@ -23,23 +23,39 @@ public class AlarmScheduler {
 
     public void schedule(Task task) {
         if (!areNotificationsEnabled()) {
-            return; // Do not schedule if notifications are disabled
+            return;
         }
 
         if (task.reminderTime > System.currentTimeMillis() && task.alarmId != 0) {
+            // Cancel any existing alarm first
+            cancel(task);
+            
             Intent intent = new Intent(context, ReminderBroadcastReceiver.class);
             intent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_TITLE, task.title);
             intent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_ID, task.id);
+            intent.putExtra("task_description", task.description);
 
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-            if (canScheduleExactAlarms()) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
-            } else {
-                // Guide user to settings to grant permission
-                Intent settingsIntent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                context.startActivity(settingsIntent);
-                Toast.makeText(context, "Please grant permission to schedule exact alarms.", Toast.LENGTH_LONG).show();
+            try {
+                if (canScheduleExactAlarms()) {
+                    // Use most reliable alarm method
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
+                    } else {
+                        alarmManager.setExact(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
+                    }
+                } else {
+                    // Fallback for devices without exact alarm permission
+                    alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
+                    
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        Toast.makeText(context, "Exact alarm permission needed for precise reminders", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } catch (Exception e) {
+                // Fallback scheduling
+                alarmManager.set(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
             }
         }
     }

@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="NothingDialog" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/nothing_dialog_bg</item>
+        <item name="android:textColor">@color/nothing_white</item>
+        <item name="colorPrimary">@color/nothing_white</item>
+        <item name="colorAccent">@color/nothing_white</item>
+    </style>
 </resources>

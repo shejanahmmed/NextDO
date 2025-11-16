@@ -18,19 +18,29 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String taskTitle = intent.getStringExtra(EXTRA_TASK_TITLE);
+        String taskDescription = intent.getStringExtra("task_description");
         int taskId = intent.getIntExtra(EXTRA_TASK_ID, 0);
 
         Intent mainIntent = new Intent(context, MainActivity.class);
         mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, taskId, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
+        String contentText = taskTitle != null ? taskTitle : "You have a reminder";
+        if (taskDescription != null && !taskDescription.isEmpty()) {
+            contentText = taskTitle + ": " + taskDescription;
+        }
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NotificationHelper.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_alarm)
                 .setContentTitle("NextDO Reminder")
-                .setContentText(taskTitle != null ? taskTitle : "You have a reminder.")
+                .setContentText(contentText)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 

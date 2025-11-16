@@ -1,95 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    app:cardBackgroundColor="@color/dark_background"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="0dp"
-    app:strokeColor="@color/white"
-    app:strokeWidth="2dp">
+    android:orientation="vertical"
+    android:background="@drawable/nothing_card_bg"
+    android:padding="20dp"
+    android:layout_marginBottom="16dp"
+    android:clickable="true"
+    android:focusable="true">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <CheckBox
             android:id="@+id/checkbox_completed"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:buttonTint="@color/white"
-            app:layout_constraintTop_toTopOf="@id/text_title"
-            app:layout_constraintBottom_toBottomOf="@id/text_description"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/nothing_white" />
 
-        <TextView
-            android:id="@+id/text_title"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="16dp"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/checkbox_completed"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Assignment" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/nothing_white"
+                tools:text="Assignment" />
+
+            <TextView
+                android:id="@+id/text_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="14sp"
+                android:textColor="@color/nothing_gray"
+                android:visibility="gone"
+                tools:text="Complete the project documentation" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Priority and Reminder Row -->
+    <LinearLayout
+        android:id="@+id/details_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:visibility="gone">
 
         <TextView
-            android:id="@+id/text_description"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintEnd_toEndOf="@id/text_title"
-            app:layout_constraintStart_toStartOf="@id/text_title"
-            app:layout_constraintTop_toBottomOf="@id/text_title"
-            tools:text="Se6899" />
-
-        <!-- DEFINITIVE FIX: Using a Flow helper to robustly handle the layout -->
-        <androidx.constraintlayout.helper.widget.Flow
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:constraint_referenced_ids="chip_priority,text_reminder"
-            app:flow_horizontalGap="8dp"
-            app:flow_wrapMode="chain"
-            app:flow_horizontalStyle="packed"
-            app:flow_horizontalAlign="start"
-            app:layout_constraintStart_toStartOf="@id/text_description"
-            app:layout_constraintTop_toBottomOf="@id/text_description" />
-
-        <com.google.android.material.chip.Chip
             android:id="@+id/chip_priority"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#E57373"
+            android:background="@drawable/nothing_priority_chip"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
             android:textSize="12sp"
-            app:chipBackgroundColor="#2C1E1E"
-            app:chipCornerRadius="8dp"
-            app:chipMinHeight="24dp"
-            app:chipStrokeColor="#E57373"
-            app:chipStrokeWidth="1dp"
+            android:textStyle="bold"
+            android:textColor="@color/nothing_white"
             tools:text="HIGH" />
 
         <TextView
             android:id="@+id/text_reminder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawablePadding="8dp"
-            android:gravity="center"
-            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-            android:textColor="@color/text_secondary"
+            android:layout_marginStart="12dp"
+            android:drawablePadding="6dp"
+            android:textSize="12sp"
+            android:textColor="@color/nothing_gray"
+            android:gravity="center_vertical"
             app:drawableStartCompat="@drawable/ic_alarm"
-            app:drawableTint="@color/text_secondary"
+            app:drawableTint="@color/nothing_gray"
             tools:text="Nov 15, 15:12" />
+    </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>

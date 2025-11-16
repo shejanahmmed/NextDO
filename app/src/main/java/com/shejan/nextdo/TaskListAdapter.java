@@ -22,6 +22,7 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
     public interface OnTaskInteractionListener {
         void onTaskCompleted(Task task, boolean isCompleted);
         void onTaskClicked(Task task);
+        void onTaskLongClicked(Task task);
     }
 
     public TaskListAdapter(@NonNull DiffUtil.ItemCallback<Task> diffCallback, OnTaskInteractionListener listener) {
@@ -72,23 +73,43 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
         }
 
         public void bind(final Task task, final OnTaskInteractionListener listener) {
-            binding.textTitle.setText(task.title != null ? task.title : "");
-            binding.textDescription.setText(task.description != null ? task.description : "");
-
-            if (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) {
-                binding.chipPriority.setText(task.priority);
-                binding.chipPriority.setVisibility(View.VISIBLE);
-            } else {
-                binding.chipPriority.setVisibility(View.GONE);
+            if (task == null) return;
+            
+            if (binding.textTitle != null) {
+                binding.textTitle.setText(task.title != null ? task.title : "");
+            }
+            
+            if (binding.textDescription != null) {
+                binding.textDescription.setText(task.description != null ? task.description : "");
+                binding.textDescription.setVisibility(task.description != null && !task.description.isEmpty() ? View.VISIBLE : View.GONE);
             }
 
-            if (task.reminderTime > 0) {
-                // DEFINITIVE FIX: Use a custom format that omits seconds.
-                SimpleDateFormat sdf = new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
-                binding.textReminder.setText(sdf.format(task.reminderTime));
-                binding.textReminder.setVisibility(View.VISIBLE);
-            } else {
-                binding.textReminder.setVisibility(View.GONE);
+            if (binding.chipPriority != null) {
+                if (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) {
+                    binding.chipPriority.setText(task.priority);
+                    binding.chipPriority.setVisibility(View.VISIBLE);
+                } else {
+                    binding.chipPriority.setVisibility(View.GONE);
+                }
+            }
+
+            if (binding.textReminder != null) {
+                if (task.reminderTime > 0) {
+                    try {
+                        SimpleDateFormat sdf = new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
+                        binding.textReminder.setText(sdf.format(task.reminderTime));
+                        binding.textReminder.setVisibility(View.VISIBLE);
+                    } catch (Exception e) {
+                        binding.textReminder.setVisibility(View.GONE);
+                    }
+                } else {
+                    binding.textReminder.setVisibility(View.GONE);
+                }
+            }
+            
+            if (binding.detailsLayout != null) {
+                boolean hasDetails = (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) || task.reminderTime > 0;
+                binding.detailsLayout.setVisibility(hasDetails ? View.VISIBLE : View.GONE);
             }
 
             binding.checkboxCompleted.setOnCheckedChangeListener(null);
@@ -103,6 +124,14 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
                 if (listener != null) {
                     listener.onTaskClicked(task);
                 }
+            });
+
+            itemView.setOnLongClickListener(v -> {
+                if (listener != null) {
+                    listener.onTaskLongClicked(task);
+                    return true;
+                }
+                return false;
             });
         }
     }

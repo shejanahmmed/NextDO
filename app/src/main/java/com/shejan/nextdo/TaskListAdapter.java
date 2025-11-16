@@ -77,12 +77,29 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             
             if (binding.textTitle != null) {
                 binding.textTitle.setText(task.title != null ? task.title : "");
+                if (task.isCompleted) {
+                    binding.textTitle.setPaintFlags(binding.textTitle.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+                    binding.textTitle.setAlpha(0.6f);
+                } else {
+                    binding.textTitle.setPaintFlags(binding.textTitle.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+                    binding.textTitle.setAlpha(1.0f);
+                }
             }
             
             if (binding.textDescription != null) {
                 binding.textDescription.setText(task.description != null ? task.description : "");
                 binding.textDescription.setVisibility(task.description != null && !task.description.isEmpty() ? View.VISIBLE : View.GONE);
+                if (task.isCompleted) {
+                    binding.textDescription.setPaintFlags(binding.textDescription.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+                    binding.textDescription.setAlpha(0.6f);
+                } else {
+                    binding.textDescription.setPaintFlags(binding.textDescription.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+                    binding.textDescription.setAlpha(1.0f);
+                }
             }
+            
+            // DEFINITIVE FIX: Removing conditional styling for completed tasks.
+            binding.getRoot().setBackground(androidx.core.content.ContextCompat.getDrawable(binding.getRoot().getContext(), R.drawable.nothing_card_bg));
 
             if (binding.chipPriority != null) {
                 if (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) {

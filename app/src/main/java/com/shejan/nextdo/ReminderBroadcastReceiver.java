@@ -24,23 +24,44 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
         Intent mainIntent = new Intent(context, MainActivity.class);
         mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, taskId, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        
+        Intent deleteIntent = new Intent(context, NotificationDismissReceiver.class);
+        deleteIntent.putExtra(EXTRA_TASK_TITLE, taskTitle);
+        deleteIntent.putExtra("task_description", taskDescription);
+        deleteIntent.putExtra(EXTRA_TASK_ID, taskId);
+        PendingIntent deletePendingIntent = PendingIntent.getBroadcast(context, taskId + 10000, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         String contentText = taskTitle != null ? taskTitle : "You have a reminder";
         if (taskDescription != null && !taskDescription.isEmpty()) {
             contentText = taskTitle + ": " + taskDescription;
         }
 
+        android.content.SharedPreferences prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
+        boolean vibrationEnabled = prefs.getBoolean("vibration", true);
+        boolean soundEnabled = prefs.getBoolean("sound", true);
+        boolean persistentEnabled = prefs.getBoolean("persistent_notifications", false);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NotificationHelper.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_alarm)
                 .setContentTitle("NextDO Reminder")
                 .setContentText(contentText)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setAutoCancel(!persistentEnabled)
+                .setOngoing(persistentEnabled)
+                .setOnlyAlertOnce(false)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        if (persistentEnabled) {
+            builder.setDeleteIntent(deletePendingIntent);
+        }
+
+        int defaults = NotificationCompat.DEFAULT_LIGHTS;
+        if (soundEnabled) defaults |= NotificationCompat.DEFAULT_SOUND;
+        if (vibrationEnabled) defaults |= NotificationCompat.DEFAULT_VIBRATE;
+        builder.setDefaults(defaults);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 

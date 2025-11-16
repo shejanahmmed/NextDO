@@ -24,6 +24,9 @@
             android:name=".ReminderBroadcastReceiver"
             android:enabled="true" />
         <receiver
+            android:name=".NotificationDismissReceiver"
+            android:enabled="true" />
+        <receiver
             android:name=".BootCompletedReceiver"
             android:enabled="true"
             android:exported="true">

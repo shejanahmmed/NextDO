@@ -21,6 +21,9 @@ public class NotificationHelper {
             channel.enableVibration(true);
             channel.setShowBadge(true);
             channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                channel.setBlockable(false);
+            }
             
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             if (notificationManager != null) {

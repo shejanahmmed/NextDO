@@ -43,40 +43,79 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setupThemeSettings() {
-        if (binding.themeRadioGroup == null) return;
-        
         String currentTheme = sharedPreferences.getString("theme", "dark");
-        if ("light".equals(currentTheme)) {
-            binding.themeRadioGroup.check(R.id.light_theme_button);
-        } else if ("system".equals(currentTheme)) {
-            binding.themeRadioGroup.check(R.id.system_theme_button);
-        } else {
-            binding.themeRadioGroup.check(R.id.dark_theme_button);
-        }
-
-        binding.themeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            try {
-                String themeValue;
-                if (checkedId == R.id.light_theme_button) {
-                    themeValue = "light";
-                } else if (checkedId == R.id.dark_theme_button) {
-                    themeValue = "dark";
-                } else {
-                    themeValue = "system";
+        updateCurrentThemeText(currentTheme);
+        
+        if (binding.appearanceButton != null) {
+            binding.appearanceButton.setOnClickListener(v -> {
+                String[] themeOptions = {"Light", "Dark", "System"};
+                String[] themeValues = {"light", "dark", "system"};
+                
+                int selectedIndex = 1; // Default to dark
+                for (int i = 0; i < themeValues.length; i++) {
+                    if (themeValues[i].equals(currentTheme)) {
+                        selectedIndex = i;
+                        break;
+                    }
                 }
-                sharedPreferences.edit().putString("theme", themeValue).apply();
-                recreate();
-            } catch (Exception e) {
-                // Handle theme change failure
-            }
-        });
+                
+                new AlertDialog.Builder(this)
+                        .setTitle("Choose Theme")
+                        .setSingleChoiceItems(themeOptions, selectedIndex, (dialog, which) -> {
+                            String selectedTheme = themeValues[which];
+                            sharedPreferences.edit().putString("theme", selectedTheme).apply();
+                            updateCurrentThemeText(selectedTheme);
+                            dialog.dismiss();
+                            recreate();
+                        })
+                        .show();
+            });
+        }
+    }
+    
+    private void updateCurrentThemeText(String theme) {
+        if (binding.currentThemeText != null) {
+            String displayText = "Dark";
+            if ("light".equals(theme)) displayText = "Light";
+            else if ("system".equals(theme)) displayText = "System";
+            binding.currentThemeText.setText(displayText);
+        }
     }
 
     private void setupNotificationSettings() {
         if (binding.notificationsSwitch != null) {
             binding.notificationsSwitch.setChecked(sharedPreferences.getBoolean("notifications", true));
             binding.notificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.switch_animation);
+                binding.notificationsSwitch.startAnimation(animation);
                 sharedPreferences.edit().putBoolean("notifications", isChecked).apply();
+            });
+        }
+
+        if (binding.soundSwitch != null) {
+            binding.soundSwitch.setChecked(sharedPreferences.getBoolean("sound", true));
+            binding.soundSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.switch_animation);
+                binding.soundSwitch.startAnimation(animation);
+                sharedPreferences.edit().putBoolean("sound", isChecked).apply();
+            });
+        }
+
+        if (binding.vibrationSwitch != null) {
+            binding.vibrationSwitch.setChecked(sharedPreferences.getBoolean("vibration", true));
+            binding.vibrationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.switch_animation);
+                binding.vibrationSwitch.startAnimation(animation);
+                sharedPreferences.edit().putBoolean("vibration", isChecked).apply();
+            });
+        }
+
+        if (binding.persistentNotificationsSwitch != null) {
+            binding.persistentNotificationsSwitch.setChecked(sharedPreferences.getBoolean("persistent_notifications", false));
+            binding.persistentNotificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.switch_animation);
+                binding.persistentNotificationsSwitch.startAnimation(animation);
+                sharedPreferences.edit().putBoolean("persistent_notifications", isChecked).apply();
             });
         }
 

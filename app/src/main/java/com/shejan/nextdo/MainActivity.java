@@ -114,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
         if (binding.fab != null) {
             binding.fab.setOnClickListener(view -> {
+                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fab_click_animation);
+                binding.fab.startAnimation(animation);
                 Intent intent = new Intent(MainActivity.this, NewTaskActivity.class);
                 taskActivityLauncher.launch(intent);
             });
@@ -223,6 +225,11 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     public void onTaskCompleted(Task task, boolean isCompleted) {
         task.isCompleted = isCompleted;
         taskViewModel.update(task);
+        
+        if (isCompleted) {
+            androidx.core.app.NotificationManagerCompat notificationManager = androidx.core.app.NotificationManagerCompat.from(this);
+            notificationManager.cancel(task.id);
+        }
     }
 
     @Override

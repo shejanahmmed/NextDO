@@ -129,9 +129,8 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             itemView.setOnLongClickListener(v -> {
                 if (listener != null) {
                     listener.onTaskLongClicked(task);
-                    return true;
                 }
-                return false;
+                return true;
             });
         }
     }

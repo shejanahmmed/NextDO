@@ -2,8 +2,14 @@
 <resources>
     <style name="NothingDialog" parent="Theme.MaterialComponents.Dialog.Alert">
         <item name="android:windowBackground">@drawable/nothing_dialog_bg</item>
-        <item name="android:textColor">@color/nothing_white</item>
-        <item name="colorPrimary">@color/nothing_white</item>
-        <item name="colorAccent">@color/nothing_white</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnSurface</item>
+        <item name="colorPrimary">?attr/colorPrimary</item>
+        <item name="colorAccent">?attr/colorPrimary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:layout_margin">24dp</item>
+        <item name="android:padding">8dp</item>
     </style>
 </resources>

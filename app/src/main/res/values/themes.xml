@@ -3,9 +3,12 @@
     <!-- DEFINITIVE FIX: Using a dedicated preferenceTheme to force correct text color -->
     <style name="Theme.NextDO" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimary">@color/light_accent</item>
         <item name="colorPrimaryVariant">@color/light_background</item>
         <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSurface">@color/light_surface</item>
+        <item name="colorOnSurface">@color/light_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/light_on_surface_variant</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/light_accent</item>
         <item name="colorOnSecondary">@color/white</item>
@@ -17,6 +20,9 @@
 
         <!-- Set status bar icon color to dark -->
         <item name="android:windowLightStatusBar">true</item>
+        <!-- Navigation bar color -->
+        <item name="android:navigationBarColor">@color/light_background</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
 
         <!-- Apply the custom theme to the settings screen -->
         <item name="preferenceTheme">@style/App.Preference.Theme</item>

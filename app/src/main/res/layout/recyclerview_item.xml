@@ -8,8 +8,7 @@
     android:background="@drawable/nothing_card_bg"
     android:padding="20dp"
     android:layout_marginBottom="16dp"
-    android:clickable="true"
-    android:focusable="true">
+>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,7 +20,7 @@
             android:id="@+id/checkbox_completed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:buttonTint="@color/nothing_white" />
+            android:buttonTint="#34C759" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -36,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/nothing_white"
+                android:textColor="?attr/colorOnSurface"
                 tools:text="Assignment" />
 
             <TextView
@@ -45,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:textSize="14sp"
-                android:textColor="@color/nothing_gray"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:visibility="gone"
                 tools:text="Complete the project documentation" />
 
@@ -71,7 +70,7 @@
             android:paddingVertical="4dp"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:textColor="@color/nothing_white"
+            android:textColor="?attr/colorOnSurface"
             tools:text="HIGH" />
 
         <TextView
@@ -81,10 +80,10 @@
             android:layout_marginStart="12dp"
             android:drawablePadding="6dp"
             android:textSize="12sp"
-            android:textColor="@color/nothing_gray"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:gravity="center_vertical"
             app:drawableStartCompat="@drawable/ic_alarm"
-            app:drawableTint="@color/nothing_gray"
+            app:drawableTint="?attr/colorOnSurfaceVariant"
             tools:text="Nov 15, 15:12" />
     </LinearLayout>
 

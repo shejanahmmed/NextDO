@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/nothing_black"
+    android:background="?android:attr/windowBackground"
     tools:context=".SettingsActivity">
 
     <!-- Back arrow -->
@@ -18,6 +18,7 @@
         android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="?attr/colorOnSurface"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,23 +28,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Settings"
-        android:textSize="32sp"
+        android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@color/nothing_white"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/back_arrow" />
+        android:textColor="?attr/colorOnSurface"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toEndOf="@id/back_arrow"
+        app:layout_constraintTop_toTopOf="@id/back_arrow"
+        app:layout_constraintBottom_toBottomOf="@id/back_arrow" />
 
-    <!-- Nothing-style red dot accent -->
-    <View
-        android:layout_width="8dp"
-        android:layout_height="8dp"
-        android:background="@drawable/nothing_dot"
-        android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@id/settings_title"
-        app:layout_constraintTop_toTopOf="@id/settings_title"
-        app:layout_constraintBottom_toBottomOf="@id/settings_title" />
+
 
     <ScrollView
         android:layout_width="0dp"
@@ -75,7 +68,7 @@
                     android:text="Appearance"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="@color/nothing_white"
+                    android:textColor="?attr/colorOnSurface"
                     android:layout_marginBottom="16dp" />
 
                 <RadioGroup
@@ -89,8 +82,8 @@
                         android:layout_height="48dp"
                         android:text="Light"
                         android:textSize="16sp"
-                        android:textColor="@color/nothing_white"
-                        android:buttonTint="@color/nothing_white"
+                        android:textColor="?attr/colorOnSurface"
+                        android:buttonTint="?attr/colorPrimary"
                         android:paddingStart="8dp" />
 
                     <RadioButton
@@ -99,8 +92,8 @@
                         android:layout_height="48dp"
                         android:text="Dark"
                         android:textSize="16sp"
-                        android:textColor="@color/nothing_white"
-                        android:buttonTint="@color/nothing_white"
+                        android:textColor="?attr/colorOnSurface"
+                        android:buttonTint="?attr/colorPrimary"
                         android:paddingStart="8dp" />
 
                     <RadioButton
@@ -109,8 +102,8 @@
                         android:layout_height="48dp"
                         android:text="System"
                         android:textSize="16sp"
-                        android:textColor="@color/nothing_white"
-                        android:buttonTint="@color/nothing_white"
+                        android:textColor="?attr/colorOnSurface"
+                        android:buttonTint="?attr/colorPrimary"
                         android:paddingStart="8dp" />
                 </RadioGroup>
             </LinearLayout>
@@ -130,7 +123,7 @@
                     android:text="Notifications"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="@color/nothing_white"
+                    android:textColor="?attr/colorOnSurface"
                     android:layout_marginBottom="16dp" />
 
                 <LinearLayout
@@ -145,20 +138,20 @@
                         android:layout_weight="1"
                         android:text="Enable notifications"
                         android:textSize="16sp"
-                        android:textColor="@color/nothing_white" />
+                        android:textColor="?attr/colorOnSurface" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/notifications_switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:thumbTint="@color/white"
-                        app:trackTint="@color/nothing_white" />
+                        app:thumbTint="#FFFFFF"
+                        app:trackTint="#34C759" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/nothing_gray"
+                    android:background="?attr/colorOnSurface"
                     android:alpha="0.2"
                     android:layout_marginVertical="16dp" />
 
@@ -178,14 +171,14 @@
                         android:layout_weight="1"
                         android:text="Snooze duration"
                         android:textSize="16sp"
-                        android:textColor="@color/nothing_white" />
+                        android:textColor="?attr/colorOnSurface" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="›"
                         android:textSize="20sp"
-                        android:textColor="@color/nothing_gray" />
+                        android:textColor="?attr/colorOnSurface" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
@@ -206,7 +199,7 @@
             android:layout_height="wrap_content"
             android:text="Made by Shejan"
             android:textSize="14sp"
-            android:textColor="@color/nothing_gray"
+            android:textColor="?attr/colorOnSurface"
             android:layout_marginBottom="12dp" />
 
         <LinearLayout
@@ -221,6 +214,7 @@
                 android:layout_height="24dp"
                 android:layout_marginHorizontal="12dp"
                 android:src="@drawable/ic_github"
+                app:tint="?attr/colorOnSurface"
                 android:clickable="true"
                 android:focusable="true" />
 
@@ -230,6 +224,7 @@
                 android:layout_height="24dp"
                 android:layout_marginHorizontal="12dp"
                 android:src="@drawable/ic_instagram"
+                app:tint="?attr/colorOnSurface"
                 android:clickable="true"
                 android:focusable="true" />
 
@@ -239,6 +234,7 @@
                 android:layout_height="24dp"
                 android:layout_marginHorizontal="12dp"
                 android:src="@drawable/ic_linkedin"
+                app:tint="?attr/colorOnSurface"
                 android:clickable="true"
                 android:focusable="true" />
         </LinearLayout>

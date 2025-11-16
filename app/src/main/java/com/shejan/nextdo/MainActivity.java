@@ -119,7 +119,17 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
             });
         }
 
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return false;
+            }
+            
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+                return true;
+            }
             private final Paint textPaint = new Paint();
             private final ColorDrawable background = new ColorDrawable();
 
@@ -164,7 +174,8 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                 }
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
             }
-        }).attachToRecyclerView(binding.recyclerview);
+        });
+        itemTouchHelper.attachToRecyclerView(binding.recyclerview);
     }
 
     private void setupSettingsButton() {
@@ -237,25 +248,17 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         
         String[] options = {"Edit", "Delete"};
         
-        try {
-            new androidx.appcompat.app.AlertDialog.Builder(this, R.style.NothingDialog)
-                    .setItems(options, (dialog, which) -> {
-                        if (which == 0) {
-                            // Edit
-                            onTaskClicked(task);
-                        } else {
-                            // Delete
-                            taskViewModel.delete(task);
-                            if (binding.getRoot() != null) {
-                                com.google.android.material.snackbar.Snackbar.make(binding.getRoot(), "Task deleted", com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
-                                        .setAction("Undo", v -> taskViewModel.insert(task))
-                                        .show();
-                            }
-                        }
-                    })
-                    .show();
-        } catch (Exception e) {
-            // Handle dialog creation failure
-        }
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        onTaskClicked(task);
+                    } else {
+                        taskViewModel.delete(task);
+                        Snackbar.make(binding.getRoot(), "Task deleted", Snackbar.LENGTH_LONG)
+                                .setAction("Undo", v -> taskViewModel.insert(task))
+                                .show();
+                    }
+                })
+                .show();
     }
 }

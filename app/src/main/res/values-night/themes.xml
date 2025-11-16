@@ -6,6 +6,9 @@
         <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryVariant">@color/black</item>
         <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnSurfaceVariant">@color/nothing_gray</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/dark_accent</item>
         <item name="colorOnSecondary">@color/black</item>

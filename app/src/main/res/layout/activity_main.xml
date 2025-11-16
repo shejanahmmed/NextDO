@@ -21,15 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Nothing-style white dot accent -->
-    <View
-        android:layout_width="8dp"
-        android:layout_height="8dp"
-        android:background="@drawable/nothing_dot"
-        android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@id/main_title"
-        app:layout_constraintTop_toTopOf="@id/main_title"
-        app:layout_constraintBottom_toBottomOf="@id/main_title" />
+
 
     <!-- Settings icon -->
     <ImageView
@@ -41,6 +33,7 @@
         android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="?attr/colorOnSurface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/main_title"
         app:layout_constraintBottom_toBottomOf="@id/main_title" />
@@ -94,8 +87,9 @@
         android:layout_height="56dp"
         android:layout_margin="24dp"
         android:background="@drawable/nothing_fab_bg"
+        android:backgroundTint="#34C759"
         android:text="+"
-        android:textColor="?attr/colorOnPrimary"
+        android:textColor="#FFFFFF"
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"

@@ -10,6 +10,15 @@ NextDO is a minimal to do app that helps you stay organized and on time. You can
 - Smooth performance  
 - Built with Java for Android
 
+## Screenshots
+
+<p float="left">
+  <img src="https://github.com/user-attachments/assets/c4bc33de-207e-4430-ae2d-9ff4397d4828" width="200" />
+  <img src="https://github.com/user-attachments/assets/4e6b5234-5bdd-481f-8e59-a5f8f992e5f2" width="200" />
+  <img src="https://github.com/user-attachments/assets/d69608ab-4d1c-4eb7-9715-97f65de1e809" width="200" />
+  <img src="https://github.com/user-attachments/assets/a5505413-41fe-43af-a7c8-428ba1212e42" width="200" />
+</p>
+
 ## Installation
 You can download the latest APK from the **Releases** section of this repository  
 Just install it on your Android device and start using it right away

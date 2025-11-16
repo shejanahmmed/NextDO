@@ -3,12 +3,20 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#FF888888</color>
+    <color name="text_secondary">#B3FFFFFF</color>
 
+    <!-- Nothing-inspired colors -->
+    <color name="nothing_white">#FFFFFF</color>
+    <color name="nothing_gray">#808080</color>
+    <color name="nothing_light_gray">#F5F5F5</color>
+    <color name="nothing_dark_gray">#1A1A1A</color>
+    <color name="nothing_black">#000000</color>
+    
     <!-- Dark Theme Colors -->
     <color name="dark_primary">#FFFFFFFF</color>
     <color name="dark_on_primary">#FF000000</color>
     <color name="dark_background">#FF000000</color>
-    <color name="dark_surface">#FF1C1C1E</color>
+    <color name="dark_surface">#FF121212</color>
     <color name="dark_accent">#FF7B54E8</color>
 
     <!-- Light Theme Colors -->

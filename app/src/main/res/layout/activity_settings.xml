@@ -4,75 +4,244 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground"
+    android:background="@color/nothing_black"
     tools:context=".SettingsActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Settings"
-        app:titleTextColor="?attr/colorPrimary" />
-
-    <FrameLayout
-        android:id="@+id/settings_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/footer_layout"
-        app:layout_constraintEnd_toEndOf="parent"
+    <!-- Back arrow -->
+    <ImageView
+        android:id="@+id/back_arrow"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_arrow_back"
+        android:layout_marginTop="48dp"
+        android:layout_marginStart="24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/footer_layout"
+    <!-- Nothing-style minimal header -->
+    <TextView
+        android:id="@+id/settings_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:layout_marginBottom="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Settings"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="@color/nothing_white"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/back_arrow" />
+
+    <!-- Nothing-style red dot accent -->
+    <View
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:background="@drawable/nothing_dot"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/settings_title"
+        app:layout_constraintTop_toTopOf="@id/settings_title"
+        app:layout_constraintBottom_toBottomOf="@id/settings_title" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@id/settings_title"
+        app:layout_constraintBottom_toTopOf="@id/footer_layout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp">
+
+            <!-- Theme Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/nothing_card_bg"
+                android:padding="20dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Appearance"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/nothing_white"
+                    android:layout_marginBottom="16dp" />
+
+                <RadioGroup
+                    android:id="@+id/theme_radio_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/light_theme_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Light"
+                        android:textSize="16sp"
+                        android:textColor="@color/nothing_white"
+                        android:buttonTint="@color/nothing_white"
+                        android:paddingStart="8dp" />
+
+                    <RadioButton
+                        android:id="@+id/dark_theme_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Dark"
+                        android:textSize="16sp"
+                        android:textColor="@color/nothing_white"
+                        android:buttonTint="@color/nothing_white"
+                        android:paddingStart="8dp" />
+
+                    <RadioButton
+                        android:id="@+id/system_theme_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="System"
+                        android:textSize="16sp"
+                        android:textColor="@color/nothing_white"
+                        android:buttonTint="@color/nothing_white"
+                        android:paddingStart="8dp" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <!-- Notifications Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/nothing_card_bg"
+                android:padding="20dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Notifications"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/nothing_white"
+                    android:layout_marginBottom="16dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Enable notifications"
+                        android:textSize="16sp"
+                        android:textColor="@color/nothing_white" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/notifications_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:thumbTint="@color/white"
+                        app:trackTint="@color/nothing_white" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/nothing_gray"
+                    android:alpha="0.2"
+                    android:layout_marginVertical="16dp" />
+
+                <LinearLayout
+                    android:id="@+id/snooze_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Snooze duration"
+                        android:textSize="16sp"
+                        android:textColor="@color/nothing_white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textSize="20sp"
+                        android:textColor="@color/nothing_gray" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Nothing-style minimal footer -->
+    <LinearLayout
+        android:id="@+id/footer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
         <TextView
-            android:id="@+id/made_by_shejan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Made by Shejan"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/gray" />
+            android:textSize="14sp"
+            android:textColor="@color/nothing_gray"
+            android:layout_marginBottom="12dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp">
+            android:gravity="center">
 
             <ImageView
                 android:id="@+id/github_icon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:padding="12dp"
-                android:src="@drawable/ic_github" />
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginHorizontal="12dp"
+                android:src="@drawable/ic_github"
+                android:clickable="true"
+                android:focusable="true" />
 
             <ImageView
                 android:id="@+id/instagram_icon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:padding="12dp"
-                android:src="@drawable/ic_instagram" />
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginHorizontal="12dp"
+                android:src="@drawable/ic_instagram"
+                android:clickable="true"
+                android:focusable="true" />
 
             <ImageView
                 android:id="@+id/linkedin_icon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:padding="12dp"
-                android:src="@drawable/ic_linkedin" />
-
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginHorizontal="12dp"
+                android:src="@drawable/ic_linkedin"
+                android:clickable="true"
+                android:focusable="true" />
         </LinearLayout>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,20 +12,18 @@ import android.widget.AutoCompleteTextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
 import com.shejan.nextdo.databinding.ActivityNewTaskBinding;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import java.util.Locale;
 
+// DEFINITIVE FIX: Correctly managing the unique alarmId for every task.
 public class NewTaskActivity extends AppCompatActivity {
 
     public static final String EXTRA_ID = "com.shejan.nextdo.ID";
+    public static final String EXTRA_ALARM_ID = "com.shejan.nextdo.ALARM_ID";
     public static final String EXTRA_TITLE = "com.shejan.nextdo.TITLE";
     public static final String EXTRA_DESCRIPTION = "com.shejan.nextdo.DESCRIPTION";
     public static final String EXTRA_PRIORITY = "com.shejan.nextdo.PRIORITY";
@@ -35,7 +33,9 @@ public class NewTaskActivity extends AppCompatActivity {
 
     private ActivityNewTaskBinding binding;
     private Calendar calendar = Calendar.getInstance();
-    private int taskId = -1;
+    private int taskId = 0;
+    private int alarmId = 0;
+    private AlarmScheduler alarmScheduler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +50,8 @@ public class NewTaskActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
+        alarmScheduler = new AlarmScheduler(this);
+
         ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, getResources().getStringArray(R.array.priority_array));
         ((AutoCompleteTextView) binding.priorityAutoCompleteTextView).setAdapter(priorityAdapter);
 
@@ -62,7 +64,8 @@ public class NewTaskActivity extends AppCompatActivity {
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setTitle("Edit Todo");
             }
-            taskId = intent.getIntExtra(EXTRA_ID, -1);
+            taskId = intent.getIntExtra(EXTRA_ID, 0);
+            alarmId = intent.getIntExtra(EXTRA_ALARM_ID, 0);
             String title = intent.getStringExtra(EXTRA_TITLE);
             String description = intent.getStringExtra(EXTRA_DESCRIPTION);
 
@@ -103,18 +106,29 @@ public class NewTaskActivity extends AppCompatActivity {
                 String repeat = ((AutoCompleteTextView) binding.repeatAutoCompleteTextView).getText().toString();
                 long reminderTime = calendar.getTimeInMillis();
 
-                if (taskId != -1) {
-                    replyIntent.putExtra(EXTRA_ID, taskId);
+                Task task = new Task();
+                if (taskId != 0) {
+                    task.id = taskId;
                 }
+                if (alarmId == 0 && reminderTime > System.currentTimeMillis()) {
+                    alarmId = (int) System.currentTimeMillis(); // Generate a new unique ID
+                }
+                task.alarmId = alarmId;
+                task.title = title;
+                task.description = description;
+                task.priority = priority;
+                task.reminderTime = reminderTime;
+                task.repeat = repeat;
+
+                alarmScheduler.schedule(task);
+
+                replyIntent.putExtra(EXTRA_ID, task.id);
+                replyIntent.putExtra(EXTRA_ALARM_ID, task.alarmId);
                 replyIntent.putExtra(EXTRA_TITLE, title);
                 replyIntent.putExtra(EXTRA_DESCRIPTION, description);
                 replyIntent.putExtra(EXTRA_PRIORITY, priority);
                 replyIntent.putExtra(EXTRA_REMINDER_TIME, reminderTime);
                 replyIntent.putExtra(EXTRA_REPEAT, repeat);
-
-                if (reminderTime > System.currentTimeMillis()) {
-                    scheduleReminder(title, reminderTime, taskId != -1 ? taskId : (int) System.currentTimeMillis());
-                }
 
                 setResult(RESULT_OK, replyIntent);
             }
@@ -124,7 +138,7 @@ public class NewTaskActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (taskId != -1) {
+        if (taskId != 0) {
             getMenuInflater().inflate(R.menu.menu_edit_task, menu);
         }
         return true;
@@ -134,7 +148,13 @@ public class NewTaskActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_delete) {
             Intent replyIntent = new Intent();
-            replyIntent.putExtra(EXTRA_ID, taskId);
+            if (taskId != 0) {
+                Task task = new Task();
+                task.id = taskId;
+                task.alarmId = alarmId;
+                alarmScheduler.cancel(task);
+                replyIntent.putExtra(EXTRA_ID, taskId);
+            }
             setResult(RESULT_DELETE, replyIntent);
             finish();
             return true;
@@ -164,29 +184,14 @@ public class NewTaskActivity extends AppCompatActivity {
                 (view, hourOfDay, minute) -> {
                     calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     calendar.set(Calendar.MINUTE, minute);
+                    calendar.set(Calendar.SECOND, 0);
                     updateReminderTimeText();
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
         timePickerDialog.show();
     }
 
     private void updateReminderTimeText() {
-        DateFormat dateFormat = DateFormat.getDateTimeInstance();
-        binding.textReminderTime.setText(dateFormat.format(calendar.getTime()));
-    }
-
-    private void scheduleReminder(String taskTitle, long reminderTime, int taskId) {
-        long delay = reminderTime - System.currentTimeMillis();
-
-        Data data = new Data.Builder()
-                .putString(ReminderWorker.TASK_TITLE, taskTitle)
-                .putInt(ReminderWorker.TASK_ID, taskId)
-                .build();
-
-        OneTimeWorkRequest reminderWorkRequest = new OneTimeWorkRequest.Builder(ReminderWorker.class)
-                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                .setInputData(data)
-                .build();
-
-        WorkManager.getInstance(this).enqueue(reminderWorkRequest);
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
+        binding.textReminderTime.setText(sdf.format(calendar.getTime()));
     }
 }

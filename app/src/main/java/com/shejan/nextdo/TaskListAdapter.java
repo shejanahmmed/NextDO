@@ -3,6 +3,7 @@ package com.shejan.nextdo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
@@ -10,7 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.shejan.nextdo.databinding.RecyclerviewItemBinding;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.Objects;
 
 public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewHolder> {
@@ -73,7 +75,7 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             binding.textTitle.setText(task.title != null ? task.title : "");
             binding.textDescription.setText(task.description != null ? task.description : "");
 
-            if (task.priority != null && !task.priority.equals("NONE")) {
+            if (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) {
                 binding.chipPriority.setText(task.priority);
                 binding.chipPriority.setVisibility(View.VISIBLE);
             } else {
@@ -81,8 +83,9 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             }
 
             if (task.reminderTime > 0) {
-                DateFormat dateFormat = DateFormat.getDateTimeInstance();
-                binding.textReminder.setText(dateFormat.format(task.reminderTime));
+                // DEFINITIVE FIX: Use a custom format that omits seconds.
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
+                binding.textReminder.setText(sdf.format(task.reminderTime));
                 binding.textReminder.setVisibility(View.VISIBLE);
             } else {
                 binding.textReminder.setVisibility(View.GONE);

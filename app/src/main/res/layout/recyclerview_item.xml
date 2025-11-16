@@ -8,11 +8,11 @@
     android:layout_marginEnd="16dp"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="8dp"
-    app:cardBackgroundColor="#1C1C1E"
-    app:cardCornerRadius="24dp"
+    app:cardBackgroundColor="@color/dark_background"
+    app:cardCornerRadius="8dp"
     app:cardElevation="0dp"
-    app:strokeColor="#4A4A4A"
-    app:strokeWidth="1dp">
+    app:strokeColor="@color/white"
+    app:strokeWidth="2dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -24,19 +24,19 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:buttonTint="@color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/text_description"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/text_title" />
+            app:layout_constraintTop_toTopOf="@id/text_title"
+            app:layout_constraintBottom_toBottomOf="@id/text_description"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/text_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:layout_marginStart="16dp"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/checkbox_completed"
+            app:layout_constraintStart_toEndOf="@id/checkbox_completed"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Assignment" />
 
@@ -46,42 +46,48 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/gray"
-            app:layout_constraintEnd_toEndOf="@+id/text_title"
-            app:layout_constraintStart_toStartOf="@+id/text_title"
-            app:layout_constraintTop_toBottomOf="@+id/text_title"
-            tools:text="SE111" />
+            android:textColor="@color/text_secondary"
+            app:layout_constraintEnd_toEndOf="@id/text_title"
+            app:layout_constraintStart_toStartOf="@id/text_title"
+            app:layout_constraintTop_toBottomOf="@id/text_title"
+            tools:text="Se6899" />
+
+        <!-- DEFINITIVE FIX: Using a Flow helper to robustly handle the layout -->
+        <androidx.constraintlayout.helper.widget.Flow
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:constraint_referenced_ids="chip_priority,text_reminder"
+            app:flow_horizontalGap="8dp"
+            app:flow_wrapMode="chain"
+            app:flow_horizontalStyle="packed"
+            app:flow_horizontalAlign="start"
+            app:layout_constraintStart_toStartOf="@id/text_description"
+            app:layout_constraintTop_toBottomOf="@id/text_description" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_priority"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:textColor="#E57373"
             android:textSize="12sp"
-            app:chipBackgroundColor="@android:color/transparent"
+            app:chipBackgroundColor="#2C1E1E"
             app:chipCornerRadius="8dp"
             app:chipMinHeight="24dp"
             app:chipStrokeColor="#E57373"
             app:chipStrokeWidth="1dp"
-            app:layout_constraintStart_toStartOf="@+id/text_description"
-            app:layout_constraintTop_toBottomOf="@+id/text_description"
             tools:text="HIGH" />
 
         <TextView
             android:id="@+id/text_reminder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:drawablePadding="8dp"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-            android:textColor="@color/gray"
+            android:textColor="@color/text_secondary"
             app:drawableStartCompat="@drawable/ic_alarm"
-            app:drawableTint="@color/gray"
-            app:layout_constraintBottom_toBottomOf="@+id/chip_priority"
-            app:layout_constraintStart_toEndOf="@+id/chip_priority"
-            app:layout_constraintTop_toTopOf="@+id/chip_priority"
+            app:drawableTint="@color/text_secondary"
             tools:text="Nov 15, 15:12" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

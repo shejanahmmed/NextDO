@@ -13,4 +13,5 @@ public class Task {
     public long reminderTime = 0;
     public String repeat = "";
     public boolean isCompleted = false;
+    public int alarmId = 0; // DEFINITIVE FIX: Add a dedicated, unique ID for alarms.
 }

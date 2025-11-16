@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- DEFINITIVE FIX: Using a dedicated preferenceTheme to force correct text color -->
     <style name="Theme.NextDO" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/black</item>
@@ -17,5 +18,12 @@
         <!-- Set status bar icon color to dark -->
         <item name="android:windowLightStatusBar">true</item>
 
+        <!-- Apply the custom theme to the settings screen -->
+        <item name="preferenceTheme">@style/App.Preference.Theme</item>
+    </style>
+
+    <style name="App.Preference.Theme" parent="@style/PreferenceThemeOverlay.v14.Material">
+        <!-- This forces the category title text to be black in light mode -->
+        <item name="colorAccent">@color/black</item>
     </style>
 </resources>

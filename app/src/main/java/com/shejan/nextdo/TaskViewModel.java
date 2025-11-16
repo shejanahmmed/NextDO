@@ -1,15 +1,17 @@
 package com.shejan.nextdo;
 
 import android.app.Application;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import java.util.List;
 
+// DEFINITIVE FIX: Rewriting the ViewModel to use separate insert and update methods.
 public class TaskViewModel extends AndroidViewModel {
-    private TaskRepository repository;
-    private LiveData<List<Task>> allTasks;
+    private final TaskRepository repository;
+    private final LiveData<List<Task>> allTasks;
 
-    public TaskViewModel(Application application) {
+    public TaskViewModel(@NonNull Application application) {
         super(application);
         repository = new TaskRepository(application);
         allTasks = repository.getAllTasks();
@@ -29,9 +31,5 @@ public class TaskViewModel extends AndroidViewModel {
 
     public void delete(Task task) {
         repository.delete(task);
-    }
-
-    public LiveData<List<Task>> searchTasks(String query) {
-        return repository.searchTasks(query);
     }
 }

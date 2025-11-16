@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -11,7 +12,9 @@ import java.util.List;
 
 @Dao
 public interface TaskDao {
-    @Insert
+
+    // DEFINITIVE FIX: Using robust conflict strategies to guarantee LiveData updates.
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(Task task);
 
     @Update

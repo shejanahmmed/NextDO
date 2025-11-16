@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     private ActivityMainBinding binding;
     private TaskViewModel taskViewModel;
 
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (!isGranted) {
                     Toast.makeText(this, "Notifications will not be shown.", Toast.LENGTH_SHORT).show();
                 }
@@ -114,73 +114,82 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
         if (binding.fab != null) {
             // Start floating animation
-            android.view.animation.Animation floatAnimation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fab_float_animation);
+            android.view.animation.Animation floatAnimation = android.view.animation.AnimationUtils.loadAnimation(this,
+                    R.anim.fab_float_animation);
             binding.fab.startAnimation(floatAnimation);
-            
+
             binding.fab.setOnClickListener(view -> {
-                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fab_click_animation);
+                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this,
+                        R.anim.fab_click_animation);
                 binding.fab.startAnimation(animation);
                 Intent intent = new Intent(MainActivity.this, NewTaskActivity.class);
                 taskActivityLauncher.launch(intent);
             });
         }
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-            
-            @Override
-            public boolean isLongPressDragEnabled() {
-                return false;
-            }
-            
-            @Override
-            public boolean isItemViewSwipeEnabled() {
-                return true;
-            }
-            private final Paint textPaint = new Paint();
-            private final ColorDrawable background = new ColorDrawable();
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
+                    @Override
+                    public boolean isLongPressDragEnabled() {
+                        return false;
+                    }
 
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    Task taskToDelete = adapter.getTaskAt(position);
-                    taskViewModel.delete(taskToDelete);
+                    @Override
+                    public boolean isItemViewSwipeEnabled() {
+                        return true;
+                    }
 
-                    Snackbar.make(binding.getRoot(), "Task deleted", Snackbar.LENGTH_LONG)
-                            .setAction("Undo", v -> taskViewModel.insert(taskToDelete))
-                            .show();
-                }
-            }
+                    private final Paint textPaint = new Paint();
+                    private final ColorDrawable background = new ColorDrawable();
 
-            @Override
-            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                View itemView = viewHolder.itemView;
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView,
+                            @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                        return false;
+                    }
 
-                if (dX < 0) { // Swiping to the left
-                    background.setColor(Color.RED);
-                    background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
-                    background.draw(c);
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                        int position = viewHolder.getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            Task taskToDelete = adapter.getTaskAt(position);
+                            taskViewModel.delete(taskToDelete);
 
-                    textPaint.setColor(Color.WHITE);
-                    textPaint.setTextSize(getResources().getDimension(R.dimen.swipe_text_size));
-                    textPaint.setAntiAlias(true);
-                    textPaint.setTextAlign(Paint.Align.RIGHT);
+                            Snackbar.make(binding.getRoot(), "Task deleted", Snackbar.LENGTH_LONG)
+                                    .setAction("Undo", v -> taskViewModel.insert(taskToDelete))
+                                    .show();
+                        }
+                    }
 
-                    String deleteText = "Delete";
-                    float textMargin = getResources().getDimension(R.dimen.swipe_text_margin);
-                    float textX = itemView.getRight() - textMargin;
-                    float textY = itemView.getTop() + (itemView.getHeight() / 2f) - ((textPaint.descent() + textPaint.ascent()) / 2f);
+                    @Override
+                    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                            @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState,
+                            boolean isCurrentlyActive) {
+                        View itemView = viewHolder.itemView;
 
-                    c.drawText(deleteText, textX, textY, textPaint);
-                }
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
-        });
+                        if (dX < 0) { // Swiping to the left
+                            background.setColor(Color.RED);
+                            background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(),
+                                    itemView.getBottom());
+                            background.draw(c);
+
+                            textPaint.setColor(Color.WHITE);
+                            textPaint.setTextSize(getResources().getDimension(R.dimen.swipe_text_size));
+                            textPaint.setAntiAlias(true);
+                            textPaint.setTextAlign(Paint.Align.RIGHT);
+
+                            String deleteText = "Delete";
+                            float textMargin = getResources().getDimension(R.dimen.swipe_text_margin);
+                            float textX = itemView.getRight() - textMargin;
+                            float textY = itemView.getTop() + (itemView.getHeight() / 2f)
+                                    - ((textPaint.descent() + textPaint.ascent()) / 2f);
+
+                            c.drawText(deleteText, textX, textY, textPaint);
+                        }
+                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                    }
+                });
         itemTouchHelper.attachToRecyclerView(binding.recyclerview);
     }
 
@@ -198,8 +207,8 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     private void askNotificationPermission() {
         // This is only necessary for API level 33 and above.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
-                    PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 // Launch the permission request
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
@@ -229,9 +238,10 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     public void onTaskCompleted(Task task, boolean isCompleted) {
         task.isCompleted = isCompleted;
         taskViewModel.update(task);
-        
+
         if (isCompleted) {
-            androidx.core.app.NotificationManagerCompat notificationManager = androidx.core.app.NotificationManagerCompat.from(this);
+            androidx.core.app.NotificationManagerCompat notificationManager = androidx.core.app.NotificationManagerCompat
+                    .from(this);
             notificationManager.cancel(task.id);
         }
     }
@@ -255,20 +265,22 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     }
 
     private void showTaskContextMenu(Task task) {
-        if (task == null) return;
-        
+        if (task == null)
+            return;
+
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_task_options, null);
         builder.setView(customView);
-        
+
         androidx.appcompat.app.AlertDialog dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-        
+        dialog.getWindow()
+                .setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+
         customView.findViewById(R.id.edit_option).setOnClickListener(v -> {
             dialog.dismiss();
             onTaskClicked(task);
         });
-        
+
         customView.findViewById(R.id.delete_option).setOnClickListener(v -> {
             dialog.dismiss();
             taskViewModel.delete(task);
@@ -276,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                     .setAction("Undo", view -> taskViewModel.insert(task))
                     .show();
         });
-        
+
         dialog.show();
     }
 }

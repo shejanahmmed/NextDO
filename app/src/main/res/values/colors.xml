@@ -25,4 +25,7 @@
     <color name="light_background">#FFF5F5F5</color>
     <color name="light_surface">#FFFFFFFF</color>
     <color name="light_accent">#FF7B54E8</color>
+    
+    <!-- FAB text color for light theme -->
+    <color name="fab_text_color">@color/nothing_white</color>
 </resources>

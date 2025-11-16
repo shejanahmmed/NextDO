@@ -18,7 +18,6 @@ public class NotificationHelper {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
             channel.enableLights(true);
-            channel.enableVibration(true);
             channel.setShowBadge(true);
             channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

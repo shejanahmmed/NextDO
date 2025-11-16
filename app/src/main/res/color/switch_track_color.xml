@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Color when switch is checked (ON) -->
+    <item android:state_checked="true" android:color="#34C759" />
+    <!-- Color when switch is unchecked (OFF) -->
+    <item android:color="#CCCCCC" />
+</selector>

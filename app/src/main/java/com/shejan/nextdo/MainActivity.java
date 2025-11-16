@@ -113,6 +113,10 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         });
 
         if (binding.fab != null) {
+            // Start floating animation
+            android.view.animation.Animation floatAnimation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fab_float_animation);
+            binding.fab.startAnimation(floatAnimation);
+            
             binding.fab.setOnClickListener(view -> {
                 android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fab_click_animation);
                 binding.fab.startAnimation(animation);
@@ -253,19 +257,26 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     private void showTaskContextMenu(Task task) {
         if (task == null) return;
         
-        String[] options = {"Edit", "Delete"};
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_task_options, null);
+        builder.setView(customView);
         
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setItems(options, (dialog, which) -> {
-                    if (which == 0) {
-                        onTaskClicked(task);
-                    } else {
-                        taskViewModel.delete(task);
-                        Snackbar.make(binding.getRoot(), "Task deleted", Snackbar.LENGTH_LONG)
-                                .setAction("Undo", v -> taskViewModel.insert(task))
-                                .show();
-                    }
-                })
-                .show();
+        androidx.appcompat.app.AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        
+        customView.findViewById(R.id.edit_option).setOnClickListener(v -> {
+            dialog.dismiss();
+            onTaskClicked(task);
+        });
+        
+        customView.findViewById(R.id.delete_option).setOnClickListener(v -> {
+            dialog.dismiss();
+            taskViewModel.delete(task);
+            Snackbar.make(binding.getRoot(), "Task deleted", Snackbar.LENGTH_LONG)
+                    .setAction("Undo", view -> taskViewModel.insert(task))
+                    .show();
+        });
+        
+        dialog.show();
     }
 }

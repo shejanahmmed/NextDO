@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,24 +54,38 @@ public class SettingsActivity extends AppCompatActivity {
                 String[] themeOptions = {"Light", "Dark", "System"};
                 String[] themeValues = {"light", "dark", "system"};
                 
-                int selectedIndex = 1; // Default to dark
-                for (int i = 0; i < themeValues.length; i++) {
-                    if (themeValues[i].equals(currentTheme)) {
-                        selectedIndex = i;
-                        break;
-                    }
+                android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_theme_choice, null);
+                LinearLayout container = customView.findViewById(R.id.theme_options_container);
+                
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setView(customView);
+                builder.setNegativeButton("Cancel", null);
+                
+                AlertDialog dialog = builder.create();
+                dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                
+                for (int i = 0; i < themeOptions.length; i++) {
+                    final int index = i;
+                    android.view.View optionView = getLayoutInflater().inflate(R.layout.theme_option_item, container, false);
+                    TextView textView = optionView.findViewById(R.id.theme_text);
+                    RadioButton radioButton = optionView.findViewById(R.id.theme_radio);
+                    
+                    textView.setText(themeOptions[i]);
+                    boolean isSelected = themeValues[i].equals(currentTheme);
+                    radioButton.setChecked(isSelected);
+                    
+                    optionView.setOnClickListener(view -> {
+                        String selectedTheme = themeValues[index];
+                        sharedPreferences.edit().putString("theme", selectedTheme).apply();
+                        updateCurrentThemeText(selectedTheme);
+                        dialog.dismiss();
+                        recreate();
+                    });
+                    
+                    container.addView(optionView);
                 }
                 
-                new AlertDialog.Builder(this)
-                        .setTitle("Choose Theme")
-                        .setSingleChoiceItems(themeOptions, selectedIndex, (dialog, which) -> {
-                            String selectedTheme = themeValues[which];
-                            sharedPreferences.edit().putString("theme", selectedTheme).apply();
-                            updateCurrentThemeText(selectedTheme);
-                            dialog.dismiss();
-                            recreate();
-                        })
-                        .show();
+                dialog.show();
             });
         }
     }
@@ -92,24 +109,6 @@ public class SettingsActivity extends AppCompatActivity {
             });
         }
 
-        if (binding.soundSwitch != null) {
-            binding.soundSwitch.setChecked(sharedPreferences.getBoolean("sound", true));
-            binding.soundSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.switch_animation);
-                binding.soundSwitch.startAnimation(animation);
-                sharedPreferences.edit().putBoolean("sound", isChecked).apply();
-            });
-        }
-
-        if (binding.vibrationSwitch != null) {
-            binding.vibrationSwitch.setChecked(sharedPreferences.getBoolean("vibration", true));
-            binding.vibrationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.switch_animation);
-                binding.vibrationSwitch.startAnimation(animation);
-                sharedPreferences.edit().putBoolean("vibration", isChecked).apply();
-            });
-        }
-
         if (binding.persistentNotificationsSwitch != null) {
             binding.persistentNotificationsSwitch.setChecked(sharedPreferences.getBoolean("persistent_notifications", false));
             binding.persistentNotificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -124,20 +123,41 @@ public class SettingsActivity extends AppCompatActivity {
                 try {
                     String[] snoozeOptions = getResources().getStringArray(R.array.snooze_duration_entries);
                     String[] snoozeValues = getResources().getStringArray(R.array.snooze_duration_values);
+                    String currentSnooze = sharedPreferences.getString("snooze_duration", "300000");
                     
                     if (snoozeOptions.length == 0 || snoozeValues.length == 0) {
                         return;
                     }
                     
-                    new AlertDialog.Builder(this)
-                            .setTitle("Default Snooze Duration")
-                            .setItems(snoozeOptions, (dialog, which) -> {
-                                if (which >= 0 && which < snoozeValues.length) {
-                                    String snoozeValue = snoozeValues[which];
-                                    sharedPreferences.edit().putString("snooze_duration", snoozeValue).apply();
-                                }
-                            })
-                            .show();
+                    android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_snooze_duration, null);
+                    LinearLayout container = customView.findViewById(R.id.snooze_options_container);
+                    
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setView(customView);
+                    builder.setNegativeButton("Cancel", null);
+                    
+                    AlertDialog dialog = builder.create();
+                    dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    
+                    for (int i = 0; i < snoozeOptions.length; i++) {
+                        final int index = i;
+                        android.view.View optionView = getLayoutInflater().inflate(R.layout.snooze_option_item, container, false);
+                        TextView textView = optionView.findViewById(R.id.snooze_text);
+                        RadioButton radioButton = optionView.findViewById(R.id.snooze_radio);
+                        
+                        textView.setText(snoozeOptions[i]);
+                        boolean isSelected = snoozeValues[i].equals(currentSnooze);
+                        radioButton.setChecked(isSelected);
+                        
+                        optionView.setOnClickListener(view -> {
+                            sharedPreferences.edit().putString("snooze_duration", snoozeValues[index]).apply();
+                            dialog.dismiss();
+                        });
+                        
+                        container.addView(optionView);
+                    }
+                    
+                    dialog.show();
                 } catch (Exception e) {
                     // Handle dialog creation failure
                 }

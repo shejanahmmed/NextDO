@@ -144,65 +144,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:thumbTint="#FFFFFF"
-                        app:trackTint="#34C759" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?attr/colorOnSurface"
-                    android:alpha="0.2"
-                    android:layout_marginVertical="16dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Sound"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/sound_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:thumbTint="#FFFFFF"
-                        app:trackTint="#34C759" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?attr/colorOnSurface"
-                    android:alpha="0.2"
-                    android:layout_marginVertical="16dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Vibration"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/vibration_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:thumbTint="#FFFFFF"
-                        app:trackTint="#34C759" />
+                        app:trackTint="@color/switch_track_color" />
                 </LinearLayout>
 
                 <View
@@ -231,7 +173,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:thumbTint="#FFFFFF"
-                        app:trackTint="#34C759" />
+                        app:trackTint="@color/switch_track_color" />
                 </LinearLayout>
 
                 <View

@@ -1,22 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Press down effect -->
     <scale
-        android:duration="100"
+        android:duration="80"
         android:fromXScale="1.0"
         android:fromYScale="1.0"
-        android:toXScale="0.9"
-        android:toYScale="0.9"
+        android:toXScale="0.88"
+        android:toYScale="0.88"
         android:pivotX="50%"
         android:pivotY="50%"
         android:interpolator="@android:anim/accelerate_interpolator" />
+    <!-- Spring back up effect -->
     <scale
         android:duration="200"
-        android:startOffset="100"
-        android:fromXScale="0.9"
-        android:fromYScale="0.9"
+        android:startOffset="80"
+        android:fromXScale="0.88"
+        android:fromYScale="0.88"
+        android:toXScale="1.05"
+        android:toYScale="1.05"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:interpolator="@android:anim/overshoot_interpolator" />
+    <!-- Settle to normal size -->
+    <scale
+        android:duration="100"
+        android:startOffset="280"
+        android:fromXScale="1.05"
+        android:fromYScale="1.05"
         android:toXScale="1.0"
         android:toYScale="1.0"
         android:pivotX="50%"
         android:pivotY="50%"
-        android:interpolator="@android:anim/overshoot_interpolator" />
+        android:interpolator="@android:anim/decelerate_interpolator" />
 </set>

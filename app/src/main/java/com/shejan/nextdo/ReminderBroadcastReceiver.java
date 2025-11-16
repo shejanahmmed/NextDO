@@ -37,8 +37,6 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
         }
 
         android.content.SharedPreferences prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context);
-        boolean vibrationEnabled = prefs.getBoolean("vibration", true);
-        boolean soundEnabled = prefs.getBoolean("sound", true);
         boolean persistentEnabled = prefs.getBoolean("persistent_notifications", false);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NotificationHelper.CHANNEL_ID)
@@ -58,9 +56,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
             builder.setDeleteIntent(deletePendingIntent);
         }
 
-        int defaults = NotificationCompat.DEFAULT_LIGHTS;
-        if (soundEnabled) defaults |= NotificationCompat.DEFAULT_SOUND;
-        if (vibrationEnabled) defaults |= NotificationCompat.DEFAULT_VIBRATE;
+        int defaults = NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND | NotificationCompat.DEFAULT_VIBRATE;
         builder.setDefaults(defaults);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);

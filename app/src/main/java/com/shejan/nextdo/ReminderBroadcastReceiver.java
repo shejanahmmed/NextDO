@@ -49,7 +49,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(!persistentEnabled)
                 .setOngoing(persistentEnabled)
-                .setOnlyAlertOnce(false)
+                .setOnlyAlertOnce(true)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         if (persistentEnabled) {

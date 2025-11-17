@@ -239,10 +239,15 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         task.isCompleted = isCompleted;
         taskViewModel.update(task);
 
+        // Always cancel notification when task is marked as completed
         if (isCompleted) {
-            androidx.core.app.NotificationManagerCompat notificationManager = androidx.core.app.NotificationManagerCompat
-                    .from(this);
-            notificationManager.cancel(task.id);
+            try {
+                androidx.core.app.NotificationManagerCompat notificationManager = androidx.core.app.NotificationManagerCompat
+                        .from(this);
+                notificationManager.cancel(task.id);
+            } catch (Exception e) {
+                // Handle cancellation errors silently
+            }
         }
     }
 

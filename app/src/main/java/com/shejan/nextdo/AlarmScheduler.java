@@ -42,11 +42,13 @@ public class AlarmScheduler {
                 long delayMs = task.reminderTime - System.currentTimeMillis();
                 if (delayMs < 1000) {
                     // Trigger immediately for past times or times within 1 second
-                    alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 500, pendingIntent);
+                    alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 500,
+                            pendingIntent);
                 } else if (canScheduleExactAlarms()) {
                     // Use most reliable alarm method for future times
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime,
+                                pendingIntent);
                     } else {
                         alarmManager.setExact(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
                     }

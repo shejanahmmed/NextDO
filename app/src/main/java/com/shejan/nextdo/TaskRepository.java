@@ -1,11 +1,15 @@
 package com.shejan.nextdo;
 
 import android.app.Application;
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import java.util.List;
 
 // DEFINITIVE FIX: Rewriting the repository to use separate insert and update methods.
+// ADDITIONAL FIX: Added callback support for post-database operations
 public class TaskRepository {
+    private static final String TAG = "TaskRepository";
     private final TaskDao taskDao;
     private final LiveData<List<Task>> allTasks;
 
@@ -25,9 +29,33 @@ public class TaskRepository {
         });
     }
 
+    void insert(Task task, Runnable onComplete) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            Log.d(TAG, "Inserting task: " + task.title);
+            // CRITICAL FIX: Get the generated ID and update the task object
+            long newId = taskDao.insert(task);  // ← Now returns the generated ID
+            task.id = (int) newId;  // ← Assign it back to the original object
+            Log.d(TAG, "Insert complete for task: " + task.title + " (assigned id=" + newId + ")");
+            if (onComplete != null) {
+                onComplete.run();  // ← Now called with valid task.id!
+            }
+        });
+    }
+
     void update(Task task) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             taskDao.update(task);
+        });
+    }
+
+    void update(Task task, Runnable onComplete) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            Log.d(TAG, "Updating task: " + task.title);
+            taskDao.update(task);
+            Log.d(TAG, "Update complete for task: " + task.title);
+            if (onComplete != null) {
+                onComplete.run();
+            }
         });
     }
 

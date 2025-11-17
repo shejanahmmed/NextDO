@@ -14,8 +14,9 @@ import java.util.List;
 public interface TaskDao {
 
     // DEFINITIVE FIX: Using robust conflict strategies to guarantee LiveData updates.
+    // CRITICAL FIX: Return the generated ID so we can update the original task object
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insert(Task task);
+    long insert(Task task);  // ← Changed from void to long - returns generated ID
 
     @Update
     void update(Task task);
@@ -25,6 +26,9 @@ public interface TaskDao {
 
     @Query("SELECT * FROM tasks ORDER BY isCompleted ASC, id DESC")
     LiveData<List<Task>> getAllTasks();
+
+    @Query("SELECT * FROM tasks")
+    List<Task> getAllTasksSync();
 
     @Query("SELECT * FROM tasks WHERE title LIKE :query OR description LIKE :query ORDER BY id DESC")
     LiveData<List<Task>> searchTasks(String query);

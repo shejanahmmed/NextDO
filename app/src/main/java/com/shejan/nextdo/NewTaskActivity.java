@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -20,6 +21,7 @@ import java.util.Locale;
 
 // DEFINITIVE FIX: Correctly managing the unique alarmId for every task.
 public class NewTaskActivity extends AppCompatActivity {
+    private static final String TAG = "NewTaskActivity";
 
     public static final String EXTRA_ID = "com.shejan.nextdo.ID";
     public static final String EXTRA_ALARM_ID = "com.shejan.nextdo.ALARM_ID";
@@ -142,9 +144,12 @@ public class NewTaskActivity extends AppCompatActivity {
                         task.reminderTime = reminderTime;
                         task.repeat = repeat;
 
-                        if (alarmScheduler != null) {
-                            alarmScheduler.schedule(task);
-                        }
+                        Log.d(TAG, "Task details: id=" + task.id + ", alarmId=" + task.alarmId + 
+                              ", reminderTime=" + reminderTime);
+
+                        // NOTE: Do NOT schedule alarm here! MainActivity will schedule after database insert completes.
+                        // Scheduling here causes double scheduling and race conditions.
+                        Log.d(TAG, "NewTaskActivity: Not scheduling alarm here (will be scheduled by MainActivity)");
 
                         replyIntent.putExtra(EXTRA_ID, task.id);
                         replyIntent.putExtra(EXTRA_ALARM_ID, task.alarmId);

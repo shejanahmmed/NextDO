@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,9 +29,11 @@ import com.google.android.material.snackbar.Snackbar;
 import com.shejan.nextdo.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity implements TaskListAdapter.OnTaskInteractionListener {
+    private static final String TAG = "MainActivity";
 
     private ActivityMainBinding binding;
     private TaskViewModel taskViewModel;
+    private AlarmScheduler alarmScheduler;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -45,24 +48,55 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Intent data = result.getData();
                     int id = data.getIntExtra(NewTaskActivity.EXTRA_ID, 0);
+                    long reminderTime = data.getLongExtra(NewTaskActivity.EXTRA_REMINDER_TIME, 0);
 
                     Task task = new Task();
-                    if (id != 0) { // Existing task
+                    if (id != 0) { // Existing task - use the existing alarmId
                         task.id = id;
-                        task.alarmId = data.getIntExtra(NewTaskActivity.EXTRA_ALARM_ID, 0);
-                    } else {
+                        int existingAlarmId = data.getIntExtra(NewTaskActivity.EXTRA_ALARM_ID, 0);
+                        task.alarmId = existingAlarmId;
+                        Log.d(TAG, "Updating existing task " + id + " with alarmId=" + existingAlarmId);
+                    } else { // New task - generate alarmId
                         task.alarmId = (int) System.currentTimeMillis();
+                        Log.d(TAG, "New task: generated alarmId=" + task.alarmId);
                     }
                     task.title = data.getStringExtra(NewTaskActivity.EXTRA_TITLE);
                     task.description = data.getStringExtra(NewTaskActivity.EXTRA_DESCRIPTION);
                     task.priority = data.getStringExtra(NewTaskActivity.EXTRA_PRIORITY);
-                    task.reminderTime = data.getLongExtra(NewTaskActivity.EXTRA_REMINDER_TIME, 0);
+                    task.reminderTime = reminderTime;
                     task.repeat = data.getStringExtra(NewTaskActivity.EXTRA_REPEAT);
 
                     if (id != 0) {
-                        taskViewModel.update(task);
+                        Log.d(TAG, "Updating task " + id + " with reminderTime=" + reminderTime);
+                        
+                        // Schedule alarm callback AFTER database update completes
+                        final Task taskForCallback = task;
+                        final long finalReminderTime = reminderTime;
+                        taskViewModel.update(task, () -> {
+                            Log.d(TAG, "Database update complete, scheduling alarm if needed");
+                            if (finalReminderTime > 0 && taskForCallback.alarmId != 0) {
+                                Log.d(TAG, "Scheduling alarm for updated task");
+                                alarmScheduler.schedule(taskForCallback);
+                            } else {
+                                Log.d(TAG, "No reminder for updated task, canceling any existing alarm");
+                                alarmScheduler.cancel(taskForCallback);
+                            }
+                        });
                     } else {
-                        taskViewModel.insert(task);
+                        Log.d(TAG, "Inserting new task with reminderTime=" + reminderTime);
+                        
+                        // Schedule alarm callback AFTER database insert completes
+                        final Task taskForCallback = task;
+                        final long finalReminderTime = reminderTime;
+                        taskViewModel.insert(task, () -> {
+                            Log.d(TAG, "Database insert complete, scheduling alarm if needed");
+                            if (finalReminderTime > 0 && taskForCallback.alarmId != 0) {
+                                Log.d(TAG, "Scheduling alarm for new task after database insert");
+                                alarmScheduler.schedule(taskForCallback);
+                            } else {
+                                Log.d(TAG, "No reminder for new task");
+                            }
+                        });
                     }
                 } else if (result.getResultCode() == NewTaskActivity.RESULT_DELETE && result.getData() != null) {
                     Intent data = result.getData();
@@ -84,6 +118,10 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Initialize AlarmScheduler
+        alarmScheduler = new AlarmScheduler(this);
+        Log.d(TAG, "AlarmScheduler initialized");
 
         // Remove toolbar for Nothing theme
         setupSettingsButton();

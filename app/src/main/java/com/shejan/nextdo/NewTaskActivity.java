@@ -48,18 +48,19 @@ public class NewTaskActivity extends AppCompatActivity {
 
         alarmScheduler = new AlarmScheduler(this);
 
-        ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.priority_array));
+        ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
+                getResources().getStringArray(R.array.priority_array));
         priorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         if (binding.spinnerPriority != null) {
             binding.spinnerPriority.setAdapter(priorityAdapter);
         }
 
-        ArrayAdapter<String> repeatAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.repeat_array));
+        ArrayAdapter<String> repeatAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
+                getResources().getStringArray(R.array.repeat_array));
         repeatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         if (binding.spinnerRepeat != null) {
             binding.spinnerRepeat.setAdapter(repeatAdapter);
         }
-
 
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_ID)) {
@@ -104,7 +105,7 @@ public class NewTaskActivity extends AppCompatActivity {
         if (binding.buttonSetReminder != null) {
             binding.buttonSetReminder.setOnClickListener(v -> showDateTimePicker());
         }
-        
+
         setupBackButton();
 
         if (binding.buttonSave != null) {
@@ -115,11 +116,16 @@ public class NewTaskActivity extends AppCompatActivity {
                         setResult(RESULT_CANCELED, replyIntent);
                     } else {
                         String title = binding.editTitle.getText().toString();
-                        String description = binding.editDescription != null ? binding.editDescription.getText().toString() : "";
-                        String priority = binding.spinnerPriority != null && binding.spinnerPriority.getSelectedItem() != null ? 
-                                binding.spinnerPriority.getSelectedItem().toString() : "NONE";
-                        String repeat = binding.spinnerRepeat != null && binding.spinnerRepeat.getSelectedItem() != null ? 
-                                binding.spinnerRepeat.getSelectedItem().toString() : "NONE";
+                        String description = binding.editDescription != null
+                                ? binding.editDescription.getText().toString()
+                                : "";
+                        String priority = binding.spinnerPriority != null
+                                && binding.spinnerPriority.getSelectedItem() != null
+                                        ? binding.spinnerPriority.getSelectedItem().toString()
+                                        : "NONE";
+                        String repeat = binding.spinnerRepeat != null && binding.spinnerRepeat.getSelectedItem() != null
+                                ? binding.spinnerRepeat.getSelectedItem().toString()
+                                : "NONE";
                         long reminderTime = calendar.getTimeInMillis();
 
                         Task task = new Task();

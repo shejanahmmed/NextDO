@@ -28,28 +28,31 @@ public class AlarmScheduler {
         if (task.reminderTime > System.currentTimeMillis() && task.alarmId != 0) {
             // Cancel any existing alarm first
             cancel(task);
-            
+
             Intent intent = new Intent(context, ReminderBroadcastReceiver.class);
             intent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_TITLE, task.title);
             intent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_ID, task.id);
             intent.putExtra("task_description", task.description);
 
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.alarmId, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
             try {
                 if (canScheduleExactAlarms()) {
                     // Use most reliable alarm method
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime,
+                                pendingIntent);
                     } else {
                         alarmManager.setExact(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
                     }
                 } else {
                     // Fallback for devices without exact alarm permission
                     alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
-                    
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        Toast.makeText(context, "Exact alarm permission needed for precise reminders", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Exact alarm permission needed for precise reminders",
+                                Toast.LENGTH_SHORT).show();
                     }
                 }
             } catch (Exception e) {
@@ -62,7 +65,8 @@ public class AlarmScheduler {
     public void cancel(Task task) {
         if (task.alarmId != 0) {
             Intent intent = new Intent(context, ReminderBroadcastReceiver.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, task.alarmId, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             alarmManager.cancel(pendingIntent);
         }
     }
@@ -75,7 +79,7 @@ public class AlarmScheduler {
     private boolean canScheduleExactAlarms() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             return alarmManager.canScheduleExactAlarms();
-        } 
+        }
         return true; // Permissions are not needed for earlier versions
     }
 }

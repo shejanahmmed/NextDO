@@ -21,7 +21,9 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
 
     public interface OnTaskInteractionListener {
         void onTaskCompleted(Task task, boolean isCompleted);
+
         void onTaskClicked(Task task);
+
         void onTaskLongClicked(Task task);
     }
 
@@ -33,7 +35,8 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        RecyclerviewItemBinding binding = RecyclerviewItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        RecyclerviewItemBinding binding = RecyclerviewItemBinding.inflate(LayoutInflater.from(parent.getContext()),
+                parent, false);
         return new TaskViewHolder(binding);
     }
 
@@ -73,19 +76,22 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
         }
 
         public void bind(final Task task, final OnTaskInteractionListener listener) {
-            if (task == null) return;
-            
+            if (task == null)
+                return;
+
             if (binding.textTitle != null) {
                 binding.textTitle.setText(task.title != null ? task.title : "");
             }
-            
+
             if (binding.textDescription != null) {
                 binding.textDescription.setText(task.description != null ? task.description : "");
-                binding.textDescription.setVisibility(task.description != null && !task.description.isEmpty() ? View.VISIBLE : View.GONE);
+                binding.textDescription.setVisibility(
+                        task.description != null && !task.description.isEmpty() ? View.VISIBLE : View.GONE);
             }
-            
+
             // DEFINITIVE FIX: Removing conditional styling for completed tasks.
-            binding.getRoot().setBackground(androidx.core.content.ContextCompat.getDrawable(binding.getRoot().getContext(), R.drawable.nothing_card_bg));
+            binding.getRoot().setBackground(androidx.core.content.ContextCompat
+                    .getDrawable(binding.getRoot().getContext(), R.drawable.nothing_card_bg));
 
             if (binding.chipPriority != null) {
                 if (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) {
@@ -109,9 +115,10 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
                     binding.textReminder.setVisibility(View.GONE);
                 }
             }
-            
+
             if (binding.detailsLayout != null) {
-                boolean hasDetails = (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) || task.reminderTime > 0;
+                boolean hasDetails = (task.priority != null && !task.priority.isEmpty()
+                        && !task.priority.equalsIgnoreCase("NONE")) || task.reminderTime > 0;
                 binding.detailsLayout.setVisibility(hasDetails ? View.VISIBLE : View.GONE);
             }
 

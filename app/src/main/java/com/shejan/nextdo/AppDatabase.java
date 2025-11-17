@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // DEFINITIVE FIX: Upgrading the database to version 2.
-@Database(entities = {Task.class}, version = 2, exportSchema = false)
+@Database(entities = { Task.class }, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract TaskDao taskDao();
 

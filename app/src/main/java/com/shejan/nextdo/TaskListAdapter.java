@@ -126,6 +126,12 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
                 binding.detailsLayout.setVisibility(hasDetails ? View.VISIBLE : View.GONE);
             }
 
+            // Apply accent color to checkbox
+            android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
+                    .getDefaultSharedPreferences(binding.getRoot().getContext());
+            int accentColor = prefs.getInt("accent_color", 0xFF34C759);
+            binding.checkboxCompleted.setButtonTintList(android.content.res.ColorStateList.valueOf(accentColor));
+
             binding.checkboxCompleted.setOnCheckedChangeListener(null);
             binding.checkboxCompleted.setChecked(task.isCompleted);
             binding.checkboxCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {

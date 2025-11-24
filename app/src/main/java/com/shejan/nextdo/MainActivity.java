@@ -239,12 +239,17 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
                             // Vibration feedback
                             try {
-                                android.os.VibrationEffect effect = android.os.VibrationEffect.createOneShot(50,
-                                        android.os.VibrationEffect.DEFAULT_AMPLITUDE);
                                 android.os.Vibrator vibrator = (android.os.Vibrator) getSystemService(
                                         android.content.Context.VIBRATOR_SERVICE);
                                 if (vibrator != null) {
-                                    vibrator.vibrate(effect);
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                        android.os.VibrationEffect effect = android.os.VibrationEffect.createOneShot(50,
+                                                android.os.VibrationEffect.DEFAULT_AMPLITUDE);
+                                        vibrator.vibrate(effect);
+                                    } else {
+                                        // Deprecated in API 26
+                                        vibrator.vibrate(50);
+                                    }
                                 }
                             } catch (Exception e) {
                                 // Vibration not available
@@ -509,6 +514,21 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         // Find the ConstraintLayout inside the DrawerLayout
         View content = binding.drawerLayout.getChildAt(0);
 
+        if ("custom".equals(background)) {
+            try {
+                java.io.File file = new java.io.File(getFilesDir(), "custom_background.jpg");
+                if (file.exists()) {
+                    android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeFile(file.getAbsolutePath());
+                    android.graphics.drawable.BitmapDrawable drawable = new android.graphics.drawable.BitmapDrawable(
+                            getResources(), bitmap);
+                    content.setBackground(drawable);
+                    return;
+                }
+            } catch (Exception e) {
+                // Fallback to default if loading fails
+            }
+        }
+
         int drawableId = 0;
         switch (background) {
             case "bg_night_cottage":
@@ -530,11 +550,6 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
         if (drawableId != 0) {
             content.setBackground(ContextCompat.getDrawable(this, drawableId));
-            // Ensure background scales properly (centerCrop equivalent for View background
-            // is tricky,
-            // but setting background drawable usually stretches. For better scaling, we
-            // might need an ImageView,
-            // but for now let's try setting the background directly.)
         } else {
             // Default background (theme attribute)
             android.util.TypedValue typedValue = new android.util.TypedValue();

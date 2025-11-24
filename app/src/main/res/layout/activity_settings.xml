@@ -65,14 +65,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Appearance"
+                    android:text="Customization"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface"
                     android:layout_marginBottom="16dp" />
 
                 <LinearLayout
-                    android:id="@+id/appearance_button"
+                    android:id="@+id/accent_color_button"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:orientation="horizontal"
@@ -85,18 +85,16 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Theme"
+                        android:text="Accent Color"
                         android:textSize="16sp"
                         android:textColor="?attr/colorOnSurface" />
 
-                    <TextView
-                        android:id="@+id/current_theme_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Dark"
-                        android:textSize="14sp"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginEnd="8dp" />
+                    <View
+                        android:id="@+id/color_preview"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/color_circle" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -186,7 +184,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:thumbTint="#FFFFFF"
-                        app:trackTint="@color/switch_track_color" />
+                        app:trackTint="@color/switch_track_color_custom" />
                 </LinearLayout>
 
                 <View
@@ -215,7 +213,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:thumbTint="#FFFFFF"
-                        app:trackTint="@color/switch_track_color" />
+                        app:trackTint="@color/switch_track_color_custom" />
                 </LinearLayout>
 
                 <View

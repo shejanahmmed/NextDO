@@ -7,17 +7,50 @@ import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.shejan.nextdo.databinding.ActivitySettingsBinding;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
 public class SettingsActivity extends AppCompatActivity {
 
     private ActivitySettingsBinding binding;
     private SharedPreferences sharedPreferences;
+
+    private final ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            uri -> {
+                if (uri != null) {
+                    try {
+                        InputStream inputStream = getContentResolver().openInputStream(uri);
+                        File file = new File(getFilesDir(), "custom_background.jpg");
+                        FileOutputStream outputStream = new FileOutputStream(file);
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        while ((inputStream != null) && ((length = inputStream.read(buffer)) > 0)) {
+                            outputStream.write(buffer, 0, length);
+                        }
+                        if (inputStream != null)
+                            inputStream.close();
+                        outputStream.close();
+
+                        sharedPreferences.edit().putString("app_background", "custom").apply();
+                        updateCurrentBackgroundText("custom");
+                        Toast.makeText(this, "Background set", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Toast.makeText(this, "Failed to set background", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +67,7 @@ public class SettingsActivity extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         setupBackButton();
-        setupThemeSettings();
+        setupAccentColorSettings();
         setupBackgroundSettings();
         setupNotificationSettings();
         setupSocialLinks();
@@ -46,61 +79,87 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    private void setupThemeSettings() {
-        String currentTheme = sharedPreferences.getString("theme", "dark");
-        updateCurrentThemeText(currentTheme);
+    private void setupAccentColorSettings() {
+        int currentColor = sharedPreferences.getInt("accent_color", 0xFF34C759);
+        updateColorPreview(currentColor);
 
-        if (binding.appearanceButton != null) {
-            binding.appearanceButton.setOnClickListener(v -> {
-                String[] themeOptions = { "Light", "Dark", "System" };
-                String[] themeValues = { "light", "dark", "system" };
-
-                android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_theme_choice, null);
-                LinearLayout container = customView.findViewById(R.id.theme_options_container);
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setView(customView);
-                builder.setNegativeButton("Cancel", null);
-
-                AlertDialog dialog = builder.create();
-                dialog.getWindow().setBackgroundDrawable(
-                        new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-
-                for (int i = 0; i < themeOptions.length; i++) {
-                    final int index = i;
-                    android.view.View optionView = getLayoutInflater().inflate(R.layout.theme_option_item, container,
-                            false);
-                    TextView textView = optionView.findViewById(R.id.theme_text);
-                    RadioButton radioButton = optionView.findViewById(R.id.theme_radio);
-
-                    textView.setText(themeOptions[i]);
-                    boolean isSelected = themeValues[i].equals(currentTheme);
-                    radioButton.setChecked(isSelected);
-
-                    optionView.setOnClickListener(view -> {
-                        String selectedTheme = themeValues[index];
-                        sharedPreferences.edit().putString("theme", selectedTheme).apply();
-                        updateCurrentThemeText(selectedTheme);
-                        dialog.dismiss();
-                        recreate();
-                    });
-
-                    container.addView(optionView);
-                }
-
-                dialog.show();
-            });
+        if (binding.accentColorButton != null) {
+            binding.accentColorButton.setOnClickListener(v -> showColorPicker(currentColor));
         }
     }
 
-    private void updateCurrentThemeText(String theme) {
-        if (binding.currentThemeText != null) {
-            String displayText = "Dark";
-            if ("light".equals(theme))
-                displayText = "Light";
-            else if ("system".equals(theme))
-                displayText = "System";
-            binding.currentThemeText.setText(displayText);
+    private void showColorPicker(int currentColor) {
+        int[] colors = { 0xFF34C759, 0xFF007AFF, 0xFFFF3B30, 0xFFFF9500, 0xFFFFCC00, 0xFFAF52DE, 0xFFFF2D55,
+                0xFF5AC8FA };
+        String[] colorNames = { "Green", "Blue", "Red", "Orange", "Yellow", "Purple", "Pink", "Cyan" };
+
+        android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_theme_choice, null);
+        LinearLayout container = customView.findViewById(R.id.theme_options_container);
+        TextView title = customView.findViewById(R.id.dialog_title);
+        if (title != null)
+            title.setText("Choose Accent Color");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(customView);
+        builder.setNegativeButton("Cancel", null);
+        AlertDialog dialog = builder.create();
+        dialog.getWindow()
+                .setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        for (int i = 0; i < colors.length; i++) {
+            final int color = colors[i];
+            android.view.View optionView = getLayoutInflater().inflate(R.layout.theme_option_item, container, false);
+            TextView textView = optionView.findViewById(R.id.theme_text);
+            RadioButton radioButton = optionView.findViewById(R.id.theme_radio);
+            android.view.View colorCircle = optionView.findViewById(R.id.color_circle);
+
+            textView.setText(colorNames[i]);
+            radioButton.setChecked(color == currentColor);
+            radioButton.setButtonTintList(android.content.res.ColorStateList.valueOf(color));
+
+            // Show and color the preview circle
+            if (colorCircle != null) {
+                colorCircle.setVisibility(android.view.View.VISIBLE);
+                android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
+                drawable.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+                drawable.setColor(color);
+                colorCircle.setBackground(drawable);
+            }
+
+            optionView.setOnClickListener(view -> {
+                sharedPreferences.edit().putInt("accent_color", color).apply();
+                updateColorPreview(color);
+
+                // Apply color to notification switch immediately
+                if (binding.notificationsSwitch != null) {
+                    // Set thumb to white
+                    binding.notificationsSwitch
+                            .setThumbTintList(android.content.res.ColorStateList.valueOf(0xFFFFFFFF));
+
+                    // Set track to accent color when checked, gray when unchecked
+                    int[][] states = new int[][] {
+                            new int[] { android.R.attr.state_checked },
+                            new int[] { -android.R.attr.state_checked }
+                    };
+                    int[] trackColors = new int[] { color, 0x4DFFFFFF };
+                    binding.notificationsSwitch
+                            .setTrackTintList(new android.content.res.ColorStateList(states, trackColors));
+                }
+
+                dialog.dismiss();
+                Toast.makeText(this, "Accent color changed", Toast.LENGTH_SHORT).show();
+            });
+            container.addView(optionView);
+        }
+        dialog.show();
+    }
+
+    private void updateColorPreview(int color) {
+        if (binding.colorPreview != null) {
+            android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
+            drawable.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+            drawable.setColor(color);
+            binding.colorPreview.setBackground(drawable);
         }
     }
 
@@ -111,9 +170,9 @@ public class SettingsActivity extends AppCompatActivity {
         if (binding.backgroundButton != null) {
             binding.backgroundButton.setOnClickListener(v -> {
                 String[] backgroundNames = { "Default (Black)", "Night Cottage", "Urban Sketch", "Mystic Tree",
-                        "Dark Waves" };
+                        "Dark Waves", "Choose from Gallery" };
                 String[] backgroundValues = { "default", "bg_night_cottage", "bg_urban_sketch", "bg_mystic_tree",
-                        "bg_dark_waves" };
+                        "bg_dark_waves", "custom" };
 
                 android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_theme_choice, null);
                 LinearLayout container = customView.findViewById(R.id.theme_options_container);
@@ -142,10 +201,14 @@ public class SettingsActivity extends AppCompatActivity {
 
                     optionView.setOnClickListener(view -> {
                         String selectedBackground = backgroundValues[index];
-                        sharedPreferences.edit().putString("app_background", selectedBackground).apply();
-                        updateCurrentBackgroundText(selectedBackground);
-                        dialog.dismiss();
-                        // Optional: Show toast or just let user go back to see change
+                        if ("custom".equals(selectedBackground)) {
+                            imagePickerLauncher.launch("image/*");
+                            dialog.dismiss();
+                        } else {
+                            sharedPreferences.edit().putString("app_background", selectedBackground).apply();
+                            updateCurrentBackgroundText(selectedBackground);
+                            dialog.dismiss();
+                        }
                     });
 
                     container.addView(optionView);
@@ -172,6 +235,9 @@ public class SettingsActivity extends AppCompatActivity {
                 case "bg_dark_waves":
                     displayText = "Dark Waves";
                     break;
+                case "custom":
+                    displayText = "Custom Image";
+                    break;
             }
             binding.currentBackgroundText.setText(displayText);
         }
@@ -179,6 +245,22 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void setupNotificationSettings() {
         if (binding.notificationsSwitch != null) {
+            int accentColor = sharedPreferences.getInt("accent_color", 0xFF34C759);
+
+            // Set thumb to white
+            binding.notificationsSwitch.setThumbTintList(android.content.res.ColorStateList.valueOf(0xFFFFFFFF));
+
+            // Set track to accent color when checked, gray when unchecked
+            int[][] states = new int[][] {
+                    new int[] { android.R.attr.state_checked },
+                    new int[] { -android.R.attr.state_checked }
+            };
+            int[] colors = new int[] {
+                    accentColor,
+                    0x4DFFFFFF // 30% white when unchecked
+            };
+            binding.notificationsSwitch.setTrackTintList(new android.content.res.ColorStateList(states, colors));
+
             binding.notificationsSwitch.setChecked(sharedPreferences.getBoolean("notifications", true));
             binding.notificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this,

@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +28,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.shejan.nextdo.databinding.ActivityMainBinding;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity implements TaskListAdapter.OnTaskInteractionListener {
     private static final String TAG = "MainActivity";
@@ -34,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     private ActivityMainBinding binding;
     private TaskViewModel taskViewModel;
     private AlarmScheduler alarmScheduler;
+    private boolean shouldScrollToTop = false;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -68,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
                     if (id != 0) {
                         Log.d(TAG, "Updating task " + id + " with reminderTime=" + reminderTime);
-                        
+
                         // Schedule alarm callback AFTER database update completes
                         final Task taskForCallback = task;
                         final long finalReminderTime = reminderTime;
@@ -84,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                         });
                     } else {
                         Log.d(TAG, "Inserting new task with reminderTime=" + reminderTime);
-                        
+
                         // Schedule alarm callback AFTER database insert completes
                         final Task taskForCallback = task;
                         final long finalReminderTime = reminderTime;
@@ -97,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                                 Log.d(TAG, "No reminder for new task");
                             }
                         });
+                        shouldScrollToTop = true;
                     }
                 } else if (result.getResultCode() == NewTaskActivity.RESULT_DELETE && result.getData() != null) {
                     Intent data = result.getData();
@@ -112,6 +121,12 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
             });
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        applyBackground();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ThemeManager.applyTheme(this);
@@ -119,12 +134,23 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Enable Edge-to-Edge
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        ViewCompat.setOnApplyWindowInsetsListener(binding.drawerLayout, (v, windowInsets) -> {
+            androidx.core.graphics.Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            // Apply padding to the ConstraintLayout inside DrawerLayout to avoid overlap
+            // We find the ConstraintLayout (first child of DrawerLayout)
+            View content = binding.drawerLayout.getChildAt(0);
+            content.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
+
         // Initialize AlarmScheduler
         alarmScheduler = new AlarmScheduler(this);
         Log.d(TAG, "AlarmScheduler initialized");
 
         // Remove toolbar for Nothing theme
-        setupSettingsButton();
+        setupNavigationDrawer();
 
         askNotificationPermission();
 
@@ -137,7 +163,12 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
         taskViewModel.getAllTasks().observe(this, tasks -> {
             if (tasks != null) {
-                adapter.submitList(tasks);
+                adapter.submitList(tasks, () -> {
+                    if (shouldScrollToTop) {
+                        binding.recyclerview.smoothScrollToPosition(0);
+                        shouldScrollToTop = false;
+                    }
+                });
                 if (binding.emptyView != null && binding.recyclerview != null) {
                     if (tasks.isEmpty()) {
                         binding.emptyView.setVisibility(View.VISIBLE);
@@ -151,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         });
 
         if (binding.fab != null) {
+
             // Start floating animation
             android.view.animation.Animation floatAnimation = android.view.animation.AnimationUtils.loadAnimation(this,
                     R.anim.fab_float_animation);
@@ -166,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         }
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(
-                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
                     @Override
                     public boolean isLongPressDragEnabled() {
@@ -178,7 +210,19 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                         return true;
                     }
 
+                    @Override
+                    public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+                        return 0.3f; // Lower threshold for easier swipe
+                    }
+
+                    @Override
+                    public float getSwipeEscapeVelocity(float defaultValue) {
+                        return defaultValue * 0.5f; // Easier to trigger swipe
+                    }
+
                     private final Paint textPaint = new Paint();
+                    private final Paint iconPaint = new Paint();
+                    private final Paint circlePaint = new Paint();
                     private final ColorDrawable background = new ColorDrawable();
 
                     @Override
@@ -191,14 +235,77 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         int position = viewHolder.getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
-                            Task taskToDelete = adapter.getTaskAt(position);
-                            taskViewModel.delete(taskToDelete);
+                            Task task = adapter.getTaskAt(position);
 
-                            Snackbar.make(binding.getRoot(), "Task deleted", Snackbar.LENGTH_LONG)
-                                    .setAction("Undo", v -> taskViewModel.insert(taskToDelete))
-                                    .show();
+                            // Vibration feedback
+                            try {
+                                android.os.VibrationEffect effect = android.os.VibrationEffect.createOneShot(50,
+                                        android.os.VibrationEffect.DEFAULT_AMPLITUDE);
+                                android.os.Vibrator vibrator = (android.os.Vibrator) getSystemService(
+                                        android.content.Context.VIBRATOR_SERVICE);
+                                if (vibrator != null) {
+                                    vibrator.vibrate(effect);
+                                }
+                            } catch (Exception e) {
+                                // Vibration not available
+                            }
+
+                            if (direction == ItemTouchHelper.LEFT) {
+                                // HEAVY DELETE ANIMATION
+                                viewHolder.itemView.animate()
+                                        .alpha(0f)
+                                        .scaleX(0.5f)
+                                        .scaleY(0.5f)
+                                        .rotation(15f)
+                                        .translationX(-viewHolder.itemView.getWidth())
+                                        .setDuration(400)
+                                        .setInterpolator(new android.view.animation.AccelerateInterpolator())
+                                        .withEndAction(() -> {
+                                            taskViewModel.delete(task);
+                                            viewHolder.itemView.setAlpha(1f);
+                                            viewHolder.itemView.setScaleX(1f);
+                                            viewHolder.itemView.setScaleY(1f);
+                                            viewHolder.itemView.setRotation(0f);
+                                            viewHolder.itemView.setTranslationX(0f);
+                                            Snackbar.make(binding.getRoot(), "Task deleted", Snackbar.LENGTH_LONG)
+                                                    .setAction("Undo", v -> taskViewModel.insert(task))
+                                                    .show();
+                                        })
+                                        .start();
+                            } else if (direction == ItemTouchHelper.RIGHT) {
+                                // RIGHT SWIPE - Edit action
+                                final Task taskToEdit = task;
+
+                                // CRITICAL FIX: Reset the item immediately to prevent removal
+                                adapter.notifyItemChanged(position);
+
+                                // Play bounce animation
+                                viewHolder.itemView.animate()
+                                        .scaleX(1.15f)
+                                        .scaleY(1.15f)
+                                        .rotation(-3f)
+                                        .setDuration(150)
+                                        .setInterpolator(new android.view.animation.OvershootInterpolator())
+                                        .withEndAction(() -> {
+                                            viewHolder.itemView.animate()
+                                                    .scaleX(1f)
+                                                    .scaleY(1f)
+                                                    .rotation(0f)
+                                                    .setDuration(150)
+                                                    .start();
+                                        })
+                                        .start();
+
+                                // Open edit screen after delay to ensure item is restored
+                                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                                    onTaskClicked(taskToEdit);
+                                }, 100);
+                            }
                         }
                     }
+
+                    private Drawable deleteIcon;
+                    private Drawable editIcon;
 
                     @Override
                     public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
@@ -206,40 +313,252 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                             boolean isCurrentlyActive) {
                         View itemView = viewHolder.itemView;
 
-                        if (dX < 0) { // Swiping to the left
-                            background.setColor(Color.RED);
-                            background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(),
-                                    itemView.getBottom());
+                        // Initialize icons if needed
+                        if (deleteIcon == null) {
+                            deleteIcon = ContextCompat.getDrawable(MainActivity.this, R.drawable.ic_swipe_delete);
+                        }
+                        if (editIcon == null) {
+                            editIcon = ContextCompat.getDrawable(MainActivity.this, R.drawable.ic_swipe_edit);
+                        }
+
+                        // Much lower threshold for easier activation
+                        float swipeThreshold = itemView.getWidth() * 0.15f;
+
+                        if (dX < 0) { // Swiping LEFT (Delete) - HEAVY ANIMATIONS
+                            float swipeProgress = Math.min(Math.abs(dX) / swipeThreshold, 1.0f);
+
+                            // LIGHTER MATTE RED
+                            int startColor = Color.parseColor("#E57373"); // Light Matte Red
+                            int endColor = Color.parseColor("#EF5350"); // Slightly darker
+                            int currentColor = interpolateColor(startColor, endColor, swipeProgress);
+
+                            background.setColor(currentColor);
+                            background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(),
+                                    itemView.getRight(), itemView.getBottom());
                             background.draw(c);
 
+                            // PULSING CIRCLE EFFECT
+                            circlePaint.setColor(Color.WHITE);
+                            circlePaint.setAlpha((int) (100 * swipeProgress));
+                            circlePaint.setAntiAlias(true);
+                            float pulseRadius = 70f * swipeProgress
+                                    * (1 + 0.3f * (float) Math.sin(System.currentTimeMillis() / 100.0));
+                            float circleCenterX = itemView.getRight() - 120;
+                            float circleCenterY = itemView.getTop() + (itemView.getHeight() / 2f);
+                            c.drawCircle(circleCenterX, circleCenterY, pulseRadius, circlePaint);
+
+                            // LARGE ANIMATED ICON (PNG)
+                            if (deleteIcon != null) {
+                                float iconSize = 70f * swipeProgress;
+                                float iconCenterX = itemView.getRight() - 120;
+                                float iconCenterY = itemView.getTop() + (itemView.getHeight() / 2f);
+
+                                int halfSize = (int) (iconSize / 2);
+                                deleteIcon.setBounds(
+                                        (int) (iconCenterX - halfSize),
+                                        (int) (iconCenterY - halfSize),
+                                        (int) (iconCenterX + halfSize),
+                                        (int) (iconCenterY + halfSize));
+                                deleteIcon.setAlpha((int) (255 * swipeProgress));
+                                deleteIcon.draw(c);
+                            }
+
+                            // LARGE BOLD TEXT
                             textPaint.setColor(Color.WHITE);
-                            textPaint.setTextSize(getResources().getDimension(R.dimen.swipe_text_size));
+                            textPaint.setTextSize(42f * swipeProgress);
                             textPaint.setAntiAlias(true);
-                            textPaint.setTextAlign(Paint.Align.RIGHT);
+                            textPaint.setTextAlign(Paint.Align.CENTER);
+                            textPaint.setAlpha((int) (255 * swipeProgress));
+                            textPaint.setFakeBoldText(true);
 
-                            String deleteText = "Delete";
-                            float textMargin = getResources().getDimension(R.dimen.swipe_text_margin);
-                            float textX = itemView.getRight() - textMargin;
-                            float textY = itemView.getTop() + (itemView.getHeight() / 2f)
-                                    - ((textPaint.descent() + textPaint.ascent()) / 2f);
+                            String deleteText = "DELETE";
+                            // Adjust text position relative to the icon size
+                            float textY = itemView.getTop() + (itemView.getHeight() / 2f) + (70f * swipeProgress / 2)
+                                    + 40;
+                            c.drawText(deleteText, circleCenterX, textY, textPaint);
 
-                            c.drawText(deleteText, textX, textY, textPaint);
+                            // DRAMATIC SCALE AND ROTATION
+                            float scale = 1.0f - (swipeProgress * 0.15f);
+                            float rotation = swipeProgress * 8f;
+                            itemView.setScaleX(scale);
+                            itemView.setScaleY(scale);
+                            itemView.setRotation(rotation);
+
+                            // ELEVATION EFFECT
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                                itemView.setElevation(20f * swipeProgress);
+                            }
+
+                        } else if (dX > 0) { // Swiping RIGHT (Edit) - HEAVY ANIMATIONS
+                            float swipeProgress = Math.min(dX / swipeThreshold, 1.0f);
+
+                            // LIGHTER MATTE GREEN
+                            int startColor = Color.parseColor("#81C784"); // Light Matte Green
+                            int endColor = Color.parseColor("#66BB6A"); // Slightly darker
+                            int currentColor = interpolateColor(startColor, endColor, swipeProgress);
+
+                            background.setColor(currentColor);
+                            background.setBounds(itemView.getLeft(), itemView.getTop(),
+                                    itemView.getLeft() + (int) dX, itemView.getBottom());
+                            background.draw(c);
+
+                            // PULSING CIRCLE EFFECT
+                            circlePaint.setColor(Color.WHITE);
+                            circlePaint.setAlpha((int) (100 * swipeProgress));
+                            circlePaint.setAntiAlias(true);
+                            float pulseRadius = 70f * swipeProgress
+                                    * (1 + 0.3f * (float) Math.sin(System.currentTimeMillis() / 100.0));
+                            float circleCenterX = itemView.getLeft() + 120;
+                            float circleCenterY = itemView.getTop() + (itemView.getHeight() / 2f);
+                            c.drawCircle(circleCenterX, circleCenterY, pulseRadius, circlePaint);
+
+                            // LARGE ANIMATED ICON (PNG)
+                            if (editIcon != null) {
+                                float iconSize = 70f * swipeProgress;
+                                float iconCenterX = itemView.getLeft() + 120;
+                                float iconCenterY = itemView.getTop() + (itemView.getHeight() / 2f);
+
+                                int halfSize = (int) (iconSize / 2);
+                                editIcon.setBounds(
+                                        (int) (iconCenterX - halfSize),
+                                        (int) (iconCenterY - halfSize),
+                                        (int) (iconCenterX + halfSize),
+                                        (int) (iconCenterY + halfSize));
+                                editIcon.setAlpha((int) (255 * swipeProgress));
+                                editIcon.draw(c);
+                            }
+
+                            // LARGE BOLD TEXT
+                            textPaint.setColor(Color.WHITE);
+                            textPaint.setTextSize(42f * swipeProgress);
+                            textPaint.setAntiAlias(true);
+                            textPaint.setTextAlign(Paint.Align.CENTER);
+                            textPaint.setAlpha((int) (255 * swipeProgress));
+                            textPaint.setFakeBoldText(true);
+
+                            String editText = "EDIT";
+                            // Adjust text position relative to the icon size
+                            float textY = itemView.getTop() + (itemView.getHeight() / 2f) + (70f * swipeProgress / 2)
+                                    + 40;
+                            c.drawText(editText, circleCenterX, textY, textPaint);
+
+                            // DRAMATIC SCALE AND ROTATION
+                            float scale = 1.0f - (swipeProgress * 0.15f);
+                            float rotation = -swipeProgress * 8f;
+                            itemView.setScaleX(scale);
+                            itemView.setScaleY(scale);
+                            itemView.setRotation(rotation);
+
+                            // ELEVATION EFFECT
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                                itemView.setElevation(20f * swipeProgress);
+                            }
+                        } else {
+                            // Reset all transformations
+                            itemView.setScaleX(1.0f);
+                            itemView.setScaleY(1.0f);
+                            itemView.setRotation(0f);
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                                itemView.setElevation(0f);
+                            }
                         }
+
                         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                    }
+
+                    @Override
+                    public void clearView(@NonNull RecyclerView recyclerView,
+                            @NonNull RecyclerView.ViewHolder viewHolder) {
+                        super.clearView(recyclerView, viewHolder);
+                        // Reset all transformations when swipe is cancelled
+                        viewHolder.itemView.setScaleX(1.0f);
+                        viewHolder.itemView.setScaleY(1.0f);
+                        viewHolder.itemView.setRotation(0f);
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                            viewHolder.itemView.setElevation(0f);
+                        }
+                    }
+
+                    // Helper method for smooth color interpolation
+                    private int interpolateColor(int startColor, int endColor, float fraction) {
+                        int startA = Color.alpha(startColor);
+                        int startR = Color.red(startColor);
+                        int startG = Color.green(startColor);
+                        int startB = Color.blue(startColor);
+
+                        int endA = Color.alpha(endColor);
+                        int endR = Color.red(endColor);
+                        int endG = Color.green(endColor);
+                        int endB = Color.blue(endColor);
+
+                        return Color.argb(
+                                (int) (startA + fraction * (endA - startA)),
+                                (int) (startR + fraction * (endR - startR)),
+                                (int) (startG + fraction * (endG - startG)),
+                                (int) (startB + fraction * (endB - startB)));
                     }
                 });
         itemTouchHelper.attachToRecyclerView(binding.recyclerview);
     }
 
-    private void setupSettingsButton() {
-        try {
-            findViewById(R.id.settings_icon).setOnClickListener(v -> {
+    private void applyBackground() {
+        android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
+                .getDefaultSharedPreferences(this);
+        String background = prefs.getString("app_background", "default");
+
+        // Find the ConstraintLayout inside the DrawerLayout
+        View content = binding.drawerLayout.getChildAt(0);
+
+        int drawableId = 0;
+        switch (background) {
+            case "bg_night_cottage":
+                drawableId = R.drawable.bg_night_cottage;
+                break;
+            case "bg_urban_sketch":
+                drawableId = R.drawable.bg_urban_sketch;
+                break;
+            case "bg_mystic_tree":
+                drawableId = R.drawable.bg_mystic_tree;
+                break;
+            case "bg_dark_waves":
+                drawableId = R.drawable.bg_dark_waves;
+                break;
+            default:
+                drawableId = 0;
+                break;
+        }
+
+        if (drawableId != 0) {
+            content.setBackground(ContextCompat.getDrawable(this, drawableId));
+            // Ensure background scales properly (centerCrop equivalent for View background
+            // is tricky,
+            // but setting background drawable usually stretches. For better scaling, we
+            // might need an ImageView,
+            // but for now let's try setting the background directly.)
+        } else {
+            // Default background (theme attribute)
+            android.util.TypedValue typedValue = new android.util.TypedValue();
+            getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+            if (typedValue.resourceId != 0) {
+                content.setBackgroundResource(typedValue.resourceId);
+            } else {
+                content.setBackgroundColor(typedValue.data);
+            }
+        }
+    }
+
+    private void setupNavigationDrawer() {
+        binding.menuIcon.setOnClickListener(v -> binding.drawerLayout.openDrawer(GravityCompat.END));
+
+        binding.navView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_settings) {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
-            });
-        } catch (Exception e) {
-            // Handle settings button setup failure
-        }
+            }
+            binding.drawerLayout.closeDrawer(GravityCompat.END);
+            return true;
+        });
     }
 
     private void askNotificationPermission() {

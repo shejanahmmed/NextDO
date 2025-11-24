@@ -36,6 +36,7 @@ public class NewTaskActivity extends AppCompatActivity {
     private Calendar calendar = Calendar.getInstance();
     private int taskId = 0;
     private int alarmId = 0;
+    private boolean isReminderSet = false;
     private AlarmScheduler alarmScheduler;
 
     @Override
@@ -96,6 +97,7 @@ public class NewTaskActivity extends AppCompatActivity {
             long reminderTime = intent.getLongExtra(EXTRA_REMINDER_TIME, 0);
             if (reminderTime > 0) {
                 calendar.setTimeInMillis(reminderTime);
+                isReminderSet = true;
                 updateReminderTimeText();
             }
         } else {
@@ -128,7 +130,7 @@ public class NewTaskActivity extends AppCompatActivity {
                         String repeat = binding.spinnerRepeat != null && binding.spinnerRepeat.getSelectedItem() != null
                                 ? binding.spinnerRepeat.getSelectedItem().toString()
                                 : "NONE";
-                        long reminderTime = calendar.getTimeInMillis();
+                        long reminderTime = isReminderSet ? calendar.getTimeInMillis() : 0;
 
                         Task task = new Task();
                         if (taskId != 0) {
@@ -144,10 +146,11 @@ public class NewTaskActivity extends AppCompatActivity {
                         task.reminderTime = reminderTime;
                         task.repeat = repeat;
 
-                        Log.d(TAG, "Task details: id=" + task.id + ", alarmId=" + task.alarmId + 
-                              ", reminderTime=" + reminderTime);
+                        Log.d(TAG, "Task details: id=" + task.id + ", alarmId=" + task.alarmId +
+                                ", reminderTime=" + reminderTime);
 
-                        // NOTE: Do NOT schedule alarm here! MainActivity will schedule after database insert completes.
+                        // NOTE: Do NOT schedule alarm here! MainActivity will schedule after database
+                        // insert completes.
                         // Scheduling here causes double scheduling and race conditions.
                         Log.d(TAG, "NewTaskActivity: Not scheduling alarm here (will be scheduled by MainActivity)");
 
@@ -218,6 +221,7 @@ public class NewTaskActivity extends AppCompatActivity {
                     calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     calendar.set(Calendar.MINUTE, minute);
                     calendar.set(Calendar.SECOND, 0);
+                    isReminderSet = true;
                     updateReminderTimeText();
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
         timePickerDialog.show();

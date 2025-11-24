@@ -14,14 +14,14 @@
         <item name="colorOnSecondary">@color/white</item>
 
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/light_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <!-- Window background. -->
         <item name="android:windowBackground">@color/light_background</item>
 
         <!-- Set status bar icon color to dark -->
         <item name="android:windowLightStatusBar">true</item>
         <!-- Navigation bar color -->
-        <item name="android:navigationBarColor">@color/light_background</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
 
         <!-- Apply the custom theme to the settings screen -->

@@ -35,6 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         setupBackButton();
         setupThemeSettings();
+        setupBackgroundSettings();
         setupNotificationSettings();
         setupSocialLinks();
     }
@@ -100,6 +101,79 @@ public class SettingsActivity extends AppCompatActivity {
             else if ("system".equals(theme))
                 displayText = "System";
             binding.currentThemeText.setText(displayText);
+        }
+    }
+
+    private void setupBackgroundSettings() {
+        String currentBackground = sharedPreferences.getString("app_background", "default");
+        updateCurrentBackgroundText(currentBackground);
+
+        if (binding.backgroundButton != null) {
+            binding.backgroundButton.setOnClickListener(v -> {
+                String[] backgroundNames = { "Default (Black)", "Night Cottage", "Urban Sketch", "Mystic Tree",
+                        "Dark Waves" };
+                String[] backgroundValues = { "default", "bg_night_cottage", "bg_urban_sketch", "bg_mystic_tree",
+                        "bg_dark_waves" };
+
+                android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_theme_choice, null);
+                LinearLayout container = customView.findViewById(R.id.theme_options_container);
+                TextView title = customView.findViewById(R.id.dialog_title);
+                if (title != null)
+                    title.setText("Choose Background");
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setView(customView);
+                builder.setNegativeButton("Cancel", null);
+
+                AlertDialog dialog = builder.create();
+                dialog.getWindow().setBackgroundDrawable(
+                        new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+                for (int i = 0; i < backgroundNames.length; i++) {
+                    final int index = i;
+                    android.view.View optionView = getLayoutInflater().inflate(R.layout.theme_option_item, container,
+                            false);
+                    TextView textView = optionView.findViewById(R.id.theme_text);
+                    RadioButton radioButton = optionView.findViewById(R.id.theme_radio);
+
+                    textView.setText(backgroundNames[i]);
+                    boolean isSelected = backgroundValues[i].equals(currentBackground);
+                    radioButton.setChecked(isSelected);
+
+                    optionView.setOnClickListener(view -> {
+                        String selectedBackground = backgroundValues[index];
+                        sharedPreferences.edit().putString("app_background", selectedBackground).apply();
+                        updateCurrentBackgroundText(selectedBackground);
+                        dialog.dismiss();
+                        // Optional: Show toast or just let user go back to see change
+                    });
+
+                    container.addView(optionView);
+                }
+
+                dialog.show();
+            });
+        }
+    }
+
+    private void updateCurrentBackgroundText(String background) {
+        if (binding.currentBackgroundText != null) {
+            String displayText = "Default";
+            switch (background) {
+                case "bg_night_cottage":
+                    displayText = "Night Cottage";
+                    break;
+                case "bg_urban_sketch":
+                    displayText = "Urban Sketch";
+                    break;
+                case "bg_mystic_tree":
+                    displayText = "Mystic Tree";
+                    break;
+                case "bg_dark_waves":
+                    displayText = "Dark Waves";
+                    break;
+            }
+            binding.currentBackgroundText.setText(displayText);
         }
     }
 

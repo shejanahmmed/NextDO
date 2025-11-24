@@ -90,8 +90,12 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             }
 
             // DEFINITIVE FIX: Removing conditional styling for completed tasks.
-            binding.getRoot().setBackground(androidx.core.content.ContextCompat
-                    .getDrawable(binding.getRoot().getContext(), R.drawable.nothing_card_bg));
+            android.graphics.drawable.Drawable background = androidx.core.content.ContextCompat
+                    .getDrawable(binding.getRoot().getContext(), R.drawable.nothing_card_bg);
+            if (background != null) {
+                background.mutate().setAlpha(180); // Make it more transparent
+                binding.getRoot().setBackground(background);
+            }
 
             if (binding.chipPriority != null) {
                 if (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) {

@@ -74,18 +74,14 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setupBackButton() {
-        if (binding.backArrow != null) {
-            binding.backArrow.setOnClickListener(v -> finish());
-        }
+        binding.backArrow.setOnClickListener(v -> finish());
     }
 
     private void setupAccentColorSettings() {
         int currentColor = sharedPreferences.getInt("accent_color", 0xFF34C759);
         updateColorPreview(currentColor);
 
-        if (binding.accentColorButton != null) {
-            binding.accentColorButton.setOnClickListener(v -> showColorPicker(currentColor));
-        }
+        binding.accentColorButton.setOnClickListener(v -> showColorPicker(currentColor));
     }
 
     private void showColorPicker(int currentColor) {
@@ -97,14 +93,16 @@ public class SettingsActivity extends AppCompatActivity {
         LinearLayout container = customView.findViewById(R.id.theme_options_container);
         TextView title = customView.findViewById(R.id.dialog_title);
         if (title != null)
-            title.setText("Choose Accent Color");
+            title.setText(R.string.choose_accent_color);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(customView);
         builder.setNegativeButton("Cancel", null);
         AlertDialog dialog = builder.create();
-        dialog.getWindow()
-                .setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
 
         for (int i = 0; i < colors.length; i++) {
             final int color = colors[i];
@@ -132,12 +130,8 @@ public class SettingsActivity extends AppCompatActivity {
 
                 // Apply color to notification switch immediately
                 // Apply color to notification switch immediately
-                if (binding.notificationsSwitch != null) {
-                    applySwitchColors(binding.notificationsSwitch, color);
-                }
-                if (binding.persistentNotificationsSwitch != null) {
-                    applySwitchColors(binding.persistentNotificationsSwitch, color);
-                }
+                applySwitchColors(binding.notificationsSwitch, color);
+                applySwitchColors(binding.persistentNotificationsSwitch, color);
 
                 dialog.dismiss();
                 Toast.makeText(this, "Accent color changed", Toast.LENGTH_SHORT).show();
@@ -148,92 +142,88 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void updateColorPreview(int color) {
-        if (binding.colorPreview != null) {
-            android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
-            drawable.setShape(android.graphics.drawable.GradientDrawable.OVAL);
-            drawable.setColor(color);
-            binding.colorPreview.setBackground(drawable);
-        }
+        android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
+        drawable.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        drawable.setColor(color);
+        binding.colorPreview.setBackground(drawable);
     }
 
     private void setupBackgroundSettings() {
         String currentBackground = sharedPreferences.getString("app_background", "default");
         updateCurrentBackgroundText(currentBackground);
 
-        if (binding.backgroundButton != null) {
-            binding.backgroundButton.setOnClickListener(v -> {
-                String[] backgroundNames = { "Default (Black)", "Night Cottage", "Urban Sketch", "Mystic Tree",
-                        "Dark Waves", "Choose from Gallery" };
-                String[] backgroundValues = { "default", "bg_night_cottage", "bg_urban_sketch", "bg_mystic_tree",
-                        "bg_dark_waves", "custom" };
+        binding.backgroundButton.setOnClickListener(v -> {
+            String[] backgroundNames = { "Default (Black)", "Night Cottage", "Urban Sketch", "Mystic Tree",
+                    "Dark Waves", "Choose from Gallery" };
+            String[] backgroundValues = { "default", "bg_night_cottage", "bg_urban_sketch", "bg_mystic_tree",
+                    "bg_dark_waves", "custom" };
 
-                android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_theme_choice, null);
-                LinearLayout container = customView.findViewById(R.id.theme_options_container);
-                TextView title = customView.findViewById(R.id.dialog_title);
-                if (title != null)
-                    title.setText("Choose Background");
+            android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_theme_choice, null);
+            LinearLayout container = customView.findViewById(R.id.theme_options_container);
+            TextView title = customView.findViewById(R.id.dialog_title);
+            if (title != null)
+                title.setText(R.string.choose_background);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setView(customView);
-                builder.setNegativeButton("Cancel", null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setView(customView);
+            builder.setNegativeButton("Cancel", null);
 
-                AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
+            if (dialog.getWindow() != null) {
                 dialog.getWindow().setBackgroundDrawable(
                         new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            }
 
-                for (int i = 0; i < backgroundNames.length; i++) {
-                    final int index = i;
-                    android.view.View optionView = getLayoutInflater().inflate(R.layout.theme_option_item, container,
-                            false);
-                    TextView textView = optionView.findViewById(R.id.theme_text);
-                    RadioButton radioButton = optionView.findViewById(R.id.theme_radio);
+            for (int i = 0; i < backgroundNames.length; i++) {
+                final int index = i;
+                android.view.View optionView = getLayoutInflater().inflate(R.layout.theme_option_item, container,
+                        false);
+                TextView textView = optionView.findViewById(R.id.theme_text);
+                RadioButton radioButton = optionView.findViewById(R.id.theme_radio);
 
-                    textView.setText(backgroundNames[i]);
-                    boolean isSelected = backgroundValues[i].equals(currentBackground);
-                    radioButton.setChecked(isSelected);
+                textView.setText(backgroundNames[i]);
+                boolean isSelected = backgroundValues[i].equals(currentBackground);
+                radioButton.setChecked(isSelected);
 
-                    optionView.setOnClickListener(view -> {
-                        String selectedBackground = backgroundValues[index];
-                        if ("custom".equals(selectedBackground)) {
-                            imagePickerLauncher.launch("image/*");
-                            dialog.dismiss();
-                        } else {
-                            sharedPreferences.edit().putString("app_background", selectedBackground).apply();
-                            updateCurrentBackgroundText(selectedBackground);
-                            dialog.dismiss();
-                        }
-                    });
+                optionView.setOnClickListener(view -> {
+                    String selectedBackground = backgroundValues[index];
+                    if ("custom".equals(selectedBackground)) {
+                        imagePickerLauncher.launch("image/*");
+                        dialog.dismiss();
+                    } else {
+                        sharedPreferences.edit().putString("app_background", selectedBackground).apply();
+                        updateCurrentBackgroundText(selectedBackground);
+                        dialog.dismiss();
+                    }
+                });
 
-                    container.addView(optionView);
-                }
+                container.addView(optionView);
+            }
 
-                dialog.show();
-            });
-        }
+            dialog.show();
+        });
     }
 
     private void updateCurrentBackgroundText(String background) {
-        if (binding.currentBackgroundText != null) {
-            String displayText = "Default";
-            switch (background) {
-                case "bg_night_cottage":
-                    displayText = "Night Cottage";
-                    break;
-                case "bg_urban_sketch":
-                    displayText = "Urban Sketch";
-                    break;
-                case "bg_mystic_tree":
-                    displayText = "Mystic Tree";
-                    break;
-                case "bg_dark_waves":
-                    displayText = "Dark Waves";
-                    break;
-                case "custom":
-                    displayText = "Custom Image";
-                    break;
-            }
-            binding.currentBackgroundText.setText(displayText);
+        String displayText = "Default";
+        switch (background) {
+            case "bg_night_cottage":
+                displayText = "Night Cottage";
+                break;
+            case "bg_urban_sketch":
+                displayText = "Urban Sketch";
+                break;
+            case "bg_mystic_tree":
+                displayText = "Mystic Tree";
+                break;
+            case "bg_dark_waves":
+                displayText = "Dark Waves";
+                break;
+            case "custom":
+                displayText = "Custom Image";
+                break;
         }
+        binding.currentBackgroundText.setText(displayText);
     }
 
     private void applySwitchColors(com.google.android.material.switchmaterial.SwitchMaterial switchView,
@@ -259,88 +249,78 @@ public class SettingsActivity extends AppCompatActivity {
     private void setupNotificationSettings() {
         int accentColor = sharedPreferences.getInt("accent_color", 0xFF34C759);
 
-        if (binding.notificationsSwitch != null) {
-            applySwitchColors(binding.notificationsSwitch, accentColor);
-            binding.notificationsSwitch.setChecked(sharedPreferences.getBoolean("notifications", true));
-            binding.notificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this,
-                        R.anim.switch_animation);
-                binding.notificationsSwitch.startAnimation(animation);
-                sharedPreferences.edit().putBoolean("notifications", isChecked).apply();
-            });
-        }
+        applySwitchColors(binding.notificationsSwitch, accentColor);
+        binding.notificationsSwitch.setChecked(sharedPreferences.getBoolean("notifications", true));
+        binding.notificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this,
+                    R.anim.switch_animation);
+            binding.notificationsSwitch.startAnimation(animation);
+            sharedPreferences.edit().putBoolean("notifications", isChecked).apply();
+        });
 
-        if (binding.persistentNotificationsSwitch != null) {
-            applySwitchColors(binding.persistentNotificationsSwitch, accentColor);
-            binding.persistentNotificationsSwitch
-                    .setChecked(sharedPreferences.getBoolean("persistent_notifications", false));
-            binding.persistentNotificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this,
-                        R.anim.switch_animation);
-                binding.persistentNotificationsSwitch.startAnimation(animation);
-                sharedPreferences.edit().putBoolean("persistent_notifications", isChecked).apply();
-            });
-        }
+        applySwitchColors(binding.persistentNotificationsSwitch, accentColor);
+        binding.persistentNotificationsSwitch
+                .setChecked(sharedPreferences.getBoolean("persistent_notifications", false));
+        binding.persistentNotificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this,
+                    R.anim.switch_animation);
+            binding.persistentNotificationsSwitch.startAnimation(animation);
+            sharedPreferences.edit().putBoolean("persistent_notifications", isChecked).apply();
+        });
 
-        if (binding.snoozeSetting != null) {
-            binding.snoozeSetting.setOnClickListener(v -> {
-                try {
-                    String[] snoozeOptions = getResources().getStringArray(R.array.snooze_duration_entries);
-                    String[] snoozeValues = getResources().getStringArray(R.array.snooze_duration_values);
-                    String currentSnooze = sharedPreferences.getString("snooze_duration", "300000");
+        binding.snoozeSetting.setOnClickListener(v -> {
+            try {
+                String[] snoozeOptions = getResources().getStringArray(R.array.snooze_duration_entries);
+                String[] snoozeValues = getResources().getStringArray(R.array.snooze_duration_values);
+                String currentSnooze = sharedPreferences.getString("snooze_duration", "300000");
 
-                    if (snoozeOptions.length == 0 || snoozeValues.length == 0) {
-                        return;
-                    }
+                if (snoozeOptions.length == 0 || snoozeValues.length == 0) {
+                    return;
+                }
 
-                    android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_snooze_duration, null);
-                    LinearLayout container = customView.findViewById(R.id.snooze_options_container);
+                android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_snooze_duration, null);
+                LinearLayout container = customView.findViewById(R.id.snooze_options_container);
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setView(customView);
-                    builder.setNegativeButton("Cancel", null);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setView(customView);
+                builder.setNegativeButton("Cancel", null);
 
-                    AlertDialog dialog = builder.create();
+                AlertDialog dialog = builder.create();
+                if (dialog.getWindow() != null) {
                     dialog.getWindow().setBackgroundDrawable(
                             new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-
-                    for (int i = 0; i < snoozeOptions.length; i++) {
-                        final int index = i;
-                        android.view.View optionView = getLayoutInflater().inflate(R.layout.snooze_option_item,
-                                container, false);
-                        TextView textView = optionView.findViewById(R.id.snooze_text);
-                        RadioButton radioButton = optionView.findViewById(R.id.snooze_radio);
-
-                        textView.setText(snoozeOptions[i]);
-                        boolean isSelected = snoozeValues[i].equals(currentSnooze);
-                        radioButton.setChecked(isSelected);
-
-                        optionView.setOnClickListener(view -> {
-                            sharedPreferences.edit().putString("snooze_duration", snoozeValues[index]).apply();
-                            dialog.dismiss();
-                        });
-
-                        container.addView(optionView);
-                    }
-
-                    dialog.show();
-                } catch (Exception e) {
-                    // Handle dialog creation failure
                 }
-            });
-        }
+
+                for (int i = 0; i < snoozeOptions.length; i++) {
+                    final int index = i;
+                    android.view.View optionView = getLayoutInflater().inflate(R.layout.snooze_option_item,
+                            container, false);
+                    TextView textView = optionView.findViewById(R.id.snooze_text);
+                    RadioButton radioButton = optionView.findViewById(R.id.snooze_radio);
+
+                    textView.setText(snoozeOptions[i]);
+                    boolean isSelected = snoozeValues[i].equals(currentSnooze);
+                    radioButton.setChecked(isSelected);
+
+                    optionView.setOnClickListener(view -> {
+                        sharedPreferences.edit().putString("snooze_duration", snoozeValues[index]).apply();
+                        dialog.dismiss();
+                    });
+
+                    container.addView(optionView);
+                }
+
+                dialog.show();
+            } catch (Exception e) {
+                // Handle dialog creation failure
+            }
+        });
     }
 
     private void setupSocialLinks() {
-        if (binding.githubIcon != null) {
-            binding.githubIcon.setOnClickListener(v -> openUrl("https://github.com/shejanahmmed"));
-        }
-        if (binding.instagramIcon != null) {
-            binding.instagramIcon.setOnClickListener(v -> openUrl("https://www.instagram.com/iamshejan/"));
-        }
-        if (binding.linkedinIcon != null) {
-            binding.linkedinIcon.setOnClickListener(v -> openUrl("https://www.linkedin.com/in/farjan-ahmmed/"));
-        }
+        binding.githubIcon.setOnClickListener(v -> openUrl("https://github.com/shejanahmmed"));
+        binding.instagramIcon.setOnClickListener(v -> openUrl("https://www.instagram.com/iamshejan/"));
+        binding.linkedinIcon.setOnClickListener(v -> openUrl("https://www.linkedin.com/in/farjan-ahmmed/"));
     }
 
     private void openUrl(String url) {

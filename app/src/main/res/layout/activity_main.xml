@@ -17,7 +17,7 @@
             android:id="@+id/main_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="NextDO"
+            android:text="My Tasks"
             android:textSize="32sp"
             android:textStyle="bold"
             android:textColor="?attr/colorOnSurface"
@@ -110,6 +110,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/drawer_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

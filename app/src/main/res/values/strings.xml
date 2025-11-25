@@ -37,4 +37,6 @@
         <item>15</item>
         <item>30</item>
     </string-array>
+    <string name="choose_accent_color">Choose Accent Color</string>
+    <string name="choose_background">Choose Background</string>
 </resources>

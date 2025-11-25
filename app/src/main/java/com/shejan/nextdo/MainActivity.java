@@ -29,8 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.snackbar.Snackbar;
 import com.shejan.nextdo.databinding.ActivityMainBinding;
 import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import com.google.android.material.navigation.NavigationView;
+
 import androidx.core.view.WindowCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -112,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                     Intent data = result.getData();
                     int id = data.getIntExtra(NewTaskActivity.EXTRA_ID, -1);
                     if (id == -1) {
-                        Toast.makeText(this, "Task can\'t be deleted", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Task can't be deleted", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     Task task = new Task();
@@ -131,11 +130,10 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                 .getDefaultSharedPreferences(this);
         int accentColor = prefs.getInt("accent_color", 0xFF34C759);
 
-        if (binding.fab != null) {
-            binding.fab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accentColor));
-        }
+        binding.fab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accentColor));
 
         if (adapter != null) {
+            // noinspection NotifyDataSetChanged
             adapter.notifyDataSetChanged();
         }
     }
@@ -164,7 +162,8 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         Log.d(TAG, "AlarmScheduler initialized");
 
         // Remove toolbar for Nothing theme
-        setupNavigationDrawer();
+        // Remove toolbar for Nothing theme
+        setupDrawer();
 
         askNotificationPermission();
 
@@ -183,33 +182,28 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                         shouldScrollToTop = false;
                     }
                 });
-                if (binding.emptyView != null && binding.recyclerview != null) {
-                    if (tasks.isEmpty()) {
-                        binding.emptyView.setVisibility(View.VISIBLE);
-                        binding.recyclerview.setVisibility(View.GONE);
-                    } else {
-                        binding.emptyView.setVisibility(View.GONE);
-                        binding.recyclerview.setVisibility(View.VISIBLE);
-                    }
+                if (tasks.isEmpty()) {
+                    binding.emptyView.setVisibility(View.VISIBLE);
+                    binding.recyclerview.setVisibility(View.GONE);
+                } else {
+                    binding.emptyView.setVisibility(View.GONE);
+                    binding.recyclerview.setVisibility(View.VISIBLE);
                 }
             }
         });
 
-        if (binding.fab != null) {
+        // Start floating animation
+        android.view.animation.Animation floatAnimation = android.view.animation.AnimationUtils.loadAnimation(this,
+                R.anim.fab_float_animation);
+        binding.fab.startAnimation(floatAnimation);
 
-            // Start floating animation
-            android.view.animation.Animation floatAnimation = android.view.animation.AnimationUtils.loadAnimation(this,
-                    R.anim.fab_float_animation);
-            binding.fab.startAnimation(floatAnimation);
-
-            binding.fab.setOnClickListener(view -> {
-                android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this,
-                        R.anim.fab_click_animation);
-                binding.fab.startAnimation(animation);
-                Intent intent = new Intent(MainActivity.this, NewTaskActivity.class);
-                taskActivityLauncher.launch(intent);
-            });
-        }
+        binding.fab.setOnClickListener(view -> {
+            android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this,
+                    R.anim.fab_click_animation);
+            binding.fab.startAnimation(animation);
+            Intent intent = new Intent(MainActivity.this, NewTaskActivity.class);
+            taskActivityLauncher.launch(intent);
+        });
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(
                 new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -217,11 +211,6 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                     @Override
                     public boolean isLongPressDragEnabled() {
                         return false;
-                    }
-
-                    @Override
-                    public boolean isItemViewSwipeEnabled() {
-                        return true;
                     }
 
                     @Override
@@ -235,9 +224,9 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                     }
 
                     private final Paint textPaint = new Paint();
-                    private final Paint iconPaint = new Paint();
+
                     private final Paint circlePaint = new Paint();
-                    private final ColorDrawable background = new ColorDrawable();
+                    private final Paint backgroundPaint = new Paint();
 
                     @Override
                     public boolean onMove(@NonNull RecyclerView recyclerView,
@@ -247,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
                     @Override
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                        int position = viewHolder.getAdapterPosition();
+                        int position = viewHolder.getBindingAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
                             Task task = adapter.getTaskAt(position);
 
@@ -305,20 +294,17 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                                         .rotation(-3f)
                                         .setDuration(150)
                                         .setInterpolator(new android.view.animation.OvershootInterpolator())
-                                        .withEndAction(() -> {
-                                            viewHolder.itemView.animate()
-                                                    .scaleX(1f)
-                                                    .scaleY(1f)
-                                                    .rotation(0f)
-                                                    .setDuration(150)
-                                                    .start();
-                                        })
+                                        .withEndAction(() -> viewHolder.itemView.animate()
+                                                .scaleX(1f)
+                                                .scaleY(1f)
+                                                .rotation(0f)
+                                                .setDuration(150)
+                                                .start())
                                         .start();
 
                                 // Open edit screen after delay to ensure item is restored
-                                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                                    onTaskClicked(taskToEdit);
-                                }, 100);
+                                new android.os.Handler(android.os.Looper.getMainLooper())
+                                        .postDelayed(() -> onTaskClicked(taskToEdit), 100);
                             }
                         }
                     }
@@ -334,7 +320,8 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
                         // Initialize icons if needed
                         if (deleteIcon == null) {
-                            deleteIcon = ContextCompat.getDrawable(MainActivity.this, R.drawable.ic_swipe_delete);
+                            deleteIcon = ContextCompat.getDrawable(MainActivity.this,
+                                    R.drawable.ic_swipe_delete_custom);
                         }
                         if (editIcon == null) {
                             editIcon = ContextCompat.getDrawable(MainActivity.this, R.drawable.ic_swipe_edit);
@@ -346,15 +333,16 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                         if (dX < 0) { // Swiping LEFT (Delete) - HEAVY ANIMATIONS
                             float swipeProgress = Math.min(Math.abs(dX) / swipeThreshold, 1.0f);
 
-                            // LIGHTER MATTE RED
-                            int startColor = Color.parseColor("#E57373"); // Light Matte Red
-                            int endColor = Color.parseColor("#EF5350"); // Slightly darker
+                            // LIGHTER MATTE RED (40% transparent = 60% opacity = 99 hex)
+                            int startColor = Color.parseColor("#99E57373"); // Light Matte Red
+                            int endColor = Color.parseColor("#99EF5350"); // Slightly darker
                             int currentColor = interpolateColor(startColor, endColor, swipeProgress);
 
-                            background.setColor(currentColor);
-                            background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(),
+                            backgroundPaint.setColor(currentColor);
+                            android.graphics.RectF backgroundRect = new android.graphics.RectF(
+                                    itemView.getRight() + (int) dX, itemView.getTop(),
                                     itemView.getRight(), itemView.getBottom());
-                            background.draw(c);
+                            c.drawRoundRect(backgroundRect, 30f, 30f, backgroundPaint);
 
                             // PULSING CIRCLE EFFECT
                             circlePaint.setColor(Color.WHITE);
@@ -404,22 +392,22 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                             itemView.setRotation(rotation);
 
                             // ELEVATION EFFECT
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                                itemView.setElevation(20f * swipeProgress);
-                            }
+                            // ELEVATION EFFECT
+                            itemView.setElevation(20f * swipeProgress);
 
                         } else if (dX > 0) { // Swiping RIGHT (Edit) - HEAVY ANIMATIONS
                             float swipeProgress = Math.min(dX / swipeThreshold, 1.0f);
 
-                            // LIGHTER MATTE GREEN
-                            int startColor = Color.parseColor("#81C784"); // Light Matte Green
-                            int endColor = Color.parseColor("#66BB6A"); // Slightly darker
+                            // LIGHTER MATTE GREEN (40% transparent = 60% opacity = 99 hex)
+                            int startColor = Color.parseColor("#9981C784"); // Light Matte Green
+                            int endColor = Color.parseColor("#9966BB6A"); // Slightly darker
                             int currentColor = interpolateColor(startColor, endColor, swipeProgress);
 
-                            background.setColor(currentColor);
-                            background.setBounds(itemView.getLeft(), itemView.getTop(),
+                            backgroundPaint.setColor(currentColor);
+                            android.graphics.RectF backgroundRect = new android.graphics.RectF(itemView.getLeft(),
+                                    itemView.getTop(),
                                     itemView.getLeft() + (int) dX, itemView.getBottom());
-                            background.draw(c);
+                            c.drawRoundRect(backgroundRect, 30f, 30f, backgroundPaint);
 
                             // PULSING CIRCLE EFFECT
                             circlePaint.setColor(Color.WHITE);
@@ -469,17 +457,15 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                             itemView.setRotation(rotation);
 
                             // ELEVATION EFFECT
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                                itemView.setElevation(20f * swipeProgress);
-                            }
+                            // ELEVATION EFFECT
+                            itemView.setElevation(20f * swipeProgress);
                         } else {
                             // Reset all transformations
                             itemView.setScaleX(1.0f);
                             itemView.setScaleY(1.0f);
                             itemView.setRotation(0f);
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                                itemView.setElevation(0f);
-                            }
+                            itemView.setRotation(0f);
+                            itemView.setElevation(0f);
                         }
 
                         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
@@ -493,9 +479,8 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                         viewHolder.itemView.setScaleX(1.0f);
                         viewHolder.itemView.setScaleY(1.0f);
                         viewHolder.itemView.setRotation(0f);
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                            viewHolder.itemView.setElevation(0f);
-                        }
+                        viewHolder.itemView.setRotation(0f);
+                        viewHolder.itemView.setElevation(0f);
                     }
 
                     // Helper method for smooth color interpolation
@@ -518,6 +503,44 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                     }
                 });
         itemTouchHelper.attachToRecyclerView(binding.recyclerview);
+    }
+
+    private void setupDrawer() {
+        binding.menuIcon.setOnClickListener(v -> binding.drawerLayout.openDrawer(GravityCompat.END));
+
+        binding.navView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_settings) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+            } else if (id == R.id.nav_about) {
+                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(intent);
+            } else if (id == R.id.nav_help) {
+                Intent intent = new Intent(MainActivity.this, HelpFAQActivity.class);
+                startActivity(intent);
+            }
+            binding.drawerLayout.closeDrawer(GravityCompat.END);
+            return true;
+        });
+
+        // Setup Close Button in Header
+        android.view.View headerView = binding.navView.getHeaderView(0);
+        android.view.View closeButton = headerView.findViewById(R.id.close_drawer_button);
+        if (closeButton != null) {
+            closeButton.setOnClickListener(v -> binding.drawerLayout.closeDrawer(GravityCompat.END));
+        }
+    }
+
+    private void askNotificationPermission() {
+        // This is only necessary for API level 33 and above.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Launch the permission request
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void applyBackground() {
@@ -543,7 +566,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
             }
         }
 
-        int drawableId = 0;
+        int drawableId;
         switch (background) {
             case "bg_night_cottage":
                 drawableId = R.drawable.bg_night_cottage;
@@ -572,31 +595,6 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                 content.setBackgroundResource(typedValue.resourceId);
             } else {
                 content.setBackgroundColor(typedValue.data);
-            }
-        }
-    }
-
-    private void setupNavigationDrawer() {
-        binding.menuIcon.setOnClickListener(v -> binding.drawerLayout.openDrawer(GravityCompat.END));
-
-        binding.navView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_settings) {
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-            }
-            binding.drawerLayout.closeDrawer(GravityCompat.END);
-            return true;
-        });
-    }
-
-    private void askNotificationPermission() {
-        // This is only necessary for API level 33 and above.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                // Launch the permission request
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         }
     }
@@ -664,8 +662,10 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         builder.setView(customView);
 
         androidx.appcompat.app.AlertDialog dialog = builder.create();
-        dialog.getWindow()
-                .setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
 
         customView.findViewById(R.id.edit_option).setOnClickListener(v -> {
             dialog.dismiss();

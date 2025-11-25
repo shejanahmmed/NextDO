@@ -70,7 +70,7 @@ public class SettingsActivity extends AppCompatActivity {
         setupAccentColorSettings();
         setupBackgroundSettings();
         setupNotificationSettings();
-        setupSocialLinks();
+
     }
 
     private void setupBackButton() {
@@ -317,18 +317,4 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void setupSocialLinks() {
-        binding.githubIcon.setOnClickListener(v -> openUrl("https://github.com/shejanahmmed"));
-        binding.instagramIcon.setOnClickListener(v -> openUrl("https://www.instagram.com/iamshejan/"));
-        binding.linkedinIcon.setOnClickListener(v -> openUrl("https://www.linkedin.com/in/farjan-ahmmed/"));
-    }
-
-    private void openUrl(String url) {
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(intent);
-        } catch (Exception e) {
-            // Handle URL opening failure
-        }
-    }
 }

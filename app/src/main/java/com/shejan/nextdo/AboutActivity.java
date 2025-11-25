@@ -25,7 +25,7 @@ public class AboutActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
 
         TextView versionText = findViewById(R.id.version_text);
@@ -35,6 +35,24 @@ public class AboutActivity extends AppCompatActivity {
             versionText.setText("Version " + version);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
+        }
+
+        setupSocialLinks();
+    }
+
+    private void setupSocialLinks() {
+        findViewById(R.id.github_icon).setOnClickListener(v -> openUrl("https://github.com/shejanahmmed"));
+        findViewById(R.id.instagram_icon).setOnClickListener(v -> openUrl("https://www.instagram.com/iamshejan/"));
+        findViewById(R.id.linkedin_icon).setOnClickListener(v -> openUrl("https://www.linkedin.com/in/farjan-ahmmed/"));
+    }
+
+    private void openUrl(String url) {
+        try {
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                    android.net.Uri.parse(url));
+            startActivity(intent);
+        } catch (Exception e) {
+            // Handle URL opening failure
         }
     }
 

@@ -3,12 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:background="#000000"
         app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
@@ -24,13 +25,22 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#000000"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:background="#000000"
+            android:padding="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/nothing_card_bg"
+                android:padding="20dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -58,6 +68,13 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="16dp"
+                android:background="?attr/colorOnSurface"
+                android:alpha="0.1" />
+
             <!-- Q2 -->
             <TextView
                 android:layout_width="match_parent"
@@ -76,6 +93,13 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="16dp"
+                android:background="?attr/colorOnSurface"
+                android:alpha="0.1" />
+
             <!-- Q3 -->
             <TextView
                 android:layout_width="match_parent"
@@ -88,11 +112,18 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tap on any task to open the edit screen, or swipe it to the right."
+                android:text="Tap on any task to open the edit screen or swipe it to the right."
                 android:textColor="?attr/colorOnSurface"
                 android:alpha="0.7"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="16dp"
+                android:background="?attr/colorOnSurface"
+                android:alpha="0.1" />
 
             <!-- Q4 -->
             <TextView
@@ -111,6 +142,8 @@
                 android:alpha="0.7"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

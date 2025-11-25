@@ -131,19 +131,12 @@ public class SettingsActivity extends AppCompatActivity {
                 updateColorPreview(color);
 
                 // Apply color to notification switch immediately
+                // Apply color to notification switch immediately
                 if (binding.notificationsSwitch != null) {
-                    // Set thumb to white
-                    binding.notificationsSwitch
-                            .setThumbTintList(android.content.res.ColorStateList.valueOf(0xFFFFFFFF));
-
-                    // Set track to accent color when checked, gray when unchecked
-                    int[][] states = new int[][] {
-                            new int[] { android.R.attr.state_checked },
-                            new int[] { -android.R.attr.state_checked }
-                    };
-                    int[] trackColors = new int[] { color, 0x4DFFFFFF };
-                    binding.notificationsSwitch
-                            .setTrackTintList(new android.content.res.ColorStateList(states, trackColors));
+                    applySwitchColors(binding.notificationsSwitch, color);
+                }
+                if (binding.persistentNotificationsSwitch != null) {
+                    applySwitchColors(binding.persistentNotificationsSwitch, color);
                 }
 
                 dialog.dismiss();
@@ -243,24 +236,31 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    private void applySwitchColors(com.google.android.material.switchmaterial.SwitchMaterial switchView,
+            int accentColor) {
+        if (switchView == null)
+            return;
+
+        // Set thumb to white
+        switchView.setThumbTintList(android.content.res.ColorStateList.valueOf(0xFFFFFFFF));
+
+        // Set track to accent color when checked, gray when unchecked
+        int[][] states = new int[][] {
+                new int[] { android.R.attr.state_checked },
+                new int[] { -android.R.attr.state_checked }
+        };
+        int[] colors = new int[] {
+                accentColor,
+                0x4DFFFFFF // 30% white when unchecked
+        };
+        switchView.setTrackTintList(new android.content.res.ColorStateList(states, colors));
+    }
+
     private void setupNotificationSettings() {
+        int accentColor = sharedPreferences.getInt("accent_color", 0xFF34C759);
+
         if (binding.notificationsSwitch != null) {
-            int accentColor = sharedPreferences.getInt("accent_color", 0xFF34C759);
-
-            // Set thumb to white
-            binding.notificationsSwitch.setThumbTintList(android.content.res.ColorStateList.valueOf(0xFFFFFFFF));
-
-            // Set track to accent color when checked, gray when unchecked
-            int[][] states = new int[][] {
-                    new int[] { android.R.attr.state_checked },
-                    new int[] { -android.R.attr.state_checked }
-            };
-            int[] colors = new int[] {
-                    accentColor,
-                    0x4DFFFFFF // 30% white when unchecked
-            };
-            binding.notificationsSwitch.setTrackTintList(new android.content.res.ColorStateList(states, colors));
-
+            applySwitchColors(binding.notificationsSwitch, accentColor);
             binding.notificationsSwitch.setChecked(sharedPreferences.getBoolean("notifications", true));
             binding.notificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this,
@@ -271,6 +271,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         if (binding.persistentNotificationsSwitch != null) {
+            applySwitchColors(binding.persistentNotificationsSwitch, accentColor);
             binding.persistentNotificationsSwitch
                     .setChecked(sharedPreferences.getBoolean("persistent_notifications", false));
             binding.persistentNotificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

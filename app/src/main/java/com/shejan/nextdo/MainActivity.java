@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     private TaskViewModel taskViewModel;
     private AlarmScheduler alarmScheduler;
     private boolean shouldScrollToTop = false;
+    private TaskListAdapter adapter;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -124,6 +125,19 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     protected void onResume() {
         super.onResume();
         applyBackground();
+
+        // Refresh accent color
+        android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
+                .getDefaultSharedPreferences(this);
+        int accentColor = prefs.getInt("accent_color", 0xFF34C759);
+
+        if (binding.fab != null) {
+            binding.fab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accentColor));
+        }
+
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -157,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         TaskViewModelFactory factory = new TaskViewModelFactory(getApplication());
         taskViewModel = new ViewModelProvider(this, factory).get(TaskViewModel.class);
 
-        final TaskListAdapter adapter = new TaskListAdapter(new TaskListAdapter.TaskDiff(), this);
+        adapter = new TaskListAdapter(new TaskListAdapter.TaskDiff(), this);
         binding.recyclerview.setAdapter(adapter);
         binding.recyclerview.setLayoutManager(new LinearLayoutManager(this));
 

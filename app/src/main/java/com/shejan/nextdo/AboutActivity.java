@@ -32,9 +32,9 @@ public class AboutActivity extends AppCompatActivity {
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String version = pInfo.versionName;
-            versionText.setText("Version " + version);
+            versionText.setText(getString(R.string.version_template, version));
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            android.util.Log.e("AboutActivity", "Package name not found", e);
         }
 
         setupSocialLinks();

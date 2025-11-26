@@ -14,28 +14,33 @@ public class NotificationHelper {
 
     public static void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "NextDO Reminders";
-            String description = "Notifications for task reminders";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            channel.enableLights(true);
-            channel.enableVibration(true);
-            channel.setShowBadge(true);
-            channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-            
-            // CRITICAL: Allow sound for persistent notifications
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                channel.setBlockable(false);
-            }
-            
+            NotificationChannel channel = getNotificationChannel();
             Log.d(TAG, "Creating notification channel with high importance");
-            
+
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
                 Log.d(TAG, "Notification channel created successfully");
             }
         }
+    }
+
+    @androidx.annotation.RequiresApi(api = Build.VERSION_CODES.O)
+    private static NotificationChannel getNotificationChannel() {
+        CharSequence name = "NextDO Reminders";
+        String description = "Notifications for task reminders";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+        channel.setDescription(description);
+        channel.enableLights(true);
+        channel.enableVibration(true);
+        channel.setShowBadge(true);
+        channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        // CRITICAL: Allow sound for persistent notifications
+        if (Build.VERSION.SDK_INT >= 33) {
+            channel.setBlockable(false);
+        }
+        return channel;
     }
 }

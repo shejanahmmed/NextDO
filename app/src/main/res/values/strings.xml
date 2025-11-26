@@ -39,4 +39,5 @@
     </string-array>
     <string name="choose_accent_color">Choose Accent Color</string>
     <string name="choose_background">Choose Background</string>
+    <string name="version_template">Version %s</string>
 </resources>

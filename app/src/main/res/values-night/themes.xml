@@ -22,7 +22,7 @@
         <item name="android:windowLightStatusBar">false</item>
         <!-- Navigation bar color -->
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
 
         <!-- Apply the custom theme to the settings screen -->
         <item name="preferenceTheme">@style/App.Preference.Theme</item>

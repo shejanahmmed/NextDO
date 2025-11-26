@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
+
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;

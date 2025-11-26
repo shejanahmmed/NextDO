@@ -2,4 +2,5 @@
 <resources>
     <!-- Override colors for dark theme -->
     <color name="fab_text_color">@color/nothing_black</color>
+    <color name="drawer_background">#B3000000</color>
 </resources>

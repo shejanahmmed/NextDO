@@ -110,6 +110,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:fitsSystemWindows="true"
+        android:background="@color/drawer_background"
+        app:itemHorizontalPadding="32dp"
+        app:itemBackground="@drawable/nav_item_card_background"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/drawer_menu" />
 

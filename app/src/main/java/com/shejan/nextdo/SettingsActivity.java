@@ -1,8 +1,6 @@
 package com.shejan.nextdo;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;

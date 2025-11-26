@@ -27,6 +27,7 @@
         android:textSize="32sp"
         android:textStyle="bold"
         android:textColor="?attr/colorOnSurface"
+        android:layout_marginStart="12dp"
         app:layout_constraintBottom_toTopOf="@id/app_subtitle"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -38,6 +39,7 @@
         android:textColor="?attr/colorOnSurface"
         android:alpha="0.8"
         android:textSize="14sp"
+        android:layout_marginStart="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

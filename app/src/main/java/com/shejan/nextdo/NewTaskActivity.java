@@ -8,7 +8,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,7 +32,7 @@ public class NewTaskActivity extends AppCompatActivity {
     public static final int RESULT_DELETE = 2;
 
     private ActivityNewTaskBinding binding;
-    private Calendar calendar = Calendar.getInstance();
+    private final Calendar calendar = Calendar.getInstance();
     private int taskId = 0;
     private int alarmId = 0;
     private boolean isReminderSet = false;
@@ -51,19 +50,11 @@ public class NewTaskActivity extends AppCompatActivity {
 
         alarmScheduler = new AlarmScheduler(this);
 
-        ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
-                getResources().getStringArray(R.array.priority_array));
-        priorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        if (binding.spinnerPriority != null) {
-            binding.spinnerPriority.setAdapter(priorityAdapter);
-        }
+        // Setup Priority Dropdown
+        binding.textPriority.setOnClickListener(v -> showPriorityOptions());
 
-        ArrayAdapter<String> repeatAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
-                getResources().getStringArray(R.array.repeat_array));
-        repeatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        if (binding.spinnerRepeat != null) {
-            binding.spinnerRepeat.setAdapter(repeatAdapter);
-        }
+        // Setup Repeat Dropdown
+        binding.textRepeat.setOnClickListener(v -> showRepeatOptions());
 
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_ID)) {
@@ -79,19 +70,13 @@ public class NewTaskActivity extends AppCompatActivity {
             binding.editDescription.setText(description != null ? description : "");
 
             String priority = intent.getStringExtra(EXTRA_PRIORITY);
-            if (priority != null && binding.spinnerPriority != null) {
-                int priorityPosition = priorityAdapter.getPosition(priority);
-                if (priorityPosition >= 0) {
-                    binding.spinnerPriority.setSelection(priorityPosition);
-                }
+            if (priority != null) {
+                binding.textPriority.setText(priority);
             }
 
             String repeat = intent.getStringExtra(EXTRA_REPEAT);
-            if (repeat != null && binding.spinnerRepeat != null) {
-                int repeatPosition = repeatAdapter.getPosition(repeat);
-                if (repeatPosition >= 0) {
-                    binding.spinnerRepeat.setSelection(repeatPosition);
-                }
+            if (repeat != null) {
+                binding.textRepeat.setText(repeat);
             }
 
             long reminderTime = intent.getLongExtra(EXTRA_REMINDER_TIME, 0);
@@ -106,69 +91,125 @@ public class NewTaskActivity extends AppCompatActivity {
             }
         }
 
-        if (binding.buttonSetReminder != null) {
-            binding.buttonSetReminder.setOnClickListener(v -> showDateTimePicker());
-        }
+        binding.buttonSetReminder.setOnClickListener(v -> showDateTimePicker());
 
         setupBackButton();
 
-        if (binding.buttonSave != null) {
-            binding.buttonSave.setOnClickListener(view -> {
-                try {
-                    Intent replyIntent = new Intent();
-                    if (binding.editTitle == null || TextUtils.isEmpty(binding.editTitle.getText())) {
-                        setResult(RESULT_CANCELED, replyIntent);
-                    } else {
-                        String title = binding.editTitle.getText().toString();
-                        String description = binding.editDescription != null
-                                ? binding.editDescription.getText().toString()
-                                : "";
-                        String priority = binding.spinnerPriority != null
-                                && binding.spinnerPriority.getSelectedItem() != null
-                                        ? binding.spinnerPriority.getSelectedItem().toString()
-                                        : "NONE";
-                        String repeat = binding.spinnerRepeat != null && binding.spinnerRepeat.getSelectedItem() != null
-                                ? binding.spinnerRepeat.getSelectedItem().toString()
-                                : "NONE";
-                        long reminderTime = isReminderSet ? calendar.getTimeInMillis() : 0;
+        binding.buttonSave.setOnClickListener(view -> {
+            try {
+                Intent replyIntent = new Intent();
+                if (TextUtils.isEmpty(binding.editTitle.getText())) {
+                    setResult(RESULT_CANCELED, replyIntent);
+                } else {
+                    String title = binding.editTitle.getText().toString();
+                    String description = binding.editDescription.getText().toString();
+                    String priority = binding.textPriority.getText().toString();
+                    String repeat = binding.textRepeat.getText().toString();
+                    long reminderTime = isReminderSet ? calendar.getTimeInMillis() : 0;
 
-                        Task task = new Task();
-                        if (taskId != 0) {
-                            task.id = taskId;
-                        }
-                        if (alarmId == 0 && reminderTime > System.currentTimeMillis()) {
-                            alarmId = (int) System.currentTimeMillis();
-                        }
-                        task.alarmId = alarmId;
-                        task.title = title;
-                        task.description = description;
-                        task.priority = priority;
-                        task.reminderTime = reminderTime;
-                        task.repeat = repeat;
-
-                        Log.d(TAG, "Task details: id=" + task.id + ", alarmId=" + task.alarmId +
-                                ", reminderTime=" + reminderTime);
-
-                        // NOTE: Do NOT schedule alarm here! MainActivity will schedule after database
-                        // insert completes.
-                        // Scheduling here causes double scheduling and race conditions.
-                        Log.d(TAG, "NewTaskActivity: Not scheduling alarm here (will be scheduled by MainActivity)");
-
-                        replyIntent.putExtra(EXTRA_ID, task.id);
-                        replyIntent.putExtra(EXTRA_ALARM_ID, task.alarmId);
-                        replyIntent.putExtra(EXTRA_TITLE, title);
-                        replyIntent.putExtra(EXTRA_DESCRIPTION, description);
-                        replyIntent.putExtra(EXTRA_PRIORITY, priority);
-                        replyIntent.putExtra(EXTRA_REMINDER_TIME, reminderTime);
-                        replyIntent.putExtra(EXTRA_REPEAT, repeat);
-
-                        setResult(RESULT_OK, replyIntent);
+                    Task task = new Task();
+                    if (taskId != 0) {
+                        task.id = taskId;
                     }
-                } catch (Exception e) {
-                    setResult(RESULT_CANCELED, new Intent());
+                    if (alarmId == 0 && reminderTime > System.currentTimeMillis()) {
+                        alarmId = (int) System.currentTimeMillis();
+                    }
+                    task.alarmId = alarmId;
+                    task.title = title;
+                    task.description = description;
+                    task.priority = priority;
+                    task.reminderTime = reminderTime;
+                    task.repeat = repeat;
+
+                    Log.d(TAG, "Task details: id=" + task.id + ", alarmId=" + task.alarmId +
+                            ", reminderTime=" + reminderTime);
+
+                    // NOTE: Do NOT schedule alarm here! MainActivity will schedule after database
+                    // insert completes.
+                    // Scheduling here causes double scheduling and race conditions.
+                    Log.d(TAG, "NewTaskActivity: Not scheduling alarm here (will be scheduled by MainActivity)");
+
+                    replyIntent.putExtra(EXTRA_ID, task.id);
+                    replyIntent.putExtra(EXTRA_ALARM_ID, task.alarmId);
+                    replyIntent.putExtra(EXTRA_TITLE, title);
+                    replyIntent.putExtra(EXTRA_DESCRIPTION, description);
+                    replyIntent.putExtra(EXTRA_PRIORITY, priority);
+                    replyIntent.putExtra(EXTRA_REMINDER_TIME, reminderTime);
+                    replyIntent.putExtra(EXTRA_REPEAT, repeat);
+
+                    setResult(RESULT_OK, replyIntent);
                 }
-                finish();
-            });
+            } catch (Exception e) {
+                setResult(RESULT_CANCELED, new Intent());
+            }
+            finish();
+        });
+    }
+
+    private void showPriorityOptions() {
+        applyBlurEffect(true);
+        android.widget.ListPopupWindow listPopupWindow = new android.widget.ListPopupWindow(this);
+        listPopupWindow.setAnchorView(binding.textPriority);
+        listPopupWindow
+                .setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        // Set width to 150dp
+        float density = getResources().getDisplayMetrics().density;
+        listPopupWindow.setWidth((int) (150 * density));
+
+        String[] options = getResources().getStringArray(R.array.priority_array);
+        CardSpinnerAdapter adapter = new CardSpinnerAdapter(this, options);
+        listPopupWindow.setAdapter(adapter);
+
+        listPopupWindow.setOnItemClickListener((parent, view, position, id) -> {
+            binding.textPriority.setText(options[position]);
+            listPopupWindow.dismiss();
+        });
+
+        listPopupWindow.setOnDismissListener(() -> applyBlurEffect(false));
+        listPopupWindow.show();
+    }
+
+    private void showRepeatOptions() {
+        applyBlurEffect(true);
+        android.widget.ListPopupWindow listPopupWindow = new android.widget.ListPopupWindow(this);
+        listPopupWindow.setAnchorView(binding.textRepeat);
+        listPopupWindow
+                .setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        // Set width to 150dp
+        float density = getResources().getDisplayMetrics().density;
+        listPopupWindow.setWidth((int) (150 * density));
+
+        String[] options = getResources().getStringArray(R.array.repeat_array);
+        CardSpinnerAdapter adapter = new CardSpinnerAdapter(this, options);
+        listPopupWindow.setAdapter(adapter);
+
+        listPopupWindow.setOnItemClickListener((parent, view, position, id) -> {
+            binding.textRepeat.setText(options[position]);
+            listPopupWindow.dismiss();
+        });
+
+        listPopupWindow.setOnDismissListener(() -> applyBlurEffect(false));
+        listPopupWindow.show();
+    }
+
+    private void applyBlurEffect(boolean apply) {
+        if (binding.blurOverlay == null)
+            return;
+
+        if (apply) {
+            binding.blurOverlay.setVisibility(android.view.View.VISIBLE);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                binding.rootLayout.setRenderEffect(
+                        android.graphics.RenderEffect.createBlurEffect(
+                                10f, 10f, android.graphics.Shader.TileMode.CLAMP));
+            }
+        } else {
+            binding.blurOverlay.setVisibility(android.view.View.GONE);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                binding.rootLayout.setRenderEffect(null);
+            }
         }
     }
 
@@ -205,34 +246,53 @@ public class NewTaskActivity extends AppCompatActivity {
     }
 
     private void showDateTimePicker() {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                (view, year, month, dayOfMonth) -> {
-                    calendar.set(Calendar.YEAR, year);
-                    calendar.set(Calendar.MONTH, month);
-                    calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                    showTimePicker();
-                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-        datePickerDialog.show();
+        long selection = isReminderSet ? calendar.getTimeInMillis()
+                : com.google.android.material.datepicker.MaterialDatePicker.todayInUtcMilliseconds();
+        ModernCalendarBottomSheet calendarSheet = ModernCalendarBottomSheet.newInstance(selection);
+        calendarSheet.setOnDateSelectedListener(dateInMillis -> {
+            // The custom calendar returns the selected date in local time (or whatever was
+            // set in the calendar instance)
+            // We need to update our local calendar with the Year, Month, Day from the
+            // selection
+            Calendar selectedCal = Calendar.getInstance();
+            selectedCal.setTimeInMillis(dateInMillis);
+
+            calendar.set(Calendar.YEAR, selectedCal.get(Calendar.YEAR));
+            calendar.set(Calendar.MONTH, selectedCal.get(Calendar.MONTH));
+            calendar.set(Calendar.DAY_OF_MONTH, selectedCal.get(Calendar.DAY_OF_MONTH));
+
+            showTimePicker();
+        });
+        calendarSheet.show(getSupportFragmentManager(), "MODERN_CALENDAR");
     }
 
     private void showTimePicker() {
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                (view, hourOfDay, minute) -> {
-                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                    calendar.set(Calendar.MINUTE, minute);
-                    calendar.set(Calendar.SECOND, 0);
-                    isReminderSet = true;
-                    updateReminderTimeText();
-                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
-        timePickerDialog.show();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        com.google.android.material.timepicker.MaterialTimePicker timePicker = new com.google.android.material.timepicker.MaterialTimePicker.Builder()
+                .setTimeFormat(com.google.android.material.timepicker.TimeFormat.CLOCK_12H)
+                .setHour(hour)
+                .setMinute(minute)
+                .setTitleText("Select Reminder Time")
+                .setTheme(R.style.ThemeOverlay_App_MaterialTimePicker)
+                .build();
+
+        timePicker.addOnPositiveButtonClickListener(v -> {
+            calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+            calendar.set(Calendar.MINUTE, timePicker.getMinute());
+            calendar.set(Calendar.SECOND, 0);
+            isReminderSet = true;
+            updateReminderTimeText();
+        });
+
+        timePicker.show(getSupportFragmentManager(), "TIME_PICKER");
     }
 
     private void updateReminderTimeText() {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
-            if (binding.textReminderTime != null) {
-                binding.textReminderTime.setText(sdf.format(calendar.getTime()));
-            }
+            binding.textReminderTime.setText(sdf.format(calendar.getTime()));
         } catch (Exception e) {
             // Handle date formatting failure
         }

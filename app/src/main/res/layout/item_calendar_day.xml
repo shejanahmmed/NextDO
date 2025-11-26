@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/text_day"
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:layout_gravity="center"
+    android:background="@drawable/calendar_item_background_selector"
+    android:gravity="center"
+    android:textColor="@color/white"
+    android:textSize="14sp"
+    tools:text="1" />

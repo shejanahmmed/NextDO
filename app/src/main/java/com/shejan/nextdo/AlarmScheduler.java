@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.preference.PreferenceManager;
 
@@ -65,15 +64,11 @@ public class AlarmScheduler {
                         alarmManager.setAlarmClock(
                                 new AlarmManager.AlarmClockInfo(task.reminderTime, pendingIntent),
                                 pendingIntent);
-                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    } else {
                         // Android 6-11: Use setExactAndAllowWhileIdle
                         Log.d(TAG, "Using setExactAndAllowWhileIdle for Android 6-11");
                         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime,
                                 pendingIntent);
-                    } else {
-                        // Below Android 6: Use setExact
-                        Log.d(TAG, "Using setExact for Android < 6");
-                        alarmManager.setExact(AlarmManager.RTC_WAKEUP, task.reminderTime, pendingIntent);
                     }
                 } else {
                     // Fallback for devices without exact alarm permission

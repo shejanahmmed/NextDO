@@ -32,4 +32,6 @@
     <color name="fab_text_color">@color/nothing_white</color>
     
     <color name="switch_track_color_custom">#FF34C759</color>
+    
+    <color name="drawer_background">#B3F8F9FA</color>
 </resources>

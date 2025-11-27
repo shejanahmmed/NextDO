@@ -79,21 +79,15 @@ public class TaskRepository {
     }
 
     public void deleteOldTasks(long threshold) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            taskDao.deleteOldTasks(threshold);
-        });
+        AppDatabase.databaseWriteExecutor.execute(() -> taskDao.deleteOldTasks(threshold));
     }
 
     public void deleteAllDeletedTasks() {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            taskDao.deleteAllDeletedTasks();
-        });
+        AppDatabase.databaseWriteExecutor.execute(taskDao::deleteAllDeletedTasks);
     }
 
     public void deletePermanently(Task task) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            taskDao.delete(task);
-        });
+        AppDatabase.databaseWriteExecutor.execute(() -> taskDao.delete(task));
     }
 
     public void softDelete(Task task) {

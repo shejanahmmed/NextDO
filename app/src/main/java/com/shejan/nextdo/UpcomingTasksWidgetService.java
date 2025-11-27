@@ -6,6 +6,6 @@ import android.widget.RemoteViewsService;
 public class UpcomingTasksWidgetService extends RemoteViewsService {
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new UpcomingTasksRemoteViewsFactory(this.getApplicationContext());
+        return new UpcomingTasksRemoteViewsFactory(this.getApplicationContext(), intent);
     }
 }

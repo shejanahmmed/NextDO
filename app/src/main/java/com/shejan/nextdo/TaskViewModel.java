@@ -40,10 +40,6 @@ public class TaskViewModel extends AndroidViewModel {
         repository.delete(task);
     }
 
-    public LiveData<List<Task>> searchTasks(String query) {
-        return repository.searchTasks(query);
-    }
-
     public LiveData<List<Task>> getDeletedTasks() {
         return repository.getDeletedTasks();
     }

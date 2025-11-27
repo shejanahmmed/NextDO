@@ -44,7 +44,7 @@
         <receiver
             android:name=".UpcomingTasksWidgetProvider"
             android:exported="true"
-            android:label="Upcoming Tasks">
+            android:label="Upcoming task (Dark)">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -52,6 +52,19 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/upcoming_tasks_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".UpcomingTasksLightWidgetProvider"
+            android:exported="true"
+            android:label="Upcoming task (Light)">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/upcoming_tasks_light_widget_info" />
         </receiver>
 
         <service

@@ -6,7 +6,7 @@ import android.widget.RemoteViewsService;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -14,13 +14,15 @@ import java.util.Locale;
 public class UpcomingTasksRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private final Context context;
-    private List<Task> upcomingTasks = new ArrayList<>();
+    private final List<Task> upcomingTasks = new ArrayList<>();
     private final TaskDao taskDao;
+    private final String theme;
 
-    public UpcomingTasksRemoteViewsFactory(Context context) {
+    public UpcomingTasksRemoteViewsFactory(Context context, android.content.Intent intent) {
         this.context = context;
         AppDatabase db = AppDatabase.getDatabase(context);
         this.taskDao = db.taskDao();
+        this.theme = intent.getStringExtra("THEME");
     }
 
     @Override
@@ -43,7 +45,7 @@ public class UpcomingTasksRemoteViewsFactory implements RemoteViewsService.Remot
                 }
             }
             // Sort by reminder time ascending
-            Collections.sort(upcomingTasks, (t1, t2) -> Long.compare(t1.reminderTime, t2.reminderTime));
+            upcomingTasks.sort(java.util.Comparator.comparingLong(t -> t.reminderTime));
         }
     }
 
@@ -64,7 +66,11 @@ public class UpcomingTasksRemoteViewsFactory implements RemoteViewsService.Remot
         }
 
         Task task = upcomingTasks.get(position);
-        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_item_task);
+        int layoutId = R.layout.widget_item_task;
+        if ("LIGHT".equals(theme)) {
+            layoutId = R.layout.widget_item_task_light;
+        }
+        RemoteViews rv = new RemoteViews(context.getPackageName(), layoutId);
 
         rv.setTextViewText(R.id.widget_item_title, task.title);
 

@@ -97,7 +97,10 @@ public class RecycleBinActivity extends AppCompatActivity {
             if (deleteAllItem != null) {
                 deleteAllItem.setEnabled(!isEmpty);
 
-                String title = deleteAllItem.getTitle().toString();
+                CharSequence itemTitle = deleteAllItem.getTitle();
+                if (itemTitle == null)
+                    return;
+                String title = itemTitle.toString();
                 android.text.SpannableString s = new android.text.SpannableString(title);
 
                 if (isEmpty) {
@@ -123,7 +126,10 @@ public class RecycleBinActivity extends AppCompatActivity {
         boolean isEmpty = adapter.getCurrentList().isEmpty();
         deleteAllItem.setEnabled(!isEmpty);
 
-        String title = deleteAllItem.getTitle().toString();
+        CharSequence itemTitle = deleteAllItem.getTitle();
+        if (itemTitle == null)
+            return true;
+        String title = itemTitle.toString();
         android.text.SpannableString s = new android.text.SpannableString(title);
 
         if (isEmpty) {

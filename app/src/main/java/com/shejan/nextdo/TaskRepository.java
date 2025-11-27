@@ -11,7 +11,10 @@ public class TaskRepository {
     private final TaskDao taskDao;
     private final LiveData<List<Task>> allTasks;
 
+    private final Application application;
+
     TaskRepository(Application application) {
+        this.application = application;
         AppDatabase db = AppDatabase.getDatabase(application);
         taskDao = db.taskDao();
         allTasks = taskDao.getAllTasks();
@@ -22,7 +25,10 @@ public class TaskRepository {
     }
 
     void insert(Task task) {
-        AppDatabase.databaseWriteExecutor.execute(() -> taskDao.insert(task));
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            taskDao.insert(task);
+            UpcomingTasksWidgetProvider.sendRefreshBroadcast(application);
+        });
     }
 
     void insert(Task task, Runnable onComplete) {
@@ -34,11 +40,15 @@ public class TaskRepository {
             if (onComplete != null) {
                 onComplete.run();
             }
+            UpcomingTasksWidgetProvider.sendRefreshBroadcast(application);
         });
     }
 
     void update(Task task) {
-        AppDatabase.databaseWriteExecutor.execute(() -> taskDao.update(task));
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            taskDao.update(task);
+            UpcomingTasksWidgetProvider.sendRefreshBroadcast(application);
+        });
     }
 
     void update(Task task, Runnable onComplete) {
@@ -49,11 +59,15 @@ public class TaskRepository {
             if (onComplete != null) {
                 onComplete.run();
             }
+            UpcomingTasksWidgetProvider.sendRefreshBroadcast(application);
         });
     }
 
     void delete(Task task) {
-        AppDatabase.databaseWriteExecutor.execute(() -> taskDao.delete(task));
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            taskDao.delete(task);
+            UpcomingTasksWidgetProvider.sendRefreshBroadcast(application);
+        });
     }
 
     public LiveData<List<Task>> searchTasks(String query) {

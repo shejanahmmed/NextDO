@@ -41,6 +41,23 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".UpcomingTasksWidgetProvider"
+            android:exported="true"
+            android:label="Upcoming Tasks">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/upcoming_tasks_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".UpcomingTasksWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -8,16 +8,29 @@ NextDO is a minimal to do app that helps you stay organized and on time. You can
 - Get timely notifications  
 - Simple and minimal UI  
 - Smooth performance  
-- Built with Java for Android
+- Built with Java for Android  
+- Highly customizable  
+- Gesture support  
 
 ## Screenshots
 
+## Updated UI Preview
+
 <p float="left">
-  <img src="https://github.com/user-attachments/assets/c4bc33de-207e-4430-ae2d-9ff4397d4828" width="200" />
-  <img src="https://github.com/user-attachments/assets/4e6b5234-5bdd-481f-8e59-a5f8f992e5f2" width="200" />
-  <img src="https://github.com/user-attachments/assets/d69608ab-4d1c-4eb7-9715-97f65de1e809" width="200" />
-  <img src="https://github.com/user-attachments/assets/a5505413-41fe-43af-a7c8-428ba1212e42" width="200" />
+  <img src="https://github.com/user-attachments/assets/62f953d8-ac58-4c9f-a80e-630b5a8fd8c4" width="200">
+  <img src="https://github.com/user-attachments/assets/e65c808e-fb99-47a3-8058-b42a6ee99f73" width="200">
+  <img src="https://github.com/user-attachments/assets/b415d02a-32f2-4acd-8ad3-a15c5297f799" width="200">
 </p>
+
+<p float="left">
+  <img src="https://github.com/user-attachments/assets/03c2f38c-563a-474a-a0ef-9b236ca9c647" width="200">
+</p>
+
+<p float="left">
+  <img src="https://github.com/user-attachments/assets/417814a8-60d4-4ba3-b905-4a3c3f5796d2" width="200">
+  <img src="https://github.com/user-attachments/assets/fc7494d7-f811-4d5e-8bfa-082cdc536ede" width="200">
+</p>
+
 
 ## Installation
 You can download the latest APK from the **Releases** section of this repository  

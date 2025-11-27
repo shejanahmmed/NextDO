@@ -1,7 +1,7 @@
 package com.shejan.nextdo;
 
 import android.content.Context;
-import android.graphics.Canvas;
+
 import android.util.AttributeSet;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

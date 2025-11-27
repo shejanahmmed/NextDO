@@ -16,6 +16,7 @@ public class TaskViewModelFactory implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(TaskViewModel.class)) {
+            // noinspection unchecked
             return (T) new TaskViewModel(application);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");

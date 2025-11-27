@@ -24,28 +24,24 @@ public class TaskRepository {
     }
 
     void insert(Task task) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            taskDao.insert(task);
-        });
+        AppDatabase.databaseWriteExecutor.execute(() -> taskDao.insert(task));
     }
 
     void insert(Task task, Runnable onComplete) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             Log.d(TAG, "Inserting task: " + task.title);
             // CRITICAL FIX: Get the generated ID and update the task object
-            long newId = taskDao.insert(task);  // ← Now returns the generated ID
-            task.id = (int) newId;  // ← Assign it back to the original object
+            long newId = taskDao.insert(task); // ← Now returns the generated ID
+            task.id = (int) newId; // ← Assign it back to the original object
             Log.d(TAG, "Insert complete for task: " + task.title + " (assigned id=" + newId + ")");
             if (onComplete != null) {
-                onComplete.run();  // ← Now called with valid task.id!
+                onComplete.run(); // ← Now called with valid task.id!
             }
         });
     }
 
     void update(Task task) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            taskDao.update(task);
-        });
+        AppDatabase.databaseWriteExecutor.execute(() -> taskDao.update(task));
     }
 
     void update(Task task, Runnable onComplete) {
@@ -60,12 +56,7 @@ public class TaskRepository {
     }
 
     void delete(Task task) {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            taskDao.delete(task);
-        });
+        AppDatabase.databaseWriteExecutor.execute(() -> taskDao.delete(task));
     }
 
-    LiveData<List<Task>> searchTasks(String query) {
-        return taskDao.searchTasks(query);
-    }
 }

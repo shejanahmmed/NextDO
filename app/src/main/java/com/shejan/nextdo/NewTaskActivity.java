@@ -1,7 +1,5 @@
 package com.shejan.nextdo;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -195,8 +193,6 @@ public class NewTaskActivity extends AppCompatActivity {
     }
 
     private void applyBlurEffect(boolean apply) {
-        if (binding.blurOverlay == null)
-            return;
 
         if (apply) {
             binding.blurOverlay.setVisibility(android.view.View.VISIBLE);

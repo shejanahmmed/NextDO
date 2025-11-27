@@ -67,7 +67,7 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
         }
     }
 
-    static class TaskViewHolder extends RecyclerView.ViewHolder {
+    public static class TaskViewHolder extends RecyclerView.ViewHolder {
         private final RecyclerviewItemBinding binding;
 
         private TaskViewHolder(RecyclerviewItemBinding binding) {
@@ -79,15 +79,11 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             if (task == null)
                 return;
 
-            if (binding.textTitle != null) {
-                binding.textTitle.setText(task.title != null ? task.title : "");
-            }
+            binding.textTitle.setText(task.title != null ? task.title : "");
 
-            if (binding.textDescription != null) {
-                binding.textDescription.setText(task.description != null ? task.description : "");
-                binding.textDescription.setVisibility(
-                        task.description != null && !task.description.isEmpty() ? View.VISIBLE : View.GONE);
-            }
+            binding.textDescription.setText(task.description != null ? task.description : "");
+            binding.textDescription.setVisibility(
+                    task.description != null && !task.description.isEmpty() ? View.VISIBLE : View.GONE);
 
             // DEFINITIVE FIX: Removing conditional styling for completed tasks.
             android.graphics.drawable.Drawable background = androidx.core.content.ContextCompat
@@ -97,34 +93,28 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
                 binding.getRoot().setBackground(background);
             }
 
-            if (binding.chipPriority != null) {
-                if (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) {
-                    binding.chipPriority.setText(task.priority);
-                    binding.chipPriority.setVisibility(View.VISIBLE);
-                } else {
-                    binding.chipPriority.setVisibility(View.GONE);
-                }
+            if (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) {
+                binding.chipPriority.setText(task.priority);
+                binding.chipPriority.setVisibility(View.VISIBLE);
+            } else {
+                binding.chipPriority.setVisibility(View.GONE);
             }
 
-            if (binding.textReminder != null) {
-                if (task.reminderTime > 0) {
-                    try {
-                        SimpleDateFormat sdf = new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
-                        binding.textReminder.setText(sdf.format(task.reminderTime));
-                        binding.textReminder.setVisibility(View.VISIBLE);
-                    } catch (Exception e) {
-                        binding.textReminder.setVisibility(View.GONE);
-                    }
-                } else {
+            if (task.reminderTime > 0) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
+                    binding.textReminder.setText(sdf.format(task.reminderTime));
+                    binding.textReminder.setVisibility(View.VISIBLE);
+                } catch (Exception e) {
                     binding.textReminder.setVisibility(View.GONE);
                 }
+            } else {
+                binding.textReminder.setVisibility(View.GONE);
             }
 
-            if (binding.detailsLayout != null) {
-                boolean hasDetails = (task.priority != null && !task.priority.isEmpty()
-                        && !task.priority.equalsIgnoreCase("NONE")) || task.reminderTime > 0;
-                binding.detailsLayout.setVisibility(hasDetails ? View.VISIBLE : View.GONE);
-            }
+            boolean hasDetails = (task.priority != null && !task.priority.isEmpty()
+                    && !task.priority.equalsIgnoreCase("NONE")) || task.reminderTime > 0;
+            binding.detailsLayout.setVisibility(hasDetails ? View.VISIBLE : View.GONE);
 
             // Apply accent color to checkbox
             android.content.SharedPreferences prefs = androidx.preference.PreferenceManager

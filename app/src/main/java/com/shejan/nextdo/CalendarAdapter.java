@@ -8,7 +8,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -17,7 +16,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     private final List<Calendar> days;
     private final OnDateSelectedListener listener;
     private Calendar selectedDate;
-    private Calendar today;
+    private final Calendar today;
 
     public interface OnDateSelectedListener {
         void onDateSelected(Calendar date);
@@ -76,6 +75,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
             holder.itemView.setOnClickListener(v -> {
                 selectedDate = date;
+                // noinspection NotifyDataSetChanged
                 notifyDataSetChanged();
                 listener.onDateSelected(date);
             });
@@ -98,10 +98,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     public void updateDays(List<Calendar> newDays) {
         days.clear();
         days.addAll(newDays);
+        // noinspection NotifyDataSetChanged
         notifyDataSetChanged();
     }
 
-    static class CalendarViewHolder extends RecyclerView.ViewHolder {
+    public static class CalendarViewHolder extends RecyclerView.ViewHolder {
         TextView textDay;
 
         public CalendarViewHolder(@NonNull View itemView) {

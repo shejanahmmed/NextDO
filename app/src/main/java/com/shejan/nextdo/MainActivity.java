@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -147,13 +149,15 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         setContentView(binding.getRoot());
 
         // Enable Edge-to-Edge
+        binding.drawerLayout.setDrawerElevation(0f);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         ViewCompat.setOnApplyWindowInsetsListener(binding.drawerLayout, (v, windowInsets) -> {
             androidx.core.graphics.Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            // Apply padding to the ConstraintLayout inside DrawerLayout to avoid overlap
-            // We find the ConstraintLayout (first child of DrawerLayout)
-            View content = binding.drawerLayout.getChildAt(0);
-            content.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            // Apply padding to the main content container only
+            View content = findViewById(R.id.main_content_container);
+            if (content != null) {
+                content.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            }
             return WindowInsetsCompat.CONSUMED;
         });
 
@@ -164,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         // Remove toolbar for Nothing theme
         // Remove toolbar for Nothing theme
         setupDrawer();
+        setupBlurEffect();
 
         askNotificationPermission();
 
@@ -516,6 +521,14 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
             } else if (id == R.id.nav_about) {
                 Intent intent = new Intent(MainActivity.this, AboutActivity.class);
                 startActivity(intent);
+            } else if (id == R.id.nav_releases) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW,
+                            android.net.Uri.parse("https://github.com/shejanahmmed/NextDO/releases"));
+                    startActivity(intent);
+                } catch (Exception e) {
+                    // Handle potential errors
+                }
             } else if (id == R.id.nav_help) {
                 Intent intent = new Intent(MainActivity.this, HelpFAQActivity.class);
                 startActivity(intent);
@@ -681,5 +694,283 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         });
 
         dialog.show();
+    }
+
+    private void setupBlurEffect() {
+        android.widget.ImageView blurOverlay = findViewById(R.id.blur_overlay);
+
+        // Remove default scrim
+        binding.drawerLayout.setScrimColor(android.graphics.Color.TRANSPARENT);
+
+        binding.drawerLayout.addDrawerListener(new androidx.drawerlayout.widget.DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+                // Ensure blur is generated if we are sliding and it's not visible yet
+                if (slideOffset > 0 && blurOverlay.getVisibility() != View.VISIBLE) {
+                    generateBlur(blurOverlay);
+                }
+
+                if (blurOverlay.getVisibility() == View.VISIBLE) {
+                    blurOverlay.setAlpha(slideOffset);
+                }
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                blurOverlay.setAlpha(1f);
+                blurOverlay.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                blurOverlay.setVisibility(View.GONE);
+                blurOverlay.setImageBitmap(null); // Free memory
+                if (Build.VERSION.SDK_INT >= 31) {
+                    blurOverlay.setRenderEffect(null);
+                }
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                // We handle generation in onDrawerSlide now for better coverage
+            }
+        });
+    }
+
+    private void generateBlur(android.widget.ImageView blurOverlay) {
+        View content = binding.drawerLayout.getChildAt(0);
+        if (content.getWidth() > 0 && content.getHeight() > 0) {
+            try {
+                android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(
+                        content.getWidth(), content.getHeight(), android.graphics.Bitmap.Config.ARGB_8888);
+                android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
+                content.draw(canvas);
+
+                if (Build.VERSION.SDK_INT >= 31) {
+                    blurOverlay.setImageBitmap(bitmap);
+                    blurOverlay.setRenderEffect(RenderEffect.createBlurEffect(50f, 50f, Shader.TileMode.MIRROR));
+                } else {
+                    // Apply blur
+                    android.graphics.Bitmap blurred = applyBlur(bitmap);
+                    blurOverlay.setImageBitmap(blurred);
+                }
+
+                blurOverlay.setVisibility(View.VISIBLE);
+                blurOverlay.setAlpha(0f);
+            } catch (Exception e) {
+                Log.e(TAG, "Error creating blur effect", e);
+            }
+        }
+    }
+
+    private android.graphics.Bitmap applyBlur(android.graphics.Bitmap image) {
+        // Scale down for performance and "free" blur
+        float scale = 0.2f; // 1/5th size
+        int width = Math.round(image.getWidth() * scale);
+        int height = Math.round(image.getHeight() * scale);
+
+        if (width <= 0 || height <= 0)
+            return image;
+
+        android.graphics.Bitmap inputBitmap = android.graphics.Bitmap.createScaledBitmap(image, width, height, false);
+        android.graphics.Bitmap outputBitmap = android.graphics.Bitmap.createBitmap(inputBitmap);
+
+        // Fast blur algorithm (StackBlur variant simplified)
+        return fastBlur(outputBitmap); // Increased radius for stronger blur
+    }
+
+    // Fast blur algorithm
+    private android.graphics.Bitmap fastBlur(android.graphics.Bitmap sentBitmap) {
+        final int radius = 20;
+        android.graphics.Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
+
+        int w = bitmap.getWidth();
+        int h = bitmap.getHeight();
+
+        int[] pix = new int[w * h];
+        bitmap.getPixels(pix, 0, w, 0, 0, w, h);
+
+        int wm = w - 1;
+        int hm = h - 1;
+        int wh = w * h;
+        int div = radius + radius + 1;
+
+        int[] r = new int[wh];
+        int[] g = new int[wh];
+        int[] b = new int[wh];
+        int rsum, gsum, bsum, x, y, i, p, yp, yi, yw;
+        int[] vmin = new int[Math.max(w, h)];
+
+        int divsum = (div + 1) >> 1;
+        divsum *= divsum;
+        int[] dv = new int[256 * divsum];
+        for (i = 0; i < 256 * divsum; i++) {
+            dv[i] = (i / divsum);
+        }
+
+        yw = yi = 0;
+
+        int[][] stack = new int[div][3];
+        int stackpointer;
+        int stackstart;
+        int[] sir;
+        int rbs;
+        int r1 = radius + 1;
+        int routsum, goutsum, boutsum;
+        int rinsum, ginsum, binsum;
+
+        for (y = 0; y < h; y++) {
+            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
+            for (i = -radius; i <= radius; i++) {
+                p = pix[yi + Math.min(wm, Math.max(i, 0))];
+                sir = stack[i + radius];
+                sir[0] = (p & 0xff0000) >> 16;
+                sir[1] = (p & 0x00ff00) >> 8;
+                sir[2] = (p & 0x0000ff);
+                rbs = r1 - Math.abs(i);
+                rsum += sir[0] * rbs;
+                gsum += sir[1] * rbs;
+                bsum += sir[2] * rbs;
+                if (i > 0) {
+                    rinsum += sir[0];
+                    ginsum += sir[1];
+                    binsum += sir[2];
+                } else {
+                    routsum += sir[0];
+                    goutsum += sir[1];
+                    boutsum += sir[2];
+                }
+            }
+            stackpointer = radius;
+
+            for (x = 0; x < w; x++) {
+
+                r[yi] = dv[rsum];
+                g[yi] = dv[gsum];
+                b[yi] = dv[bsum];
+
+                rsum -= routsum;
+                gsum -= goutsum;
+                bsum -= boutsum;
+
+                stackstart = stackpointer - radius + div;
+                sir = stack[stackstart % div];
+
+                routsum -= sir[0];
+                goutsum -= sir[1];
+                boutsum -= sir[2];
+
+                if (y == 0) {
+                    vmin[x] = Math.min(x + radius + 1, wm);
+                }
+                p = pix[yw + vmin[x]];
+
+                sir[0] = (p & 0xff0000) >> 16;
+                sir[1] = (p & 0x00ff00) >> 8;
+                sir[2] = (p & 0x0000ff);
+
+                rinsum += sir[0];
+                ginsum += sir[1];
+                binsum += sir[2];
+
+                rsum += rinsum;
+                gsum += ginsum;
+                bsum += binsum;
+
+                stackpointer = (stackpointer + 1) % div;
+                sir = stack[(stackpointer) % div];
+
+                routsum += sir[0];
+                goutsum += sir[1];
+                boutsum += sir[2];
+
+                rinsum -= sir[0];
+                ginsum -= sir[1];
+                binsum -= sir[2];
+
+                yi++;
+            }
+            yw += w;
+        }
+        for (x = 0; x < w; x++) {
+            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
+            yp = -radius * w;
+            for (i = -radius; i <= radius; i++) {
+                yi = Math.max(0, yp) + x;
+
+                sir = stack[i + radius];
+
+                rbs = r1 - Math.abs(i);
+
+                rsum += r[yi] * rbs;
+                gsum += g[yi] * rbs;
+                bsum += b[yi] * rbs;
+
+                if (i > 0) {
+                    rinsum += sir[0];
+                    ginsum += sir[1];
+                    binsum += sir[2];
+                } else {
+                    routsum += sir[0];
+                    goutsum += sir[1];
+                    boutsum += sir[2];
+                }
+
+                if (i < hm) {
+                    yp += w;
+                }
+            }
+            yi = x;
+            stackpointer = radius;
+            for (y = 0; y < h; y++) {
+                // Preserve alpha channel: ( 0xff000000 & pix[yi] )
+                pix[yi] = (0xff000000 & pix[yi]) | (dv[rsum] << 16) | (dv[gsum] << 8) | dv[bsum];
+
+                rsum -= routsum;
+                gsum -= goutsum;
+                bsum -= boutsum;
+
+                stackstart = stackpointer - radius + div;
+                sir = stack[stackstart % div];
+
+                routsum -= sir[0];
+                goutsum -= sir[1];
+                boutsum -= sir[2];
+
+                if (x == 0) {
+                    vmin[y] = Math.min(y + r1, hm) * w;
+                }
+                p = x + vmin[y];
+
+                sir[0] = r[p];
+                sir[1] = g[p];
+                sir[2] = b[p];
+
+                rinsum += sir[0];
+                ginsum += sir[1];
+                binsum += sir[2];
+
+                rsum += rinsum;
+                gsum += ginsum;
+                bsum += binsum;
+
+                stackpointer = (stackpointer + 1) % div;
+                sir = stack[stackpointer];
+
+                routsum += sir[0];
+                goutsum += sir[1];
+                boutsum += sir[2];
+
+                rinsum -= sir[0];
+                ginsum -= sir[1];
+                binsum -= sir[2];
+
+                yi += w;
+            }
+        }
+
+        bitmap.setPixels(pix, 0, w, 0, 0, w, h);
+
+        return (bitmap);
     }
 }

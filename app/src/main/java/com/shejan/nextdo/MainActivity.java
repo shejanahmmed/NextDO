@@ -274,14 +274,15 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                                         .setDuration(400)
                                         .setInterpolator(new android.view.animation.AccelerateInterpolator())
                                         .withEndAction(() -> {
-                                            taskViewModel.delete(task);
+                                            taskViewModel.softDelete(task);
                                             viewHolder.itemView.setAlpha(1f);
                                             viewHolder.itemView.setScaleX(1f);
                                             viewHolder.itemView.setScaleY(1f);
                                             viewHolder.itemView.setRotation(0f);
                                             viewHolder.itemView.setTranslationX(0f);
-                                            Snackbar.make(binding.getRoot(), "Task deleted", Snackbar.LENGTH_LONG)
-                                                    .setAction("Undo", v -> taskViewModel.insert(task))
+                                            Snackbar.make(binding.getRoot(), "Task moved to Recycle Bin",
+                                                    Snackbar.LENGTH_LONG)
+                                                    .setAction("Undo", v -> taskViewModel.restore(task))
                                                     .show();
                                         })
                                         .start();
@@ -531,6 +532,9 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                 }
             } else if (id == R.id.nav_help) {
                 Intent intent = new Intent(MainActivity.this, HelpFAQActivity.class);
+                startActivity(intent);
+            } else if (id == R.id.nav_recycle_bin) {
+                Intent intent = new Intent(MainActivity.this, RecycleBinActivity.class);
                 startActivity(intent);
             }
             binding.drawerLayout.closeDrawer(GravityCompat.END);

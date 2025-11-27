@@ -40,4 +40,5 @@
     <string name="choose_accent_color">Choose Accent Color</string>
     <string name="choose_background">Choose Background</string>
     <string name="version_template">Version %s</string>
+    <string name="deleted_task_description">Deleted on %1$s • %2$d days left</string>
 </resources>

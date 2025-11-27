@@ -6,8 +6,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import java.util.List;
 
-// DEFINITIVE FIX: Rewriting the ViewModel to use separate insert and update methods.
-// ADDITIONAL FIX: Added callback support for post-database operations
 public class TaskViewModel extends AndroidViewModel {
     private final TaskRepository repository;
     private final LiveData<List<Task>> allTasks;
@@ -40,5 +38,33 @@ public class TaskViewModel extends AndroidViewModel {
 
     public void delete(Task task) {
         repository.delete(task);
+    }
+
+    public LiveData<List<Task>> searchTasks(String query) {
+        return repository.searchTasks(query);
+    }
+
+    public LiveData<List<Task>> getDeletedTasks() {
+        return repository.getDeletedTasks();
+    }
+
+    public void deleteOldTasks(long threshold) {
+        repository.deleteOldTasks(threshold);
+    }
+
+    public void deleteAllDeletedTasks() {
+        repository.deleteAllDeletedTasks();
+    }
+
+    public void deletePermanently(Task task) {
+        repository.deletePermanently(task);
+    }
+
+    public void softDelete(Task task) {
+        repository.softDelete(task);
+    }
+
+    public void restore(Task task) {
+        repository.restore(task);
     }
 }

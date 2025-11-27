@@ -14,4 +14,6 @@ public class Task {
     public String repeat = "";
     public boolean isCompleted = false;
     public int alarmId = 0; // DEFINITIVE FIX: Add a dedicated, unique ID for alarms.
+    public boolean isDeleted = false;
+    public long deletedTimestamp = 0;
 }

@@ -6,8 +6,6 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import java.util.List;
 
-// DEFINITIVE FIX: Rewriting the repository to use separate insert and update methods.
-// ADDITIONAL FIX: Added callback support for post-database operations
 public class TaskRepository {
     private static final String TAG = "TaskRepository";
     private final TaskDao taskDao;
@@ -30,12 +28,11 @@ public class TaskRepository {
     void insert(Task task, Runnable onComplete) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             Log.d(TAG, "Inserting task: " + task.title);
-            // CRITICAL FIX: Get the generated ID and update the task object
-            long newId = taskDao.insert(task); // ← Now returns the generated ID
-            task.id = (int) newId; // ← Assign it back to the original object
+            long newId = taskDao.insert(task);
+            task.id = (int) newId;
             Log.d(TAG, "Insert complete for task: " + task.title + " (assigned id=" + newId + ")");
             if (onComplete != null) {
-                onComplete.run(); // ← Now called with valid task.id!
+                onComplete.run();
             }
         });
     }
@@ -59,4 +56,41 @@ public class TaskRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> taskDao.delete(task));
     }
 
+    public LiveData<List<Task>> searchTasks(String query) {
+        return taskDao.searchTasks("%" + query + "%");
+    }
+
+    public LiveData<List<Task>> getDeletedTasks() {
+        return taskDao.getDeletedTasks();
+    }
+
+    public void deleteOldTasks(long threshold) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            taskDao.deleteOldTasks(threshold);
+        });
+    }
+
+    public void deleteAllDeletedTasks() {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            taskDao.deleteAllDeletedTasks();
+        });
+    }
+
+    public void deletePermanently(Task task) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            taskDao.delete(task);
+        });
+    }
+
+    public void softDelete(Task task) {
+        task.isDeleted = true;
+        task.deletedTimestamp = System.currentTimeMillis();
+        update(task);
+    }
+
+    public void restore(Task task) {
+        task.isDeleted = false;
+        task.deletedTimestamp = 0;
+        update(task);
+    }
 }

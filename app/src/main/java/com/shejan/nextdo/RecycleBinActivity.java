@@ -3,6 +3,7 @@ package com.shejan.nextdo;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,12 +17,20 @@ public class RecycleBinActivity extends AppCompatActivity {
     private TaskViewModel taskViewModel;
     private RecycleBinAdapter adapter;
 
+    private android.view.MenuItem deleteAllItem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ThemeManager.applyTheme(this);
         binding = ActivityRecycleBinBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        setSupportActionBar(binding.toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+        }
 
         // Enable Edge-to-Edge
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
@@ -44,12 +53,6 @@ public class RecycleBinActivity extends AppCompatActivity {
                     binding.recyclerviewRecycleBin.getPaddingRight(),
                     16 + systemBars.bottom // Original 16dp + inset
             );
-
-            // Apply bottom inset to Delete All button (margin)
-            androidx.constraintlayout.widget.ConstraintLayout.LayoutParams params = (androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) binding.btnDeleteAll
-                    .getLayoutParams();
-            params.bottomMargin = (int) (24 * getResources().getDisplayMetrics().density) + systemBars.bottom;
-            binding.btnDeleteAll.setLayoutParams(params);
 
             return windowInsets;
         });
@@ -81,19 +84,66 @@ public class RecycleBinActivity extends AppCompatActivity {
         // Observe deleted tasks
         taskViewModel.getDeletedTasks().observe(this, tasks -> {
             adapter.submitList(tasks);
-            if (tasks.isEmpty()) {
+            boolean isEmpty = tasks.isEmpty();
+            if (isEmpty) {
                 binding.emptyView.setVisibility(View.VISIBLE);
                 binding.recyclerviewRecycleBin.setVisibility(View.GONE);
             } else {
                 binding.emptyView.setVisibility(View.GONE);
                 binding.recyclerviewRecycleBin.setVisibility(View.VISIBLE);
             }
+
+            // Update menu item state
+            if (deleteAllItem != null) {
+                deleteAllItem.setEnabled(!isEmpty);
+
+                String title = deleteAllItem.getTitle().toString();
+                android.text.SpannableString s = new android.text.SpannableString(title);
+
+                if (isEmpty) {
+                    // Gray out
+                    s.setSpan(new android.text.style.ForegroundColorSpan(android.graphics.Color.GRAY), 0, s.length(),
+                            0);
+                } else {
+                    // Red for danger
+                    s.setSpan(new android.text.style.ForegroundColorSpan(android.graphics.Color.parseColor("#EF5350")),
+                            0, s.length(), 0);
+                }
+                deleteAllItem.setTitle(s);
+            }
         });
+    }
 
-        binding.btnDeleteAll.setOnClickListener(v ->
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_recycle_bin, menu);
+        deleteAllItem = menu.findItem(R.id.action_delete_all);
 
-        showDeleteAllConfirmationDialog());
+        // Initial state check if data is already loaded
+        boolean isEmpty = adapter.getCurrentList().isEmpty();
+        deleteAllItem.setEnabled(!isEmpty);
 
+        String title = deleteAllItem.getTitle().toString();
+        android.text.SpannableString s = new android.text.SpannableString(title);
+
+        if (isEmpty) {
+            s.setSpan(new android.text.style.ForegroundColorSpan(android.graphics.Color.GRAY), 0, s.length(), 0);
+        } else {
+            s.setSpan(new android.text.style.ForegroundColorSpan(android.graphics.Color.parseColor("#EF5350")), 0,
+                    s.length(), 0);
+        }
+        deleteAllItem.setTitle(s);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull android.view.MenuItem item) {
+        if (item.getItemId() == R.id.action_delete_all) {
+            showDeleteAllConfirmationDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void showDeleteAllConfirmationDialog() {

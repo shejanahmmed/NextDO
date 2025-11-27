@@ -58,18 +58,10 @@ public class AlarmScheduler {
                     alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, currentTime + 100, pendingIntent);
                 } else if (canScheduleExactAlarms()) {
                     // Use most reliable alarm method for future times
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        // Android 12+: Use setAlarmClock for high-priority alarms
-                        Log.d(TAG, "Using setAlarmClock for Android 12+");
-                        alarmManager.setAlarmClock(
-                                new AlarmManager.AlarmClockInfo(task.reminderTime, pendingIntent),
-                                pendingIntent);
-                    } else {
-                        // Android 6-11: Use setExactAndAllowWhileIdle
-                        Log.d(TAG, "Using setExactAndAllowWhileIdle for Android 6-11");
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime,
-                                pendingIntent);
-                    }
+                    // Use setExactAndAllowWhileIdle to avoid alarm icon
+                    Log.d(TAG, "Using setExactAndAllowWhileIdle");
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime,
+                            pendingIntent);
                 } else {
                     // Fallback for devices without exact alarm permission
                     Log.d(TAG, "No exact alarm permission, using setAndAllowWhileIdle");

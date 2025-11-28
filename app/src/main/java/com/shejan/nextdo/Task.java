@@ -16,4 +16,5 @@ public class Task {
     public int alarmId = 0; // DEFINITIVE FIX: Add a dedicated, unique ID for alarms.
     public boolean isDeleted = false;
     public long deletedTimestamp = 0;
+    public long completedTimestamp = 0;
 }

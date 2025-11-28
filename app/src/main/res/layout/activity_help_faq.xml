@@ -143,6 +143,81 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="16dp"
+                android:background="?attr/colorOnSurface"
+                android:alpha="0.1" />
+
+            <!-- Q5 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Where are my completed tasks?"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Completed tasks are moved to the 'Completed Tasks' page in the side menu. They are automatically deleted after 15 days."
+                android:textColor="?attr/colorOnSurface"
+                android:alpha="0.7"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="16dp"
+                android:background="?attr/colorOnSurface"
+                android:alpha="0.1" />
+
+            <!-- Q6 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="How does the Recycle Bin work?"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Deleted tasks are moved to the Recycle Bin. They can be restored or permanently deleted. Items in the Recycle Bin are automatically permanently deleted after 30 days."
+                android:textColor="?attr/colorOnSurface"
+                android:alpha="0.7"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="16dp"
+                android:background="?attr/colorOnSurface"
+                android:alpha="0.1" />
+
+            <!-- Q7 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Does the app have widgets?"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Yes! You can add the 'Upcoming Tasks' widget to your home screen. It comes in both Dark and Light themes to match your style."
+                android:textColor="?attr/colorOnSurface"
+                android:alpha="0.7"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp" />
+
             </LinearLayout>
 
         </LinearLayout>

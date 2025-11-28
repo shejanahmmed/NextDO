@@ -33,6 +33,7 @@ public class AlarmScheduler {
             Intent intent = new Intent(context, ReminderBroadcastReceiver.class);
             intent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_TITLE, task.title);
             intent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_ID, task.id);
+            intent.putExtra("alarm_id", task.alarmId);
             intent.putExtra("task_description", task.description);
 
             // CRITICAL FIX: Use FLAG_CANCEL_CURRENT to avoid PendingIntent reuse issues

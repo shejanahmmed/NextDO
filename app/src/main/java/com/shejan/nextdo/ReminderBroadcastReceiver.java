@@ -96,6 +96,18 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     .setAutoCancel(!persistentEnabled)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
+            // Add Snooze Action
+            int alarmId = intent.getIntExtra("alarm_id", 0);
+            Intent snoozeIntent = new Intent(context, SnoozeReceiver.class);
+            snoozeIntent.putExtra(EXTRA_TASK_ID, taskId);
+            snoozeIntent.putExtra(EXTRA_TASK_TITLE, taskTitle);
+            snoozeIntent.putExtra("alarm_id", alarmId);
+            snoozeIntent.putExtra("task_description", taskDescription);
+            PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(context, taskId + 20000, snoozeIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+            builder.addAction(R.drawable.ic_snooze, "Snooze", snoozePendingIntent);
+
             // Handle persistent vs regular notification differently
             if (persistentEnabled) {
                 // For persistent notifications: keep them ongoing but still alert

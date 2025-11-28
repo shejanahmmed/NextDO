@@ -126,6 +126,11 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             binding.checkboxCompleted.setChecked(task.isCompleted);
             binding.checkboxCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (listener != null) {
+                    if (isChecked) {
+                        task.completedTimestamp = System.currentTimeMillis();
+                    } else {
+                        task.completedTimestamp = 0;
+                    }
                     listener.onTaskCompleted(task, isChecked);
                 }
             });

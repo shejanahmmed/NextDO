@@ -130,6 +130,11 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         // Refresh accent color
         android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
                 .getDefaultSharedPreferences(this);
+
+        // Check for expired completed tasks (15 days)
+        long fifteenDaysInMillis = 15L * 24 * 60 * 60 * 1000;
+        long threshold = System.currentTimeMillis() - fifteenDaysInMillis;
+        taskViewModel.deleteOldCompletedTasks(threshold);
         int accentColor = prefs.getInt("accent_color", 0xFF34C759);
 
         binding.fab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accentColor));
@@ -179,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         binding.recyclerview.setAdapter(adapter);
         binding.recyclerview.setLayoutManager(new LinearLayoutManager(this));
 
-        taskViewModel.getAllTasks().observe(this, tasks -> {
+        taskViewModel.getActiveTasks().observe(this, tasks -> {
             if (tasks != null) {
                 adapter.submitList(tasks, () -> {
                     if (shouldScrollToTop) {
@@ -532,6 +537,9 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                 }
             } else if (id == R.id.nav_help) {
                 Intent intent = new Intent(MainActivity.this, HelpFAQActivity.class);
+                startActivity(intent);
+            } else if (id == R.id.nav_completed_tasks) {
+                Intent intent = new Intent(MainActivity.this, CompletedTasksActivity.class);
                 startActivity(intent);
             } else if (id == R.id.nav_recycle_bin) {
                 Intent intent = new Intent(MainActivity.this, RecycleBinActivity.class);

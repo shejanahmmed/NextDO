@@ -8,16 +8,18 @@ import java.util.List;
 
 public class TaskViewModel extends AndroidViewModel {
     private final TaskRepository repository;
-    private final LiveData<List<Task>> allTasks;
 
     public TaskViewModel(@NonNull Application application) {
         super(application);
         repository = new TaskRepository(application);
-        allTasks = repository.getAllTasks();
     }
 
-    public LiveData<List<Task>> getAllTasks() {
-        return allTasks;
+    public LiveData<List<Task>> getActiveTasks() {
+        return repository.getActiveTasks();
+    }
+
+    public LiveData<List<Task>> getCompletedTasks() {
+        return repository.getCompletedTasks();
     }
 
     public void insert(Task task) {
@@ -62,5 +64,9 @@ public class TaskViewModel extends AndroidViewModel {
 
     public void restore(Task task) {
         repository.restore(task);
+    }
+
+    public void deleteOldCompletedTasks(long threshold) {
+        repository.deleteOldCompletedTasks(threshold);
     }
 }

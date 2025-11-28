@@ -9,7 +9,6 @@ import java.util.List;
 public class TaskRepository {
     private static final String TAG = "TaskRepository";
     private final TaskDao taskDao;
-    private final LiveData<List<Task>> allTasks;
 
     private final Application application;
 
@@ -17,11 +16,14 @@ public class TaskRepository {
         this.application = application;
         AppDatabase db = AppDatabase.getDatabase(application);
         taskDao = db.taskDao();
-        allTasks = taskDao.getAllTasks();
     }
 
-    LiveData<List<Task>> getAllTasks() {
-        return allTasks;
+    LiveData<List<Task>> getActiveTasks() {
+        return taskDao.getActiveTasks();
+    }
+
+    LiveData<List<Task>> getCompletedTasks() {
+        return taskDao.getCompletedTasks();
     }
 
     void insert(Task task) {
@@ -70,10 +72,6 @@ public class TaskRepository {
         });
     }
 
-    public LiveData<List<Task>> searchTasks(String query) {
-        return taskDao.searchTasks("%" + query + "%");
-    }
-
     public LiveData<List<Task>> getDeletedTasks() {
         return taskDao.getDeletedTasks();
     }
@@ -100,5 +98,9 @@ public class TaskRepository {
         task.isDeleted = false;
         task.deletedTimestamp = 0;
         update(task);
+    }
+
+    public void deleteOldCompletedTasks(long threshold) {
+        AppDatabase.databaseWriteExecutor.execute(() -> taskDao.deleteOldCompletedTasks(threshold));
     }
 }

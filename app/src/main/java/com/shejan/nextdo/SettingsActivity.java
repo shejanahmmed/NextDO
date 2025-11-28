@@ -102,6 +102,17 @@ public class SettingsActivity extends AppCompatActivity {
                     new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
         }
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            binding.getRoot().setRenderEffect(
+                    android.graphics.RenderEffect.createBlurEffect(10f, 10f, android.graphics.Shader.TileMode.MIRROR));
+        }
+
+        dialog.setOnDismissListener(d -> {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                binding.getRoot().setRenderEffect(null);
+            }
+        });
+
         for (int i = 0; i < colors.length; i++) {
             final int color = colors[i];
             android.view.View optionView = getLayoutInflater().inflate(R.layout.theme_option_item, container, false);
@@ -171,6 +182,17 @@ public class SettingsActivity extends AppCompatActivity {
                 dialog.getWindow().setBackgroundDrawable(
                         new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
             }
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                binding.getRoot().setRenderEffect(android.graphics.RenderEffect.createBlurEffect(10f, 10f,
+                        android.graphics.Shader.TileMode.MIRROR));
+            }
+
+            dialog.setOnDismissListener(d -> {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    binding.getRoot().setRenderEffect(null);
+                }
+            });
 
             for (int i = 0; i < backgroundNames.length; i++) {
                 final int index = i;
@@ -288,6 +310,17 @@ public class SettingsActivity extends AppCompatActivity {
                     dialog.getWindow().setBackgroundDrawable(
                             new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
                 }
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    binding.getRoot().setRenderEffect(android.graphics.RenderEffect.createBlurEffect(10f, 10f,
+                            android.graphics.Shader.TileMode.MIRROR));
+                }
+
+                dialog.setOnDismissListener(d -> {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                        binding.getRoot().setRenderEffect(null);
+                    }
+                });
 
                 for (int i = 0; i < snoozeOptions.length; i++) {
                     final int index = i;

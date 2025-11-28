@@ -29,14 +29,14 @@ public interface TaskDao {
                             // Actually, for soft delete we use @Update. This @Delete is for permanent
                             // removal.
 
-    @Query("SELECT * FROM tasks WHERE isDeleted = 0 ORDER BY isCompleted ASC, id DESC")
-    LiveData<List<Task>> getAllTasks();
+    @Query("SELECT * FROM tasks WHERE isDeleted = 0 AND isCompleted = 0 ORDER BY id DESC")
+    LiveData<List<Task>> getActiveTasks();
+
+    @Query("SELECT * FROM tasks WHERE isDeleted = 0 AND isCompleted = 1 ORDER BY id DESC")
+    LiveData<List<Task>> getCompletedTasks();
 
     @Query("SELECT * FROM tasks WHERE isDeleted = 0")
     List<Task> getAllTasksSync();
-
-    @Query("SELECT * FROM tasks WHERE (title LIKE :query OR description LIKE :query) AND isDeleted = 0 ORDER BY id DESC")
-    LiveData<List<Task>> searchTasks(String query);
 
     // Recycle Bin Queries
     @Query("SELECT * FROM tasks WHERE isDeleted = 1 ORDER BY deletedTimestamp DESC")
@@ -47,4 +47,7 @@ public interface TaskDao {
 
     @Query("DELETE FROM tasks WHERE isDeleted = 1")
     void deleteAllDeletedTasks();
+
+    @Query("DELETE FROM tasks WHERE isCompleted = 1 AND completedTimestamp < :threshold")
+    void deleteOldCompletedTasks(long threshold);
 }

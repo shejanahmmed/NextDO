@@ -3,6 +3,7 @@ package com.shejan.nextdo;
 import android.app.Application;
 import android.util.Log;
 
+import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.LiveData;
 import java.util.List;
 
@@ -11,11 +12,13 @@ public class TaskRepository {
     private final TaskDao taskDao;
 
     private final Application application;
+    private final AlarmScheduler alarmScheduler;
 
     TaskRepository(Application application) {
         this.application = application;
         AppDatabase db = AppDatabase.getDatabase(application);
         taskDao = db.taskDao();
+        this.alarmScheduler = new AlarmScheduler(application);
     }
 
     LiveData<List<Task>> getActiveTasks() {
@@ -67,6 +70,10 @@ public class TaskRepository {
 
     void delete(Task task) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
+            // Cancel alarm and dismiss notification before deleting
+            alarmScheduler.cancel(task);
+            dismissNotification(task.id);
+
             taskDao.delete(task);
             UpcomingTasksWidgetProvider.sendRefreshBroadcast(application);
         });
@@ -85,10 +92,20 @@ public class TaskRepository {
     }
 
     public void deletePermanently(Task task) {
-        AppDatabase.databaseWriteExecutor.execute(() -> taskDao.delete(task));
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            // Cancel alarm and dismiss notification before permanent deletion
+            alarmScheduler.cancel(task);
+            dismissNotification(task.id);
+
+            taskDao.delete(task);
+        });
     }
 
     public void softDelete(Task task) {
+        // Cancel alarm and dismiss notification when soft deleting
+        alarmScheduler.cancel(task);
+        dismissNotification(task.id);
+
         task.isDeleted = true;
         task.deletedTimestamp = System.currentTimeMillis();
         update(task);
@@ -102,5 +119,18 @@ public class TaskRepository {
 
     public void deleteOldCompletedTasks(long threshold) {
         AppDatabase.databaseWriteExecutor.execute(() -> taskDao.deleteOldCompletedTasks(threshold));
+    }
+
+    /**
+     * Dismisses the notification for a given task ID
+     */
+    private void dismissNotification(int taskId) {
+        try {
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(application);
+            notificationManager.cancel(taskId);
+            Log.d(TAG, "Notification dismissed for task " + taskId);
+        } catch (Exception e) {
+            Log.e(TAG, "Error dismissing notification: " + e.getMessage());
+        }
     }
 }

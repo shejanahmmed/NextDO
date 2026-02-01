@@ -27,10 +27,7 @@
             android:name=".ReminderBroadcastReceiver"
             android:enabled="true"
             android:exported="false" />
-        <receiver
-            android:name=".NotificationDismissReceiver"
-            android:enabled="true"
-            android:exported="false" />
+
         <receiver
             android:name=".SnoozeReceiver"
             android:enabled="true"

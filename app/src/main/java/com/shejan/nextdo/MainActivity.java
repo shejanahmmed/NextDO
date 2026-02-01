@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         binding.fab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accentColor));
 
         if (adapter != null) {
+            adapter.setAccentColor(accentColor);
             // noinspection NotifyDataSetChanged
             adapter.notifyDataSetChanged();
         }
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         // Remove toolbar for Nothing theme
         // Remove toolbar for Nothing theme
         setupDrawer();
-        setupBlurEffect();
+        // setupBlurEffect() removed;
 
         askNotificationPermission();
 
@@ -215,304 +216,68 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
             taskActivityLauncher.launch(intent);
         });
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(
-                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        // Task Swipe Swipe Callback
+        setupSwipeGestures();
+    }
 
+    private void setupSwipeGestures() {
+        TaskSwipeCallback swipeCallback = new TaskSwipeCallback(this, adapter,
+                new TaskSwipeCallback.SwipeActionReceiver() {
                     @Override
-                    public boolean isLongPressDragEnabled() {
-                        return false;
+                    public void onSwipedLeft(Task task, RecyclerView.ViewHolder viewHolder) {
+                        // DELETE ANIMATION
+                        viewHolder.itemView.animate()
+                                .alpha(0f)
+                                .scaleX(0.5f)
+                                .scaleY(0.5f)
+                                .rotation(15f)
+                                .translationX(-viewHolder.itemView.getWidth())
+                                .setDuration(400)
+                                .setInterpolator(new android.view.animation.AccelerateInterpolator())
+                                .withEndAction(() -> {
+                                    taskViewModel.softDelete(task);
+                                    // Reset view state
+                                    viewHolder.itemView.setAlpha(1f);
+                                    viewHolder.itemView.setScaleX(1f);
+                                    viewHolder.itemView.setScaleY(1f);
+                                    viewHolder.itemView.setRotation(0f);
+                                    viewHolder.itemView.setTranslationX(0f);
+
+                                    Snackbar.make(binding.getRoot(), "Task moved to Recycle Bin", Snackbar.LENGTH_LONG)
+                                            .setAction("Undo", v -> taskViewModel.restore(task))
+                                            .show();
+                                })
+                                .start();
                     }
 
                     @Override
-                    public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
-                        return 0.3f; // Lower threshold for easier swipe
-                    }
-
-                    @Override
-                    public float getSwipeEscapeVelocity(float defaultValue) {
-                        return defaultValue * 0.5f; // Easier to trigger swipe
-                    }
-
-                    private final Paint textPaint = new Paint();
-
-                    private final Paint circlePaint = new Paint();
-                    private final Paint backgroundPaint = new Paint();
-
-                    @Override
-                    public boolean onMove(@NonNull RecyclerView recyclerView,
-                            @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                        return false;
-                    }
-
-                    @Override
-                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                        int position = viewHolder.getBindingAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            Task task = adapter.getTaskAt(position);
-
-                            // Vibration feedback
-                            try {
-                                android.os.Vibrator vibrator = (android.os.Vibrator) getSystemService(
-                                        android.content.Context.VIBRATOR_SERVICE);
-                                if (vibrator != null) {
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                                        android.os.VibrationEffect effect = android.os.VibrationEffect.createOneShot(50,
-                                                android.os.VibrationEffect.DEFAULT_AMPLITUDE);
-                                        vibrator.vibrate(effect);
-                                    } else {
-                                        // Deprecated in API 26
-                                        vibrator.vibrate(50);
-                                    }
-                                }
-                            } catch (Exception e) {
-                                // Vibration not available
-                            }
-
-                            if (direction == ItemTouchHelper.LEFT) {
-                                // HEAVY DELETE ANIMATION
-                                viewHolder.itemView.animate()
-                                        .alpha(0f)
-                                        .scaleX(0.5f)
-                                        .scaleY(0.5f)
-                                        .rotation(15f)
-                                        .translationX(-viewHolder.itemView.getWidth())
-                                        .setDuration(400)
-                                        .setInterpolator(new android.view.animation.AccelerateInterpolator())
-                                        .withEndAction(() -> {
-                                            taskViewModel.softDelete(task);
-                                            viewHolder.itemView.setAlpha(1f);
-                                            viewHolder.itemView.setScaleX(1f);
-                                            viewHolder.itemView.setScaleY(1f);
-                                            viewHolder.itemView.setRotation(0f);
-                                            viewHolder.itemView.setTranslationX(0f);
-                                            Snackbar.make(binding.getRoot(), "Task moved to Recycle Bin",
-                                                    Snackbar.LENGTH_LONG)
-                                                    .setAction("Undo", v -> taskViewModel.restore(task))
-                                                    .show();
-                                        })
-                                        .start();
-                            } else if (direction == ItemTouchHelper.RIGHT) {
-                                // RIGHT SWIPE - Edit action
-                                final Task taskToEdit = task;
-
-                                // CRITICAL FIX: Reset the item immediately to prevent removal
-                                adapter.notifyItemChanged(position);
-
-                                // Play bounce animation
-                                viewHolder.itemView.animate()
-                                        .scaleX(1.15f)
-                                        .scaleY(1.15f)
-                                        .rotation(-3f)
-                                        .setDuration(150)
-                                        .setInterpolator(new android.view.animation.OvershootInterpolator())
-                                        .withEndAction(() -> viewHolder.itemView.animate()
-                                                .scaleX(1f)
-                                                .scaleY(1f)
-                                                .rotation(0f)
-                                                .setDuration(150)
-                                                .start())
-                                        .start();
-
-                                // Open edit screen after delay to ensure item is restored
-                                new android.os.Handler(android.os.Looper.getMainLooper())
-                                        .postDelayed(() -> onTaskClicked(taskToEdit), 100);
-                            }
-                        }
-                    }
-
-                    private Drawable deleteIcon;
-                    private Drawable editIcon;
-
-                    @Override
-                    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
-                            @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState,
-                            boolean isCurrentlyActive) {
-                        View itemView = viewHolder.itemView;
-
-                        // Initialize icons if needed
-                        if (deleteIcon == null) {
-                            deleteIcon = ContextCompat.getDrawable(MainActivity.this,
-                                    R.drawable.ic_swipe_delete_custom);
-                        }
-                        if (editIcon == null) {
-                            editIcon = ContextCompat.getDrawable(MainActivity.this, R.drawable.ic_swipe_edit);
+                    public void onSwipedRight(Task task, int position) {
+                        // Play bounce animation
+                        RecyclerView.ViewHolder viewHolder = binding.recyclerview
+                                .findViewHolderForAdapterPosition(position);
+                        if (viewHolder != null) {
+                            viewHolder.itemView.animate()
+                                    .scaleX(1.15f)
+                                    .scaleY(1.15f)
+                                    .rotation(-3f)
+                                    .setDuration(150)
+                                    .setInterpolator(new android.view.animation.OvershootInterpolator())
+                                    .withEndAction(() -> viewHolder.itemView.animate()
+                                            .scaleX(1f)
+                                            .scaleY(1f)
+                                            .rotation(0f)
+                                            .setDuration(150)
+                                            .start())
+                                    .start();
                         }
 
-                        // Much lower threshold for easier activation
-                        float swipeThreshold = itemView.getWidth() * 0.15f;
-
-                        if (dX < 0) { // Swiping LEFT (Delete) - HEAVY ANIMATIONS
-                            float swipeProgress = Math.min(Math.abs(dX) / swipeThreshold, 1.0f);
-
-                            // LIGHTER MATTE RED (40% transparent = 60% opacity = 99 hex)
-                            int startColor = Color.parseColor("#99E57373"); // Light Matte Red
-                            int endColor = Color.parseColor("#99EF5350"); // Slightly darker
-                            int currentColor = interpolateColor(startColor, endColor, swipeProgress);
-
-                            backgroundPaint.setColor(currentColor);
-                            android.graphics.RectF backgroundRect = new android.graphics.RectF(
-                                    itemView.getRight() + (int) dX, itemView.getTop(),
-                                    itemView.getRight(), itemView.getBottom());
-                            c.drawRoundRect(backgroundRect, 30f, 30f, backgroundPaint);
-
-                            // PULSING CIRCLE EFFECT
-                            circlePaint.setColor(Color.WHITE);
-                            circlePaint.setAlpha((int) (100 * swipeProgress));
-                            circlePaint.setAntiAlias(true);
-                            float pulseRadius = 70f * swipeProgress
-                                    * (1 + 0.3f * (float) Math.sin(System.currentTimeMillis() / 100.0));
-                            float circleCenterX = itemView.getRight() - 120;
-                            float circleCenterY = itemView.getTop() + (itemView.getHeight() / 2f);
-                            c.drawCircle(circleCenterX, circleCenterY, pulseRadius, circlePaint);
-
-                            // LARGE ANIMATED ICON (PNG)
-                            if (deleteIcon != null) {
-                                float iconSize = 70f * swipeProgress;
-                                float iconCenterX = itemView.getRight() - 120;
-                                float iconCenterY = itemView.getTop() + (itemView.getHeight() / 2f);
-
-                                int halfSize = (int) (iconSize / 2);
-                                deleteIcon.setBounds(
-                                        (int) (iconCenterX - halfSize),
-                                        (int) (iconCenterY - halfSize),
-                                        (int) (iconCenterX + halfSize),
-                                        (int) (iconCenterY + halfSize));
-                                deleteIcon.setAlpha((int) (255 * swipeProgress));
-                                deleteIcon.draw(c);
-                            }
-
-                            // LARGE BOLD TEXT
-                            textPaint.setColor(Color.WHITE);
-                            textPaint.setTextSize(42f * swipeProgress);
-                            textPaint.setAntiAlias(true);
-                            textPaint.setTextAlign(Paint.Align.CENTER);
-                            textPaint.setAlpha((int) (255 * swipeProgress));
-                            textPaint.setFakeBoldText(true);
-
-                            String deleteText = "DELETE";
-                            // Adjust text position relative to the icon size
-                            float textY = itemView.getTop() + (itemView.getHeight() / 2f) + (70f * swipeProgress / 2)
-                                    + 40;
-                            c.drawText(deleteText, circleCenterX, textY, textPaint);
-
-                            // DRAMATIC SCALE AND ROTATION
-                            float scale = 1.0f - (swipeProgress * 0.15f);
-                            float rotation = swipeProgress * 8f;
-                            itemView.setScaleX(scale);
-                            itemView.setScaleY(scale);
-                            itemView.setRotation(rotation);
-
-                            // ELEVATION EFFECT
-                            // ELEVATION EFFECT
-                            itemView.setElevation(20f * swipeProgress);
-
-                        } else if (dX > 0) { // Swiping RIGHT (Edit) - HEAVY ANIMATIONS
-                            float swipeProgress = Math.min(dX / swipeThreshold, 1.0f);
-
-                            // LIGHTER MATTE GREEN (40% transparent = 60% opacity = 99 hex)
-                            int startColor = Color.parseColor("#9981C784"); // Light Matte Green
-                            int endColor = Color.parseColor("#9966BB6A"); // Slightly darker
-                            int currentColor = interpolateColor(startColor, endColor, swipeProgress);
-
-                            backgroundPaint.setColor(currentColor);
-                            android.graphics.RectF backgroundRect = new android.graphics.RectF(itemView.getLeft(),
-                                    itemView.getTop(),
-                                    itemView.getLeft() + (int) dX, itemView.getBottom());
-                            c.drawRoundRect(backgroundRect, 30f, 30f, backgroundPaint);
-
-                            // PULSING CIRCLE EFFECT
-                            circlePaint.setColor(Color.WHITE);
-                            circlePaint.setAlpha((int) (100 * swipeProgress));
-                            circlePaint.setAntiAlias(true);
-                            float pulseRadius = 70f * swipeProgress
-                                    * (1 + 0.3f * (float) Math.sin(System.currentTimeMillis() / 100.0));
-                            float circleCenterX = itemView.getLeft() + 120;
-                            float circleCenterY = itemView.getTop() + (itemView.getHeight() / 2f);
-                            c.drawCircle(circleCenterX, circleCenterY, pulseRadius, circlePaint);
-
-                            // LARGE ANIMATED ICON (PNG)
-                            if (editIcon != null) {
-                                float iconSize = 70f * swipeProgress;
-                                float iconCenterX = itemView.getLeft() + 120;
-                                float iconCenterY = itemView.getTop() + (itemView.getHeight() / 2f);
-
-                                int halfSize = (int) (iconSize / 2);
-                                editIcon.setBounds(
-                                        (int) (iconCenterX - halfSize),
-                                        (int) (iconCenterY - halfSize),
-                                        (int) (iconCenterX + halfSize),
-                                        (int) (iconCenterY + halfSize));
-                                editIcon.setAlpha((int) (255 * swipeProgress));
-                                editIcon.draw(c);
-                            }
-
-                            // LARGE BOLD TEXT
-                            textPaint.setColor(Color.WHITE);
-                            textPaint.setTextSize(42f * swipeProgress);
-                            textPaint.setAntiAlias(true);
-                            textPaint.setTextAlign(Paint.Align.CENTER);
-                            textPaint.setAlpha((int) (255 * swipeProgress));
-                            textPaint.setFakeBoldText(true);
-
-                            String editText = "EDIT";
-                            // Adjust text position relative to the icon size
-                            float textY = itemView.getTop() + (itemView.getHeight() / 2f) + (70f * swipeProgress / 2)
-                                    + 40;
-                            c.drawText(editText, circleCenterX, textY, textPaint);
-
-                            // DRAMATIC SCALE AND ROTATION
-                            float scale = 1.0f - (swipeProgress * 0.15f);
-                            float rotation = -swipeProgress * 8f;
-                            itemView.setScaleX(scale);
-                            itemView.setScaleY(scale);
-                            itemView.setRotation(rotation);
-
-                            // ELEVATION EFFECT
-                            // ELEVATION EFFECT
-                            itemView.setElevation(20f * swipeProgress);
-                        } else {
-                            // Reset all transformations
-                            itemView.setScaleX(1.0f);
-                            itemView.setScaleY(1.0f);
-                            itemView.setRotation(0f);
-                            itemView.setRotation(0f);
-                            itemView.setElevation(0f);
-                        }
-
-                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-                    }
-
-                    @Override
-                    public void clearView(@NonNull RecyclerView recyclerView,
-                            @NonNull RecyclerView.ViewHolder viewHolder) {
-                        super.clearView(recyclerView, viewHolder);
-                        // Reset all transformations when swipe is cancelled
-                        viewHolder.itemView.setScaleX(1.0f);
-                        viewHolder.itemView.setScaleY(1.0f);
-                        viewHolder.itemView.setRotation(0f);
-                        viewHolder.itemView.setRotation(0f);
-                        viewHolder.itemView.setElevation(0f);
-                    }
-
-                    // Helper method for smooth color interpolation
-                    private int interpolateColor(int startColor, int endColor, float fraction) {
-                        int startA = Color.alpha(startColor);
-                        int startR = Color.red(startColor);
-                        int startG = Color.green(startColor);
-                        int startB = Color.blue(startColor);
-
-                        int endA = Color.alpha(endColor);
-                        int endR = Color.red(endColor);
-                        int endG = Color.green(endColor);
-                        int endB = Color.blue(endColor);
-
-                        return Color.argb(
-                                (int) (startA + fraction * (endA - startA)),
-                                (int) (startR + fraction * (endR - startR)),
-                                (int) (startG + fraction * (endG - startG)),
-                                (int) (startB + fraction * (endB - startB)));
+                        // Open edit screen after delay
+                        new android.os.Handler(android.os.Looper.getMainLooper())
+                                .postDelayed(() -> onTaskClicked(task), 100);
                     }
                 });
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeCallback);
         itemTouchHelper.attachToRecyclerView(binding.recyclerview);
     }
 
@@ -708,281 +473,4 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         dialog.show();
     }
 
-    private void setupBlurEffect() {
-        android.widget.ImageView blurOverlay = findViewById(R.id.blur_overlay);
-
-        // Remove default scrim
-        binding.drawerLayout.setScrimColor(android.graphics.Color.TRANSPARENT);
-
-        binding.drawerLayout.addDrawerListener(new androidx.drawerlayout.widget.DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-                // Ensure blur is generated if we are sliding and it's not visible yet
-                if (slideOffset > 0 && blurOverlay.getVisibility() != View.VISIBLE) {
-                    generateBlur(blurOverlay);
-                }
-
-                if (blurOverlay.getVisibility() == View.VISIBLE) {
-                    blurOverlay.setAlpha(slideOffset);
-                }
-            }
-
-            @Override
-            public void onDrawerOpened(@NonNull View drawerView) {
-                blurOverlay.setAlpha(1f);
-                blurOverlay.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onDrawerClosed(@NonNull View drawerView) {
-                blurOverlay.setVisibility(View.GONE);
-                blurOverlay.setImageBitmap(null); // Free memory
-                if (Build.VERSION.SDK_INT >= 31) {
-                    blurOverlay.setRenderEffect(null);
-                }
-            }
-
-            @Override
-            public void onDrawerStateChanged(int newState) {
-                // We handle generation in onDrawerSlide now for better coverage
-            }
-        });
-    }
-
-    private void generateBlur(android.widget.ImageView blurOverlay) {
-        View content = binding.drawerLayout.getChildAt(0);
-        if (content.getWidth() > 0 && content.getHeight() > 0) {
-            try {
-                android.graphics.Bitmap bitmap = android.graphics.Bitmap.createBitmap(
-                        content.getWidth(), content.getHeight(), android.graphics.Bitmap.Config.ARGB_8888);
-                android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
-                content.draw(canvas);
-
-                if (Build.VERSION.SDK_INT >= 31) {
-                    blurOverlay.setImageBitmap(bitmap);
-                    blurOverlay.setRenderEffect(RenderEffect.createBlurEffect(50f, 50f, Shader.TileMode.MIRROR));
-                } else {
-                    // Apply blur
-                    android.graphics.Bitmap blurred = applyBlur(bitmap);
-                    blurOverlay.setImageBitmap(blurred);
-                }
-
-                blurOverlay.setVisibility(View.VISIBLE);
-                blurOverlay.setAlpha(0f);
-            } catch (Exception e) {
-                Log.e(TAG, "Error creating blur effect", e);
-            }
-        }
-    }
-
-    private android.graphics.Bitmap applyBlur(android.graphics.Bitmap image) {
-        // Scale down for performance and "free" blur
-        float scale = 0.2f; // 1/5th size
-        int width = Math.round(image.getWidth() * scale);
-        int height = Math.round(image.getHeight() * scale);
-
-        if (width <= 0 || height <= 0)
-            return image;
-
-        android.graphics.Bitmap inputBitmap = android.graphics.Bitmap.createScaledBitmap(image, width, height, false);
-        android.graphics.Bitmap outputBitmap = android.graphics.Bitmap.createBitmap(inputBitmap);
-
-        // Fast blur algorithm (StackBlur variant simplified)
-        return fastBlur(outputBitmap); // Increased radius for stronger blur
-    }
-
-    // Fast blur algorithm
-    private android.graphics.Bitmap fastBlur(android.graphics.Bitmap sentBitmap) {
-        final int radius = 20;
-        android.graphics.Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
-
-        int w = bitmap.getWidth();
-        int h = bitmap.getHeight();
-
-        int[] pix = new int[w * h];
-        bitmap.getPixels(pix, 0, w, 0, 0, w, h);
-
-        int wm = w - 1;
-        int hm = h - 1;
-        int wh = w * h;
-        int div = radius + radius + 1;
-
-        int[] r = new int[wh];
-        int[] g = new int[wh];
-        int[] b = new int[wh];
-        int rsum, gsum, bsum, x, y, i, p, yp, yi, yw;
-        int[] vmin = new int[Math.max(w, h)];
-
-        int divsum = (div + 1) >> 1;
-        divsum *= divsum;
-        int[] dv = new int[256 * divsum];
-        for (i = 0; i < 256 * divsum; i++) {
-            dv[i] = (i / divsum);
-        }
-
-        yw = yi = 0;
-
-        int[][] stack = new int[div][3];
-        int stackpointer;
-        int stackstart;
-        int[] sir;
-        int rbs;
-        int r1 = radius + 1;
-        int routsum, goutsum, boutsum;
-        int rinsum, ginsum, binsum;
-
-        for (y = 0; y < h; y++) {
-            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
-            for (i = -radius; i <= radius; i++) {
-                p = pix[yi + Math.min(wm, Math.max(i, 0))];
-                sir = stack[i + radius];
-                sir[0] = (p & 0xff0000) >> 16;
-                sir[1] = (p & 0x00ff00) >> 8;
-                sir[2] = (p & 0x0000ff);
-                rbs = r1 - Math.abs(i);
-                rsum += sir[0] * rbs;
-                gsum += sir[1] * rbs;
-                bsum += sir[2] * rbs;
-                if (i > 0) {
-                    rinsum += sir[0];
-                    ginsum += sir[1];
-                    binsum += sir[2];
-                } else {
-                    routsum += sir[0];
-                    goutsum += sir[1];
-                    boutsum += sir[2];
-                }
-            }
-            stackpointer = radius;
-
-            for (x = 0; x < w; x++) {
-
-                r[yi] = dv[rsum];
-                g[yi] = dv[gsum];
-                b[yi] = dv[bsum];
-
-                rsum -= routsum;
-                gsum -= goutsum;
-                bsum -= boutsum;
-
-                stackstart = stackpointer - radius + div;
-                sir = stack[stackstart % div];
-
-                routsum -= sir[0];
-                goutsum -= sir[1];
-                boutsum -= sir[2];
-
-                if (y == 0) {
-                    vmin[x] = Math.min(x + radius + 1, wm);
-                }
-                p = pix[yw + vmin[x]];
-
-                sir[0] = (p & 0xff0000) >> 16;
-                sir[1] = (p & 0x00ff00) >> 8;
-                sir[2] = (p & 0x0000ff);
-
-                rinsum += sir[0];
-                ginsum += sir[1];
-                binsum += sir[2];
-
-                rsum += rinsum;
-                gsum += ginsum;
-                bsum += binsum;
-
-                stackpointer = (stackpointer + 1) % div;
-                sir = stack[(stackpointer) % div];
-
-                routsum += sir[0];
-                goutsum += sir[1];
-                boutsum += sir[2];
-
-                rinsum -= sir[0];
-                ginsum -= sir[1];
-                binsum -= sir[2];
-
-                yi++;
-            }
-            yw += w;
-        }
-        for (x = 0; x < w; x++) {
-            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
-            yp = -radius * w;
-            for (i = -radius; i <= radius; i++) {
-                yi = Math.max(0, yp) + x;
-
-                sir = stack[i + radius];
-
-                rbs = r1 - Math.abs(i);
-
-                rsum += r[yi] * rbs;
-                gsum += g[yi] * rbs;
-                bsum += b[yi] * rbs;
-
-                if (i > 0) {
-                    rinsum += sir[0];
-                    ginsum += sir[1];
-                    binsum += sir[2];
-                } else {
-                    routsum += sir[0];
-                    goutsum += sir[1];
-                    boutsum += sir[2];
-                }
-
-                if (i < hm) {
-                    yp += w;
-                }
-            }
-            yi = x;
-            stackpointer = radius;
-            for (y = 0; y < h; y++) {
-                // Preserve alpha channel: ( 0xff000000 & pix[yi] )
-                pix[yi] = (0xff000000 & pix[yi]) | (dv[rsum] << 16) | (dv[gsum] << 8) | dv[bsum];
-
-                rsum -= routsum;
-                gsum -= goutsum;
-                bsum -= boutsum;
-
-                stackstart = stackpointer - radius + div;
-                sir = stack[stackstart % div];
-
-                routsum -= sir[0];
-                goutsum -= sir[1];
-                boutsum -= sir[2];
-
-                if (x == 0) {
-                    vmin[y] = Math.min(y + r1, hm) * w;
-                }
-                p = x + vmin[y];
-
-                sir[0] = r[p];
-                sir[1] = g[p];
-                sir[2] = b[p];
-
-                rinsum += sir[0];
-                ginsum += sir[1];
-                binsum += sir[2];
-
-                rsum += rinsum;
-                gsum += ginsum;
-                bsum += binsum;
-
-                stackpointer = (stackpointer + 1) % div;
-                sir = stack[stackpointer];
-
-                routsum += sir[0];
-                goutsum += sir[1];
-                boutsum += sir[2];
-
-                rinsum -= sir[0];
-                ginsum -= sir[1];
-                binsum -= sir[2];
-
-                yi += w;
-            }
-        }
-
-        bitmap.setPixels(pix, 0, w, 0, 0, w, h);
-
-        return (bitmap);
-    }
 }

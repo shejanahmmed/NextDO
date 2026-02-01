@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/task_card_border"
+        android:background="@drawable/bg_card_minimal"
         android:padding="16dp"
         android:gravity="center_vertical">
 
@@ -21,7 +21,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:button="@null"
-            android:background="@drawable/checkbox_nothing"
+            android:background="@drawable/checkbox_minimal"
             android:layout_marginEnd="16dp" />
 
         <!-- Task Info -->

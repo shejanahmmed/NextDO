@@ -67,23 +67,10 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
             PendingIntent pendingIntent = PendingIntent.getActivity(context, taskId, mainIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-            Intent deleteIntent = new Intent(context, NotificationDismissReceiver.class);
-            deleteIntent.putExtra(EXTRA_TASK_TITLE, taskTitle);
-            deleteIntent.putExtra("task_description", taskDescription);
-            deleteIntent.putExtra(EXTRA_TASK_ID, taskId);
-            PendingIntent deletePendingIntent = PendingIntent.getBroadcast(context, taskId + 10000, deleteIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
             String contentText = taskTitle != null ? taskTitle : "You have a reminder";
             if (taskDescription != null && !taskDescription.isEmpty()) {
                 contentText = taskTitle + ": " + taskDescription;
             }
-
-            android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
-                    .getDefaultSharedPreferences(context);
-            boolean persistentEnabled = prefs.getBoolean("persistent_notifications", false);
-
-            Log.d(TAG, "Persistent notifications enabled: " + persistentEnabled);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NotificationHelper.CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_alarm)
@@ -93,7 +80,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setCategory(NotificationCompat.CATEGORY_REMINDER)
                     .setContentIntent(pendingIntent)
-                    .setAutoCancel(!persistentEnabled)
+                    .setAutoCancel(true)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
             // Add Snooze Action
@@ -108,29 +95,16 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
             builder.addAction(R.drawable.ic_snooze, "Snooze", snoozePendingIntent);
 
-            // Handle persistent vs regular notification differently
-            if (persistentEnabled) {
-                // For persistent notifications: keep them ongoing but still alert
-                builder.setOngoing(true)
-                        .setDeleteIntent(deletePendingIntent)
-                        .setOnlyAlertOnce(false) // CRITICAL: Allow alerts even for persistent
-                        .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND
-                                | NotificationCompat.DEFAULT_VIBRATE)
-                        .setSound(android.media.RingtoneManager
-                                .getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION))
-                        .setVibrate(new long[] { 0, 500, 250, 500 });
-                Log.d(TAG, "Persistent notification: sound and vibration enabled");
-            } else {
-                // For regular notifications: auto-cancel and alert once
-                builder.setOngoing(false)
-                        .setOnlyAlertOnce(true)
-                        .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND
-                                | NotificationCompat.DEFAULT_VIBRATE)
-                        .setSound(android.media.RingtoneManager
-                                .getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION))
-                        .setVibrate(new long[] { 0, 500, 250, 500 });
-                Log.d(TAG, "Regular notification: auto-cancel enabled");
-            }
+            // Standard notification behavior
+            builder.setOngoing(false)
+                    .setOnlyAlertOnce(true)
+                    .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND
+                            | NotificationCompat.DEFAULT_VIBRATE)
+                    .setSound(android.media.RingtoneManager
+                            .getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION))
+                    .setVibrate(new long[] { 0, 500, 250, 500 });
+
+            Log.d(TAG, "Notification configured: auto-cancel enabled");
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 

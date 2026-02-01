@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- Nothing-style minimal header -->
+            <!-- Minimal style header -->
             <TextView
                 android:id="@+id/main_title"
                 android:layout_width="wrap_content"
@@ -88,23 +88,19 @@
                     android:textColor="?attr/colorOnSurface" />
             </LinearLayout>
 
-            <!-- Nothing-style FAB -->
-            <TextView
+            <!-- Minimal FAB -->
+            <ImageButton
                 android:id="@+id/fab"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-                android:layout_margin="24dp"
-                android:background="@drawable/nothing_fab_bg"
-                android:backgroundTint="#34C759"
-                android:text="+"
-                android:textColor="#FFFFFF"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
+                android:layout_margin="16dp"
+                android:background="@drawable/bg_fab_minimal"
+                android:src="@drawable/ic_add"
+                android:contentDescription="@string/add_task"
+                android:elevation="6dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:tint="@color/minimal_white" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

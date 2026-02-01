@@ -5,12 +5,17 @@
     <color name="gray">#FF888888</color>
     <color name="text_secondary">#B3FFFFFF</color>
 
-    <!-- Nothing-inspired colors -->
-    <color name="nothing_white">#FFFFFF</color>
-    <color name="nothing_gray">#808080</color>
-    <color name="nothing_light_gray">#F5F5F5</color>
-    <color name="nothing_dark_gray">#1A1A1A</color>
-    <color name="nothing_black">#000000</color>
+    <!-- Minimal styling colors -->
+    <color name="minimal_white">#FFFFFF</color>
+    <color name="minimal_gray">#808080</color>
+    <color name="minimal_light_gray">#F5F5F5</color>
+    <color name="minimal_dark_gray">#1A1A1A</color>
+    <color name="minimal_black">#000000</color>
+
+    <!-- Priority Colors -->
+    <color name="priority_high">#FF3B30</color>
+    <color name="priority_medium">#FFCC00</color>
+    <color name="priority_low">#34C759</color>
     
     <!-- Dark Theme Colors -->
     <color name="dark_primary">#FFFFFFFF</color>
@@ -29,7 +34,7 @@
     <color name="light_accent">#FF007BFF</color>
     
     <!-- FAB text color for light theme -->
-    <color name="fab_text_color">@color/nothing_white</color>
+    <color name="fab_text_color">@color/minimal_white</color>
     
     <color name="switch_track_color_custom">#FF34C759</color>
     

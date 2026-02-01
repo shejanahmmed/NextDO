@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.shejan.nextdo.databinding.ItemTaskNothingBinding;
+import com.shejan.nextdo.databinding.ItemTaskMinimalBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -17,7 +17,17 @@ import java.util.Objects;
 
 public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewHolder> {
 
+    // Constants to avoid magic strings
+    private static final String PRIORITY_HIGH = "HIGH";
+    private static final String PRIORITY_MEDIUM = "MEDIUM";
+    private static final String PRIORITY_NONE = "NONE";
+    private static final String REPEAT_NEVER = "NEVER";
+
     private final OnTaskInteractionListener listener;
+    private int accentColor = 0xFF34C759; // Default green
+
+    // Cache SimpleDateFormat
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
 
     public interface OnTaskInteractionListener {
         void onTaskCompleted(Task task, boolean isCompleted);
@@ -32,18 +42,23 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
         this.listener = listener;
     }
 
+    public void setAccentColor(int color) {
+        this.accentColor = color;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemTaskNothingBinding binding = ItemTaskNothingBinding.inflate(LayoutInflater.from(parent.getContext()),
+        ItemTaskMinimalBinding binding = ItemTaskMinimalBinding.inflate(LayoutInflater.from(parent.getContext()),
                 parent, false);
-        return new TaskViewHolder(binding);
+        return new TaskViewHolder(binding, accentColor, dateFormat);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task current = getItem(position);
-        holder.bind(current, listener);
+        holder.bind(current, listener, accentColor);
     }
 
     public Task getTaskAt(int position) {
@@ -68,14 +83,19 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
     }
 
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
-        private final ItemTaskNothingBinding binding;
+        private final ItemTaskMinimalBinding binding;
+        private final SimpleDateFormat dateFormat;
 
-        private TaskViewHolder(ItemTaskNothingBinding binding) {
+        private TaskViewHolder(ItemTaskMinimalBinding binding, int accentColor, SimpleDateFormat dateFormat) {
             super(binding.getRoot());
             this.binding = binding;
+            this.dateFormat = dateFormat;
+
+            // Set initial accent color
+            binding.checkboxCompleted.setButtonTintList(android.content.res.ColorStateList.valueOf(accentColor));
         }
 
-        public void bind(final Task task, final OnTaskInteractionListener listener) {
+        public void bind(final Task task, final OnTaskInteractionListener listener, int accentColor) {
             if (task == null)
                 return;
 
@@ -95,31 +115,34 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
 
             // Priority Icon
             boolean hasPriority = task.priority != null && !task.priority.isEmpty()
-                    && !task.priority.equalsIgnoreCase("NONE");
+                    && !task.priority.equalsIgnoreCase(PRIORITY_NONE);
             if (hasPriority) {
                 binding.iconPriority.setVisibility(View.VISIBLE);
                 // Set color based on priority
-                if (task.priority.equalsIgnoreCase("HIGH")) {
-                    binding.iconPriority.setColorFilter(0xFFFF3B30); // Red
-                } else if (task.priority.equalsIgnoreCase("MEDIUM")) {
-                    binding.iconPriority.setColorFilter(0xFFFFCC00); // Yellow
+                int colorResId;
+                if (task.priority.equalsIgnoreCase(PRIORITY_HIGH)) {
+                    colorResId = R.color.priority_high;
+                } else if (task.priority.equalsIgnoreCase(PRIORITY_MEDIUM)) {
+                    colorResId = R.color.priority_medium;
                 } else {
-                    binding.iconPriority.setColorFilter(0xFF34C759); // Green/Blue
+                    colorResId = R.color.priority_low;
                 }
+                binding.iconPriority.setColorFilter(
+                        androidx.core.content.ContextCompat.getColor(binding.getRoot().getContext(), colorResId));
             } else {
                 binding.iconPriority.setVisibility(View.GONE);
             }
 
             // Repeat Icon
             boolean isRecurring = task.repeat != null && !task.repeat.isEmpty()
-                    && !task.repeat.equalsIgnoreCase("NEVER");
+                    && !task.repeat.equalsIgnoreCase(REPEAT_NEVER);
             binding.iconRepeat.setVisibility(isRecurring ? View.VISIBLE : View.GONE);
 
             // Time / Reminder
             if (task.reminderTime > 0) {
                 try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
-                    binding.textTime.setText(sdf.format(task.reminderTime));
+                    // Use passed date format
+                    binding.textTime.setText(dateFormat.format(task.reminderTime));
                     binding.textTime.setVisibility(View.VISIBLE);
                 } catch (Exception e) {
                     binding.textTime.setVisibility(View.GONE);
@@ -136,17 +159,14 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             boolean hasDetails = hasPriority || isRecurring || (task.reminderTime > 0);
             binding.detailsLayout.setVisibility(hasDetails ? View.VISIBLE : View.GONE);
 
-            // Checkbox
-            // Apply accent color to checkbox
-            android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
-                    .getDefaultSharedPreferences(binding.getRoot().getContext());
-            int accentColor = prefs.getInt("accent_color", 0xFF34C759);
+            // Checkbox - Use passed accent color
             binding.checkboxCompleted.setButtonTintList(android.content.res.ColorStateList.valueOf(accentColor));
 
             binding.checkboxCompleted.setOnCheckedChangeListener(null);
             binding.checkboxCompleted.setChecked(task.isCompleted);
             binding.checkboxCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (listener != null) {
+                    // Update timestamp on completion toggle
                     if (isChecked) {
                         task.completedTimestamp = System.currentTimeMillis();
                     } else {

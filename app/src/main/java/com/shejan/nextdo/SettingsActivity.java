@@ -25,8 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
 
     private final ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(
-            new ActivityResultContracts.GetContent(),
-            uri -> {
+            new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
                     try {
                         InputStream inputStream = getContentResolver().openInputStream(uri);
@@ -140,7 +139,6 @@ public class SettingsActivity extends AppCompatActivity {
                 // Apply color to notification switch immediately
                 // Apply color to notification switch immediately
                 applySwitchColors(binding.notificationsSwitch, color);
-                applySwitchColors(binding.persistentNotificationsSwitch, color);
 
                 dialog.dismiss();
                 Toast.makeText(this, "Accent color changed", Toast.LENGTH_SHORT).show();
@@ -276,16 +274,6 @@ public class SettingsActivity extends AppCompatActivity {
                     R.anim.switch_animation);
             binding.notificationsSwitch.startAnimation(animation);
             sharedPreferences.edit().putBoolean("notifications", isChecked).apply();
-        });
-
-        applySwitchColors(binding.persistentNotificationsSwitch, accentColor);
-        binding.persistentNotificationsSwitch
-                .setChecked(sharedPreferences.getBoolean("persistent_notifications", false));
-        binding.persistentNotificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            android.view.animation.Animation animation = android.view.animation.AnimationUtils.loadAnimation(this,
-                    R.anim.switch_animation);
-            binding.persistentNotificationsSwitch.startAnimation(animation);
-            sharedPreferences.edit().putBoolean("persistent_notifications", isChecked).apply();
         });
 
         binding.snoozeSetting.setOnClickListener(v -> {

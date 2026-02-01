@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="NothingDialog" parent="Theme.MaterialComponents.Dialog.Alert">
-        <item name="android:windowBackground">@drawable/nothing_dialog_bg</item>
+    <style name="MinimalDialog" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/bg_dialog_minimal</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textColorPrimary">?attr/colorOnSurface</item>
         <item name="android:textColorSecondary">?attr/colorOnSurface</item>

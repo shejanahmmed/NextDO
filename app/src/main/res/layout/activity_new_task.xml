@@ -22,7 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Nothing-style minimal header -->
+    <!-- Minimal style header -->
     <TextView
         android:id="@+id/add_task_title"
         android:layout_width="wrap_content"
@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/nothing_card_bg"
+                android:background="@drawable/bg_card_minimal"
                 android:padding="20dp"
                 android:layout_marginBottom="16dp">
 
@@ -89,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/nothing_card_bg"
+                android:background="@drawable/bg_card_minimal"
                 android:padding="20dp"
                 android:layout_marginBottom="16dp">
 
@@ -120,7 +120,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/nothing_card_bg"
+                android:background="@drawable/bg_card_minimal"
                 android:padding="20dp"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
@@ -154,7 +154,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/nothing_card_bg"
+                android:background="@drawable/bg_card_minimal"
                 android:padding="20dp"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
@@ -188,7 +188,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/nothing_card_bg"
+                android:background="@drawable/bg_card_minimal"
                 android:padding="20dp"
                 android:layout_marginBottom="16dp">
 
@@ -239,13 +239,13 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Nothing-style save button -->
+    <!-- Minimal style save button -->
     <TextView
         android:id="@+id/button_save"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_margin="24dp"
-        android:background="@drawable/nothing_save_button"
+        android:background="@drawable/bg_button_save_minimal"
         android:text="Save Task"
         android:textColor="#FFFFFF"
         android:textSize="16sp"

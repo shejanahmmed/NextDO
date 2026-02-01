@@ -100,7 +100,7 @@ public class RecycleBinAdapter extends ListAdapter<Task, RecycleBinAdapter.TaskV
         public boolean areContentsTheSame(@NonNull Task oldItem, @NonNull Task newItem) {
             return oldItem.title.equals(newItem.title) &&
                     oldItem.description.equals(newItem.description) &&
-                    oldItem.priority.equals(newItem.priority) &&
+
                     oldItem.reminderTime == newItem.reminderTime &&
                     oldItem.isCompleted == newItem.isCompleted &&
                     oldItem.isDeleted == newItem.isDeleted;

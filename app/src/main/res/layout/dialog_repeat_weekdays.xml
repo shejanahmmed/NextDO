@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="80dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="@drawable/bg_floating_dialog">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Repeat On"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+        android:gravity="center" />
+
+    <!-- Select All -->
+    <CheckBox
+        android:id="@+id/checkbox_select_all"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="Select All"
+        android:textColor="@color/black_white_toggle_text"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:button="@null"
+        android:background="@drawable/bg_toggle_button"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Days Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:divider="?android:attr/dividerVertical"
+        android:showDividers="middle"
+        android:dividerPadding="4dp">
+
+        <CheckBox
+            android:id="@+id/checkbox_sun"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Sunday"
+            android:textColor="@color/black_white_toggle_text"
+            android:gravity="center"
+            android:button="@null"
+            android:textSize="14sp"
+            android:background="@drawable/bg_toggle_button"
+            android:layout_marginBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox_mon"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Monday"
+            android:textColor="@color/black_white_toggle_text"
+            android:gravity="center"
+            android:button="@null"
+            android:textSize="14sp"
+            android:background="@drawable/bg_toggle_button"
+            android:layout_marginBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox_tue"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Tuesday"
+            android:textColor="@color/black_white_toggle_text"
+            android:gravity="center"
+            android:button="@null"
+            android:textSize="14sp"
+            android:background="@drawable/bg_toggle_button"
+            android:layout_marginBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox_wed"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Wednesday"
+            android:textColor="@color/black_white_toggle_text"
+            android:gravity="center"
+            android:button="@null"
+            android:textSize="14sp"
+            android:background="@drawable/bg_toggle_button"
+            android:layout_marginBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox_thu"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Thursday"
+            android:textColor="@color/black_white_toggle_text"
+            android:gravity="center"
+            android:button="@null"
+            android:textSize="14sp"
+            android:background="@drawable/bg_toggle_button"
+            android:layout_marginBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox_fri"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Friday"
+            android:textColor="@color/black_white_toggle_text"
+            android:gravity="center"
+            android:button="@null"
+            android:textSize="14sp"
+            android:background="@drawable/bg_toggle_button"
+            android:layout_marginBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox_sat"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Saturday"
+            android:textColor="@color/black_white_toggle_text"
+            android:gravity="center"
+            android:button="@null"
+            android:textSize="14sp"
+            android:background="@drawable/bg_toggle_button"
+            android:layout_marginBottom="16dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/btn_done"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Done"
+            android:textColor="#34C759"
+            android:textStyle="bold"
+            android:padding="12dp"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"
+            android:background="?attr/selectableItemBackground" />
+
+        <TextView
+            android:id="@+id/btn_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:textColor="#99FFFFFF"
+            android:padding="12dp"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackground" />
+    </LinearLayout>
+
+</LinearLayout>

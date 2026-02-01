@@ -17,10 +17,6 @@ import java.util.Objects;
 
 public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewHolder> {
 
-    // Constants to avoid magic strings
-    private static final String PRIORITY_HIGH = "HIGH";
-    private static final String PRIORITY_MEDIUM = "MEDIUM";
-    private static final String PRIORITY_NONE = "NONE";
     private static final String REPEAT_NEVER = "NEVER";
 
     private final OnTaskInteractionListener listener;
@@ -75,7 +71,7 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
         public boolean areContentsTheSame(@NonNull Task oldItem, @NonNull Task newItem) {
             return Objects.equals(oldItem.title, newItem.title) &&
                     Objects.equals(oldItem.description, newItem.description) &&
-                    Objects.equals(oldItem.priority, newItem.priority) &&
+
                     oldItem.reminderTime == newItem.reminderTime &&
                     Objects.equals(oldItem.repeat, newItem.repeat) &&
                     oldItem.isCompleted == newItem.isCompleted;
@@ -113,26 +109,6 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
                 binding.textTitle.setAlpha(1.0f);
             }
 
-            // Priority Icon
-            boolean hasPriority = task.priority != null && !task.priority.isEmpty()
-                    && !task.priority.equalsIgnoreCase(PRIORITY_NONE);
-            if (hasPriority) {
-                binding.iconPriority.setVisibility(View.VISIBLE);
-                // Set color based on priority
-                int colorResId;
-                if (task.priority.equalsIgnoreCase(PRIORITY_HIGH)) {
-                    colorResId = R.color.priority_high;
-                } else if (task.priority.equalsIgnoreCase(PRIORITY_MEDIUM)) {
-                    colorResId = R.color.priority_medium;
-                } else {
-                    colorResId = R.color.priority_low;
-                }
-                binding.iconPriority.setColorFilter(
-                        androidx.core.content.ContextCompat.getColor(binding.getRoot().getContext(), colorResId));
-            } else {
-                binding.iconPriority.setVisibility(View.GONE);
-            }
-
             // Repeat Icon
             boolean isRecurring = task.repeat != null && !task.repeat.isEmpty()
                     && !task.repeat.equalsIgnoreCase(REPEAT_NEVER);
@@ -156,7 +132,7 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             binding.textCategory.setVisibility(View.GONE);
 
             // Details Layout Visibility
-            boolean hasDetails = hasPriority || isRecurring || (task.reminderTime > 0);
+            boolean hasDetails = isRecurring || (task.reminderTime > 0);
             binding.detailsLayout.setVisibility(hasDetails ? View.VISIBLE : View.GONE);
 
             // Checkbox - Use passed accent color

@@ -24,7 +24,7 @@ public class NewTaskActivity extends AppCompatActivity {
     public static final String EXTRA_ALARM_ID = "com.shejan.nextdo.ALARM_ID";
     public static final String EXTRA_TITLE = "com.shejan.nextdo.TITLE";
     public static final String EXTRA_DESCRIPTION = "com.shejan.nextdo.DESCRIPTION";
-    public static final String EXTRA_PRIORITY = "com.shejan.nextdo.PRIORITY";
+
     public static final String EXTRA_REMINDER_TIME = "com.shejan.nextdo.REMINDER_TIME";
     public static final String EXTRA_REPEAT = "com.shejan.nextdo.REPEAT";
     public static final int RESULT_DELETE = 2;
@@ -35,6 +35,7 @@ public class NewTaskActivity extends AppCompatActivity {
     private int alarmId = 0;
     private boolean isReminderSet = false;
     private AlarmScheduler alarmScheduler;
+    private String selectedRepeatDays = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,11 +49,8 @@ public class NewTaskActivity extends AppCompatActivity {
 
         alarmScheduler = new AlarmScheduler(this);
 
-        // Setup Priority Dropdown
-        binding.textPriority.setOnClickListener(v -> showPriorityOptions());
-
         // Setup Repeat Dropdown
-        binding.textRepeat.setOnClickListener(v -> showRepeatOptions());
+        binding.textRepeat.setOnClickListener(v -> showWeekdayRepeatDialog());
 
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_ID)) {
@@ -67,14 +65,10 @@ public class NewTaskActivity extends AppCompatActivity {
             binding.editTitle.setText(title != null ? title : "");
             binding.editDescription.setText(description != null ? description : "");
 
-            String priority = intent.getStringExtra(EXTRA_PRIORITY);
-            if (priority != null) {
-                binding.textPriority.setText(priority);
-            }
-
             String repeat = intent.getStringExtra(EXTRA_REPEAT);
             if (repeat != null) {
-                binding.textRepeat.setText(repeat);
+                selectedRepeatDays = repeat;
+                updateRepeatTextFromSelection();
             }
 
             long reminderTime = intent.getLongExtra(EXTRA_REMINDER_TIME, 0);
@@ -101,8 +95,8 @@ public class NewTaskActivity extends AppCompatActivity {
                 } else {
                     String title = binding.editTitle.getText().toString();
                     String description = binding.editDescription.getText().toString();
-                    String priority = binding.textPriority.getText().toString();
-                    String repeat = binding.textRepeat.getText().toString();
+
+                    String repeat = selectedRepeatDays;
                     long reminderTime = isReminderSet ? calendar.getTimeInMillis() : 0;
 
                     Task task = new Task();
@@ -115,7 +109,7 @@ public class NewTaskActivity extends AppCompatActivity {
                     task.alarmId = alarmId;
                     task.title = title;
                     task.description = description;
-                    task.priority = priority;
+
                     task.reminderTime = reminderTime;
                     task.repeat = repeat;
 
@@ -131,7 +125,7 @@ public class NewTaskActivity extends AppCompatActivity {
                     replyIntent.putExtra(EXTRA_ALARM_ID, task.alarmId);
                     replyIntent.putExtra(EXTRA_TITLE, title);
                     replyIntent.putExtra(EXTRA_DESCRIPTION, description);
-                    replyIntent.putExtra(EXTRA_PRIORITY, priority);
+
                     replyIntent.putExtra(EXTRA_REMINDER_TIME, reminderTime);
                     replyIntent.putExtra(EXTRA_REPEAT, repeat);
 
@@ -144,52 +138,195 @@ public class NewTaskActivity extends AppCompatActivity {
         });
     }
 
-    private void showPriorityOptions() {
+    private void showWeekdayRepeatDialog() {
         applyBlurEffect(true);
-        android.widget.ListPopupWindow listPopupWindow = new android.widget.ListPopupWindow(this);
-        listPopupWindow.setAnchorView(binding.textPriority);
-        listPopupWindow
-                .setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        // Inflate custom view
+        android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_repeat_weekdays, null);
+        builder.setView(dialogView);
+        android.app.AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
 
-        // Set width to 150dp
-        float density = getResources().getDisplayMetrics().density;
-        listPopupWindow.setWidth((int) (150 * density));
+            // Side-Sheet Behavior
+            android.view.WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+            params.gravity = android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL;
 
-        String[] options = getResources().getStringArray(R.array.priority_array);
-        CardSpinnerAdapter adapter = new CardSpinnerAdapter(this, options);
-        listPopupWindow.setAdapter(adapter);
+            // Use 25% of screen width for compact side-sheet
+            android.util.DisplayMetrics displayMetrics = new android.util.DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            params.width = (int) (displayMetrics.widthPixels * 0.25);
+            params.height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+            // Add some margin from the edge
+            params.x = 32; // 32px margin from right
 
-        listPopupWindow.setOnItemClickListener((parent, view, position, id) -> {
-            binding.textPriority.setText(options[position]);
-            listPopupWindow.dismiss();
+            dialog.getWindow().setAttributes(params);
+            dialog.getWindow().setDimAmount(0.3f); // Subtle dim
+        }
+
+        // Checkboxes
+        android.widget.CheckBox cbSun = dialogView.findViewById(R.id.checkbox_sun);
+        android.widget.CheckBox cbMon = dialogView.findViewById(R.id.checkbox_mon);
+        android.widget.CheckBox cbTue = dialogView.findViewById(R.id.checkbox_tue);
+        android.widget.CheckBox cbWed = dialogView.findViewById(R.id.checkbox_wed);
+        android.widget.CheckBox cbThu = dialogView.findViewById(R.id.checkbox_thu);
+        android.widget.CheckBox cbFri = dialogView.findViewById(R.id.checkbox_fri);
+        android.widget.CheckBox cbSat = dialogView.findViewById(R.id.checkbox_sat);
+
+        // Pre-select
+        if (!TextUtils.isEmpty(selectedRepeatDays)) {
+            String[] parts = selectedRepeatDays.split(",");
+            for (String day : parts) {
+                try {
+                    int dayInt = Integer.parseInt(day.trim());
+                    if (dayInt == Calendar.SUNDAY)
+                        cbSun.setChecked(true);
+                    else if (dayInt == Calendar.MONDAY)
+                        cbMon.setChecked(true);
+                    else if (dayInt == Calendar.TUESDAY)
+                        cbTue.setChecked(true);
+                    else if (dayInt == Calendar.WEDNESDAY)
+                        cbWed.setChecked(true);
+                    else if (dayInt == Calendar.THURSDAY)
+                        cbThu.setChecked(true);
+                    else if (dayInt == Calendar.FRIDAY)
+                        cbFri.setChecked(true);
+                    else if (dayInt == Calendar.SATURDAY)
+                        cbSat.setChecked(true);
+                } catch (NumberFormatException e) {
+                    // Ignore legacy or malformed
+                }
+            }
+        }
+
+        // Select All Logic
+        android.widget.CheckBox cbSelectAll = dialogView.findViewById(R.id.checkbox_select_all);
+
+        // Listener for Select All
+        cbSelectAll.setOnClickListener(v -> {
+            boolean isChecked = cbSelectAll.isChecked();
+            cbSun.setChecked(isChecked);
+            cbMon.setChecked(isChecked);
+            cbTue.setChecked(isChecked);
+            cbWed.setChecked(isChecked);
+            cbThu.setChecked(isChecked);
+            cbFri.setChecked(isChecked);
+            cbSat.setChecked(isChecked);
         });
 
-        listPopupWindow.setOnDismissListener(() -> applyBlurEffect(false));
-        listPopupWindow.show();
+        // Listeners for individual checkboxes to update Select All
+        android.widget.CompoundButton.OnCheckedChangeListener individualListener = (buttonView, isChecked) -> {
+            if (!isChecked) {
+                cbSelectAll.setChecked(false);
+            } else {
+                if (cbSun.isChecked() && cbMon.isChecked() && cbTue.isChecked() &&
+                        cbWed.isChecked() && cbThu.isChecked() && cbFri.isChecked() && cbSat.isChecked()) {
+                    cbSelectAll.setChecked(true);
+                }
+            }
+        };
+
+        cbSun.setOnCheckedChangeListener(individualListener);
+        cbMon.setOnCheckedChangeListener(individualListener);
+        cbTue.setOnCheckedChangeListener(individualListener);
+        cbWed.setOnCheckedChangeListener(individualListener);
+        cbThu.setOnCheckedChangeListener(individualListener);
+        cbFri.setOnCheckedChangeListener(individualListener);
+        cbSat.setOnCheckedChangeListener(individualListener);
+
+        // Initial state for Select All
+        if (cbSun.isChecked() && cbMon.isChecked() && cbTue.isChecked() &&
+                cbWed.isChecked() && cbThu.isChecked() && cbFri.isChecked() && cbSat.isChecked()) {
+            cbSelectAll.setChecked(true);
+        }
+
+        // Listeners
+        dialogView.findViewById(R.id.btn_cancel).setOnClickListener(v -> dialog.dismiss());
+        dialogView.findViewById(R.id.btn_done).setOnClickListener(v -> {
+            StringBuilder sb = new StringBuilder();
+            if (cbSun.isChecked())
+                sb.append(Calendar.SUNDAY).append(",");
+            if (cbMon.isChecked())
+                sb.append(Calendar.MONDAY).append(",");
+            if (cbTue.isChecked())
+                sb.append(Calendar.TUESDAY).append(",");
+            if (cbWed.isChecked())
+                sb.append(Calendar.WEDNESDAY).append(",");
+            if (cbThu.isChecked())
+                sb.append(Calendar.THURSDAY).append(",");
+            if (cbFri.isChecked())
+                sb.append(Calendar.FRIDAY).append(",");
+            if (cbSat.isChecked())
+                sb.append(Calendar.SATURDAY).append(",");
+
+            if (sb.length() > 0) {
+                sb.setLength(sb.length() - 1); // remove last comma
+            }
+
+            selectedRepeatDays = sb.toString();
+            updateRepeatTextFromSelection();
+            dialog.dismiss();
+        });
+
+        dialog.setOnDismissListener(d -> applyBlurEffect(false));
+        dialog.show();
+
+        // IMPORTANT: Set window parameters AFTER show() so window exists
+        if (dialog.getWindow() != null) {
+            android.view.WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+            params.gravity = android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL;
+
+            // Use 35% of screen width for compact side-sheet
+            android.util.DisplayMetrics displayMetrics = new android.util.DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            params.width = (int) (displayMetrics.widthPixels * 0.35);
+            params.height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+            params.x = 32; // 32px margin from right
+
+            dialog.getWindow().setAttributes(params);
+        }
     }
 
-    private void showRepeatOptions() {
-        applyBlurEffect(true);
-        android.widget.ListPopupWindow listPopupWindow = new android.widget.ListPopupWindow(this);
-        listPopupWindow.setAnchorView(binding.textRepeat);
-        listPopupWindow
-                .setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+    private void updateRepeatTextFromSelection() {
+        if (TextUtils.isEmpty(selectedRepeatDays)) {
+            binding.textRepeat.setText("NONE");
+            return;
+        }
 
-        // Set width to 150dp
-        float density = getResources().getDisplayMetrics().density;
-        listPopupWindow.setWidth((int) (150 * density));
+        StringBuilder display = new StringBuilder();
+        String[] parts = selectedRepeatDays.split(",");
+        int count = 0;
+        for (String day : parts) {
+            try {
+                int d = Integer.parseInt(day.trim());
+                if (d == Calendar.SUNDAY)
+                    display.append("Sun, ");
+                else if (d == Calendar.MONDAY)
+                    display.append("Mon, ");
+                else if (d == Calendar.TUESDAY)
+                    display.append("Tue, ");
+                else if (d == Calendar.WEDNESDAY)
+                    display.append("Wed, ");
+                else if (d == Calendar.THURSDAY)
+                    display.append("Thu, ");
+                else if (d == Calendar.FRIDAY)
+                    display.append("Fri, ");
+                else if (d == Calendar.SATURDAY)
+                    display.append("Sat, ");
+                count++;
+            } catch (Exception e) {
+            }
+        }
 
-        String[] options = getResources().getStringArray(R.array.repeat_array);
-        CardSpinnerAdapter adapter = new CardSpinnerAdapter(this, options);
-        listPopupWindow.setAdapter(adapter);
+        if (display.length() > 0) {
+            display.setLength(display.length() - 2); // remove trailing ", "
+        }
 
-        listPopupWindow.setOnItemClickListener((parent, view, position, id) -> {
-            binding.textRepeat.setText(options[position]);
-            listPopupWindow.dismiss();
-        });
-
-        listPopupWindow.setOnDismissListener(() -> applyBlurEffect(false));
-        listPopupWindow.show();
+        if (count == 7)
+            binding.textRepeat.setText("Everyday");
+        else
+            binding.textRepeat.setText(display.toString());
     }
 
     private void applyBlurEffect(boolean apply) {

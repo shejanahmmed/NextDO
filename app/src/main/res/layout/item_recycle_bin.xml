@@ -18,12 +18,7 @@
         <!-- Checkbox placeholder to maintain alignment if needed, or just remove it. 
              User image shows a checkbox-like square. Let's keep a disabled checkbox for visual consistency if desired, 
              or just the text. The user's image shows a green square. -->
-        <View
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="@drawable/bg_priority_chip_minimal"
-            android:backgroundTint="#34C759"
-            android:alpha="0.5" />
+
 
         <LinearLayout
             android:layout_width="0dp"

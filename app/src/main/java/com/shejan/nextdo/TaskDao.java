@@ -38,6 +38,9 @@ public interface TaskDao {
     @Query("SELECT * FROM tasks WHERE isDeleted = 0")
     List<Task> getAllTasksSync();
 
+    @Query("SELECT * FROM tasks WHERE id = :taskId LIMIT 1")
+    Task getTaskById(int taskId);
+
     // Recycle Bin Queries
     @Query("SELECT * FROM tasks WHERE isDeleted = 1 ORDER BY deletedTimestamp DESC")
     LiveData<List<Task>> getDeletedTasks();

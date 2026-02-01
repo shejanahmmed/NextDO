@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                     }
                     task.title = data.getStringExtra(NewTaskActivity.EXTRA_TITLE);
                     task.description = data.getStringExtra(NewTaskActivity.EXTRA_DESCRIPTION);
-                    task.priority = data.getStringExtra(NewTaskActivity.EXTRA_PRIORITY);
+
                     task.reminderTime = reminderTime;
                     task.repeat = data.getStringExtra(NewTaskActivity.EXTRA_REPEAT);
 
@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         intent.putExtra(NewTaskActivity.EXTRA_ALARM_ID, task.alarmId);
         intent.putExtra(NewTaskActivity.EXTRA_TITLE, task.title);
         intent.putExtra(NewTaskActivity.EXTRA_DESCRIPTION, task.description);
-        intent.putExtra(NewTaskActivity.EXTRA_PRIORITY, task.priority);
+
         intent.putExtra(NewTaskActivity.EXTRA_REMINDER_TIME, task.reminderTime);
         intent.putExtra(NewTaskActivity.EXTRA_REPEAT, task.repeat);
         taskActivityLauncher.launch(intent);

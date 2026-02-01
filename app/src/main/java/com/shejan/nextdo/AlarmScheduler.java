@@ -109,4 +109,50 @@ public class AlarmScheduler {
         }
         return true; // Permissions are not needed for earlier versions
     }
+
+    public static long getNextOccurrence(long fromTime, long scheduledTime, String repeatDays) {
+        if (repeatDays == null || repeatDays.isEmpty())
+            return 0;
+        if (scheduledTime <= 0)
+            return 0;
+
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.setTimeInMillis(scheduledTime);
+        int hour = calendar.get(java.util.Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(java.util.Calendar.MINUTE);
+
+        calendar.setTimeInMillis(fromTime);
+        // Ensure we start checking from the "current" valid time slot
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, hour);
+        calendar.set(java.util.Calendar.MINUTE, minute);
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+
+        java.util.Set<Integer> days = new java.util.HashSet<>();
+        try {
+            for (String s : repeatDays.split(",")) {
+                days.add(Integer.parseInt(s.trim()));
+            }
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Error parsing repeat days: " + repeatDays);
+            return 0;
+        }
+
+        if (days.isEmpty())
+            return 0;
+
+        // Check the next 8 days to find the next valid occurrence
+        // We start with i=0 (today) if it's in the future
+        for (int i = 0; i <= 8; i++) {
+            if (calendar.getTimeInMillis() > fromTime) {
+                int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
+                if (days.contains(dayOfWeek)) {
+                    return calendar.getTimeInMillis();
+                }
+            }
+            // Move to next day
+            calendar.add(java.util.Calendar.DAY_OF_YEAR, 1);
+        }
+        return 0;
+    }
 }

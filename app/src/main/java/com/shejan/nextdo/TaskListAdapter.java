@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.shejan.nextdo.databinding.RecyclerviewItemBinding;
+import com.shejan.nextdo.databinding.ItemTaskNothingBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -35,7 +35,7 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        RecyclerviewItemBinding binding = RecyclerviewItemBinding.inflate(LayoutInflater.from(parent.getContext()),
+        ItemTaskNothingBinding binding = ItemTaskNothingBinding.inflate(LayoutInflater.from(parent.getContext()),
                 parent, false);
         return new TaskViewHolder(binding);
     }
@@ -68,9 +68,9 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
     }
 
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
-        private final RecyclerviewItemBinding binding;
+        private final ItemTaskNothingBinding binding;
 
-        private TaskViewHolder(RecyclerviewItemBinding binding) {
+        private TaskViewHolder(ItemTaskNothingBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
@@ -79,43 +79,64 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             if (task == null)
                 return;
 
+            // Title
             binding.textTitle.setText(task.title != null ? task.title : "");
 
-            binding.textDescription.setText(task.description != null ? task.description : "");
-            binding.textDescription.setVisibility(
-                    task.description != null && !task.description.isEmpty() ? View.VISIBLE : View.GONE);
-
-            // DEFINITIVE FIX: Removing conditional styling for completed tasks.
-            android.graphics.drawable.Drawable background = androidx.core.content.ContextCompat
-                    .getDrawable(binding.getRoot().getContext(), R.drawable.nothing_card_bg);
-            if (background != null) {
-                background.mutate().setAlpha(180); // Make it more transparent
-                binding.getRoot().setBackground(background);
-            }
-
-            if (task.priority != null && !task.priority.isEmpty() && !task.priority.equalsIgnoreCase("NONE")) {
-                binding.chipPriority.setText(task.priority);
-                binding.chipPriority.setVisibility(View.VISIBLE);
+            // Strike through if completed
+            if (task.isCompleted) {
+                binding.textTitle.setPaintFlags(
+                        binding.textTitle.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+                binding.textTitle.setAlpha(0.5f);
             } else {
-                binding.chipPriority.setVisibility(View.GONE);
+                binding.textTitle.setPaintFlags(
+                        binding.textTitle.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+                binding.textTitle.setAlpha(1.0f);
             }
 
+            // Priority Icon
+            boolean hasPriority = task.priority != null && !task.priority.isEmpty()
+                    && !task.priority.equalsIgnoreCase("NONE");
+            if (hasPriority) {
+                binding.iconPriority.setVisibility(View.VISIBLE);
+                // Set color based on priority
+                if (task.priority.equalsIgnoreCase("HIGH")) {
+                    binding.iconPriority.setColorFilter(0xFFFF3B30); // Red
+                } else if (task.priority.equalsIgnoreCase("MEDIUM")) {
+                    binding.iconPriority.setColorFilter(0xFFFFCC00); // Yellow
+                } else {
+                    binding.iconPriority.setColorFilter(0xFF34C759); // Green/Blue
+                }
+            } else {
+                binding.iconPriority.setVisibility(View.GONE);
+            }
+
+            // Repeat Icon
+            boolean isRecurring = task.repeat != null && !task.repeat.isEmpty()
+                    && !task.repeat.equalsIgnoreCase("NEVER");
+            binding.iconRepeat.setVisibility(isRecurring ? View.VISIBLE : View.GONE);
+
+            // Time / Reminder
             if (task.reminderTime > 0) {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
-                    binding.textReminder.setText(sdf.format(task.reminderTime));
-                    binding.textReminder.setVisibility(View.VISIBLE);
+                    binding.textTime.setText(sdf.format(task.reminderTime));
+                    binding.textTime.setVisibility(View.VISIBLE);
                 } catch (Exception e) {
-                    binding.textReminder.setVisibility(View.GONE);
+                    binding.textTime.setVisibility(View.GONE);
                 }
             } else {
-                binding.textReminder.setVisibility(View.GONE);
+                binding.textTime.setVisibility(View.GONE);
             }
 
-            boolean hasDetails = (task.priority != null && !task.priority.isEmpty()
-                    && !task.priority.equalsIgnoreCase("NONE")) || task.reminderTime > 0;
+            // Category (placeholder for now, or derive from logic if available)
+            // For now, we'll hide it or show a default if we had one
+            binding.textCategory.setVisibility(View.GONE);
+
+            // Details Layout Visibility
+            boolean hasDetails = hasPriority || isRecurring || (task.reminderTime > 0);
             binding.detailsLayout.setVisibility(hasDetails ? View.VISIBLE : View.GONE);
 
+            // Checkbox
             // Apply accent color to checkbox
             android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
                     .getDefaultSharedPreferences(binding.getRoot().getContext());
@@ -135,6 +156,7 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
                 }
             });
 
+            // Click Listeners
             itemView.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onTaskClicked(task);

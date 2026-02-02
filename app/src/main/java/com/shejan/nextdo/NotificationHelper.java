@@ -29,7 +29,7 @@ public class NotificationHelper {
     private static NotificationChannel getNotificationChannel() {
         CharSequence name = "NextDO Reminders";
         String description = "Notifications for task reminders";
-        int importance = NotificationManager.IMPORTANCE_HIGH;
+        int importance = NotificationManager.IMPORTANCE_MAX; // CRITICAL: MAX for full-screen intents
         NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
         channel.setDescription(description);
         channel.enableLights(true);

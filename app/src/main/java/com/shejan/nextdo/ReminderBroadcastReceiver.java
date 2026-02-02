@@ -96,8 +96,8 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     }
                 }
 
-                // Show Notification (for non-voice reminders)
-                Log.d(TAG, "Showing notification for task " + taskId);
+                // Show Notification (for notification and alarm reminders)
+                Log.d(TAG, "Showing notification for task " + taskId + " with type: " + reminderType);
 
                 Intent mainIntent = new Intent(context, MainActivity.class);
                 mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -116,10 +116,45 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                         .setContentText(contentText)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText))
                         .setPriority(NotificationCompat.PRIORITY_MAX)
-                        .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                        .setCategory(NotificationCompat.CATEGORY_ALARM)
                         .setContentIntent(pendingIntent)
                         .setAutoCancel(true)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+                // For ALARM type: Launch full-screen AlarmActivity (primary method)
+                if ("alarm".equals(reminderType)) {
+                    Log.d(TAG, "Launching AlarmActivity for task " + taskId);
+                    Intent alarmIntent = new Intent(context, AlarmActivity.class);
+                    alarmIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    alarmIntent.putExtra("task_id", taskId);
+                    alarmIntent.putExtra("task_title", taskTitle);
+                    alarmIntent.putExtra("task_description", taskDescription);
+                    alarmIntent.putExtra("alarm_id", intent.getIntExtra("alarm_id", 0));
+
+                    try {
+                        context.startActivity(alarmIntent);
+                        // Don't show notification for alarm type - activity handles it
+                        return;
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to launch AlarmActivity: " + e.getMessage());
+                        // Fall through to show notification as backup
+                    }
+                }
+
+                // For ALARM type: Add full-screen intent to show over lockscreen
+                if ("alarm".equals(reminderType)) {
+                    Log.d(TAG, "Setting up full-screen alarm for task " + taskId);
+                    Intent fullScreenIntent = new Intent(context, MainActivity.class);
+                    fullScreenIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(context, taskId + 10000,
+                            fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                    builder.setFullScreenIntent(fullScreenPendingIntent, true)
+                            .setCategory(NotificationCompat.CATEGORY_ALARM)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setSound(android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI)
+                            .setVibrate(new long[] { 0, 1000, 500, 1000 });
+                }
 
                 // Add Snooze Action
                 int alarmId = intent.getIntExtra("alarm_id", 0);
@@ -128,6 +163,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 snoozeIntent.putExtra(EXTRA_TASK_TITLE, taskTitle);
                 snoozeIntent.putExtra("alarm_id", alarmId);
                 snoozeIntent.putExtra("task_description", taskDescription);
+                snoozeIntent.putExtra("reminder_type", reminderType);
                 PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(context, taskId + 20000, snoozeIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 

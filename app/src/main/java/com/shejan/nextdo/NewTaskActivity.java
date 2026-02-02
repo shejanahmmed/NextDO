@@ -10,6 +10,16 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.speech.tts.TextToSpeech;
+import android.animation.ObjectAnimator;
+import android.animation.AnimatorSet;
+import android.animation.ValueAnimator;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.shejan.nextdo.databinding.ActivityNewTaskBinding;
 
@@ -39,6 +49,14 @@ public class NewTaskActivity extends AppCompatActivity {
     private AlarmScheduler alarmScheduler;
     private String selectedRepeatDays = "";
     private String selectedReminderType = "notification";
+
+    // Voice preview components
+    private LinearLayout voicePreviewBox;
+    private ImageView btnPlayVoice;
+    private EqualizerView voiceEqualizer;
+    private TextToSpeech textToSpeech;
+    private boolean isTtsReady = false;
+    private boolean isSpeaking = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,6 +120,9 @@ public class NewTaskActivity extends AppCompatActivity {
         // Restore reminder type selection state (must be after setup)
         restoreReminderTypeSelection();
 
+        // Setup Voice Preview
+        setupVoicePreview();
+
         binding.buttonSave.setOnClickListener(view -> {
             try {
                 Intent replyIntent = new Intent();
@@ -129,6 +150,9 @@ public class NewTaskActivity extends AppCompatActivity {
                     task.repeat = repeat;
                     task.reminderType = selectedReminderType;
 
+                    Log.d(TAG, "SAVE DEBUG: selectedReminderType = " + selectedReminderType);
+                    Log.d(TAG, "SAVE DEBUG: task.reminderType = " + task.reminderType);
+
                     Log.d(TAG, "Task details: id=" + task.id + ", alarmId=" + task.alarmId +
                             ", reminderTime=" + reminderTime);
 
@@ -145,6 +169,8 @@ public class NewTaskActivity extends AppCompatActivity {
                     replyIntent.putExtra(EXTRA_REMINDER_TIME, reminderTime);
                     replyIntent.putExtra(EXTRA_REPEAT, repeat);
                     replyIntent.putExtra(EXTRA_REMINDER_TYPE, selectedReminderType);
+
+                    Log.d(TAG, "SAVE DEBUG: Putting EXTRA_REMINDER_TYPE = " + selectedReminderType);
 
                     setResult(RESULT_OK, replyIntent);
                 }
@@ -482,14 +508,35 @@ public class NewTaskActivity extends AppCompatActivity {
                     binding.checkboxTypeAlarm.setChecked(false);
                     binding.checkboxTypeVoice.setChecked(false);
                     selectedReminderType = "notification";
+                    if (voicePreviewBox != null) {
+                        voicePreviewBox.setVisibility(android.view.View.GONE);
+                        stopVoiceIconAnimation();
+                    }
                 } else if (buttonView.getId() == R.id.checkbox_type_alarm) {
                     binding.checkboxTypeNotification.setChecked(false);
                     binding.checkboxTypeVoice.setChecked(false);
                     selectedReminderType = "alarm";
+                    if (voicePreviewBox != null) {
+                        voicePreviewBox.setVisibility(android.view.View.GONE);
+                        stopVoiceIconAnimation();
+                    }
                 } else if (buttonView.getId() == R.id.checkbox_type_voice) {
                     binding.checkboxTypeNotification.setChecked(false);
                     binding.checkboxTypeAlarm.setChecked(false);
                     selectedReminderType = "voice";
+                    if (voicePreviewBox != null) {
+                        voicePreviewBox.setVisibility(android.view.View.VISIBLE);
+                        startVoiceIconAnimation();
+
+                        // Check if male voice is available and prompt if needed
+                        if (!TtsHelper.isPromptDismissed(NewTaskActivity.this)) {
+                            TtsHelper.checkMaleVoiceAvailability(NewTaskActivity.this, hasMaleVoice -> {
+                                if (!hasMaleVoice && !TtsHelper.isGoogleTtsInstalled(NewTaskActivity.this)) {
+                                    runOnUiThread(() -> TtsHelper.promptInstallTts(NewTaskActivity.this));
+                                }
+                            });
+                        }
+                    }
                 }
             } else {
                 // Prevent unchecking all - at least one must be selected
@@ -526,5 +573,129 @@ public class NewTaskActivity extends AppCompatActivity {
                 binding.checkboxTypeVoice.setChecked(false);
                 break;
         }
+    }
+
+    private void setupVoicePreview() {
+        voicePreviewBox = binding.voicePreviewBox;
+        btnPlayVoice = binding.btnPlayVoice;
+        voiceEqualizer = binding.voiceEqualizer;
+
+        // Initialize TextToSpeech
+        textToSpeech = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                int result = textToSpeech.setLanguage(Locale.US);
+                isTtsReady = (result != TextToSpeech.LANG_MISSING_DATA &&
+                        result != TextToSpeech.LANG_NOT_SUPPORTED);
+
+                if (isTtsReady) {
+                    // Try to set male voice
+                    setMaleVoice();
+                }
+            }
+        });
+
+        btnPlayVoice.setOnClickListener(v -> playVoicePreview());
+
+        // Show preview if voice is already selected (when editing)
+        if ("voice".equals(selectedReminderType)) {
+            voicePreviewBox.setVisibility(android.view.View.VISIBLE);
+            startVoiceIconAnimation();
+        }
+    }
+
+    private void playVoicePreview() {
+        String title = binding.editTitle.getText().toString().trim();
+
+        if (title.isEmpty()) {
+            Toast.makeText(this, "Please enter a task title first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!isTtsReady) {
+            Toast.makeText(this, "Text-to-speech not ready", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (isSpeaking) {
+            textToSpeech.stop();
+            isSpeaking = false;
+            btnPlayVoice.setImageResource(R.drawable.ic_play);
+        } else {
+            String textToSpeak = "Reminder: " + title;
+            textToSpeech.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null, "preview");
+            isSpeaking = true;
+            btnPlayVoice.setImageResource(R.drawable.ic_stop);
+
+            // Reset button after speaking
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                isSpeaking = false;
+                btnPlayVoice.setImageResource(R.drawable.ic_play);
+            }, 3000);
+        }
+    }
+
+    private void startVoiceIconAnimation() {
+        if (voiceEqualizer != null) {
+            voiceEqualizer.startAnimation();
+
+        }
+    }
+
+    private void stopVoiceIconAnimation() {
+        if (voiceEqualizer != null) {
+            voiceEqualizer.stopAnimation();
+        }
+    }
+
+    private void setMaleVoice() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                java.util.Set<android.speech.tts.Voice> voices = textToSpeech.getVoices();
+                if (voices != null) {
+                    for (android.speech.tts.Voice voice : voices) {
+                        // Look for English (US) Male voice
+                        if (voice.getLocale().equals(Locale.US)) {
+                            String voiceName = voice.getName().toLowerCase();
+                            // Check if it's a male voice
+                            if (voiceName.contains("male") && !voiceName.contains("female")) {
+                                textToSpeech.setVoice(voice);
+                                Log.d(TAG, "Selected male voice: " + voice.getName());
+                                Toast.makeText(this, "Using voice: " + voice.getName(), Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                        }
+                    }
+
+                    // Fallback: try any English male voice
+                    for (android.speech.tts.Voice voice : voices) {
+                        if (voice.getLocale().getLanguage().equals("en")) {
+                            String voiceName = voice.getName().toLowerCase();
+                            if (voiceName.contains("male") && !voiceName.contains("female")) {
+                                textToSpeech.setVoice(voice);
+                                Log.d(TAG, "Selected fallback male voice: " + voice.getName());
+                                Toast.makeText(this, "Using voice: " + voice.getName(), Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting male voice: " + e.getMessage());
+                Toast.makeText(this, "Could not set male voice: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(this, "Male voice selection not available on this Android version", Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+        stopVoiceIconAnimation();
     }
 }

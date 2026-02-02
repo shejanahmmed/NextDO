@@ -186,6 +186,43 @@
                         android:textSize="11sp"
                         android:lineSpacingExtra="4dp" />
                 </LinearLayout>
+
+                <!-- Voice Preview Box (Initially Hidden) -->
+                <LinearLayout
+                    android:id="@+id/voice_preview_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/bg_card_minimal"
+                    android:padding="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center_vertical"
+                    android:visibility="gone">
+
+                    <com.shejan.nextdo.EqualizerView
+                        android:id="@+id/voice_equalizer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Listen"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <ImageView
+                        android:id="@+id/btn_play_voice"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_play"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="8dp"
+                        android:contentDescription="Play voice preview" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Priority & Repeat Card -->

@@ -35,6 +35,9 @@ public class AlarmScheduler {
             intent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_ID, task.id);
             intent.putExtra("alarm_id", task.alarmId);
             intent.putExtra("task_description", task.description);
+            intent.putExtra("reminder_type", task.reminderType); // CRITICAL: Pass reminderType to receiver
+
+            Log.d(TAG, "Scheduling alarm with reminderType: " + task.reminderType);
 
             // CRITICAL FIX: Use FLAG_CANCEL_CURRENT to avoid PendingIntent reuse issues
             // FLAG_UPDATE_CURRENT can cause extras to be cached/reused incorrectly

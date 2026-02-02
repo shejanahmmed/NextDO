@@ -5,11 +5,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.Looper;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
+import java.util.Locale;
 
 public class ReminderBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "ReminderBroadcastReceiver";
@@ -35,6 +40,9 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 String taskTitle = intent.getStringExtra(EXTRA_TASK_TITLE);
                 String taskDescription = intent.getStringExtra("task_description");
                 int taskId = intent.getIntExtra(EXTRA_TASK_ID, 0);
+                String reminderType = intent.getStringExtra("reminder_type"); // CRITICAL: Get from intent
+
+                Log.d(TAG, "TRIGGER DEBUG: Received reminderType from intent: '" + reminderType + "'");
 
                 if (taskId == 0) {
                     Log.e(TAG, "Invalid taskId, aborting notification");
@@ -70,7 +78,25 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     Log.w(TAG, "Database error in receiver: " + e.getMessage());
                 }
 
-                // Show Notification
+                // Handle voice reminders BEFORE showing notification
+                if ("voice".equals(reminderType)) {
+                    Log.d(TAG, "Voice reminder detected from intent for task " + taskId);
+                    // Get full task from database for voice playback
+                    try {
+                        AppDatabase db = AppDatabase.getDatabase(context);
+                        Task foundTask = db.taskDao().getTaskById(taskId);
+                        if (foundTask != null) {
+                            speakVoiceReminder(context, foundTask);
+                            return; // Don't show notification for voice reminders
+                        } else {
+                            Log.w(TAG, "Task not found in database, cannot speak");
+                        }
+                    } catch (Exception e) {
+                        Log.w(TAG, "Error loading task for voice: " + e.getMessage());
+                    }
+                }
+
+                // Show Notification (for non-voice reminders)
                 Log.d(TAG, "Showing notification for task " + taskId);
 
                 Intent mainIntent = new Intent(context, MainActivity.class);
@@ -131,5 +157,103 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 pendingResult.finish();
             }
         }).start();
+    }
+
+    private void speakVoiceReminder(Context context, Task task) {
+        final TextToSpeech[] ttsWrapper = new TextToSpeech[1];
+        ttsWrapper[0] = new TextToSpeech(context, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                TextToSpeech tts = ttsWrapper[0];
+                tts.setLanguage(Locale.US);
+
+                // Set male voice
+                setMaleVoice(tts);
+
+                String textToSpeak = "Reminder: " + task.title;
+                if (task.description != null && !task.description.isEmpty()) {
+                    textToSpeak += ". " + task.description;
+                }
+
+                Log.d(TAG, "Speaking voice reminder: " + textToSpeak);
+                tts.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null, "reminder");
+
+                // Cleanup after speaking (give enough time for speech)
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    tts.stop();
+                    tts.shutdown();
+                }, 10000); // 10 seconds should be enough for most reminders
+            } else {
+                Log.e(TAG, "TTS initialization failed, falling back to notification");
+                // Fallback to showing notification if TTS fails
+                showNotificationForVoiceReminder(context, task);
+            }
+        });
+    }
+
+    private void setMaleVoice(TextToSpeech tts) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                java.util.Set<android.speech.tts.Voice> voices = tts.getVoices();
+                if (voices != null) {
+                    for (android.speech.tts.Voice voice : voices) {
+                        // Look for English (US) Male voice
+                        if (voice.getLocale().equals(Locale.US)) {
+                            String voiceName = voice.getName().toLowerCase();
+                            if (voiceName.contains("male") && !voiceName.contains("female")) {
+                                tts.setVoice(voice);
+                                Log.d(TAG, "Selected male voice: " + voice.getName());
+                                return;
+                            }
+                        }
+                    }
+
+                    // Fallback: try any English male voice
+                    for (android.speech.tts.Voice voice : voices) {
+                        if (voice.getLocale().getLanguage().equals("en")) {
+                            String voiceName = voice.getName().toLowerCase();
+                            if (voiceName.contains("male") && !voiceName.contains("female")) {
+                                tts.setVoice(voice);
+                                Log.d(TAG, "Selected fallback male voice: " + voice.getName());
+                                return;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting male voice: " + e.getMessage());
+            }
+        }
+    }
+
+    private void showNotificationForVoiceReminder(Context context, Task task) {
+        // Simple notification as fallback when TTS fails
+        Intent mainIntent = new Intent(context, MainActivity.class);
+        mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, task.id, mainIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        String contentText = "Voice Reminder: " + task.title;
+        if (task.description != null && !task.description.isEmpty()) {
+            contentText += ": " + task.description;
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
+                NotificationHelper.CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_alarm)
+                .setContentTitle("NextDO Voice Reminder")
+                .setContentText(contentText)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText))
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        if (ActivityCompat.checkSelfPermission(context,
+                android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            notificationManager.notify(task.id, builder.build());
+            Log.d(TAG, "Fallback notification shown for voice reminder");
+        }
     }
 }

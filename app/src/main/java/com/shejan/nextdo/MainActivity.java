@@ -75,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
                     task.reminderTime = reminderTime;
                     task.repeat = data.getStringExtra(NewTaskActivity.EXTRA_REPEAT);
+                    task.reminderType = data.getStringExtra(NewTaskActivity.EXTRA_REMINDER_TYPE); // CRITICAL FIX!
+
+                    Log.d(TAG, "MainActivity: Task reminderType = " + task.reminderType);
 
                     if (id != 0) {
                         Log.d(TAG, "Updating task " + id + " with reminderTime=" + reminderTime);
@@ -435,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
         intent.putExtra(NewTaskActivity.EXTRA_REMINDER_TIME, task.reminderTime);
         intent.putExtra(NewTaskActivity.EXTRA_REPEAT, task.repeat);
+        intent.putExtra(NewTaskActivity.EXTRA_REMINDER_TYPE, task.reminderType);
         taskActivityLauncher.launch(intent);
     }
 

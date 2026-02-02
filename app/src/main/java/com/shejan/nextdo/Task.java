@@ -12,6 +12,7 @@ public class Task {
     public String priority = "";
     public long reminderTime = 0;
     public String repeat = "";
+    public String reminderType = "notification"; // "notification", "alarm", or "voice"
     public boolean isCompleted = false;
     public int alarmId = 0; // DEFINITIVE FIX: Add a dedicated, unique ID for alarms.
     public boolean isDeleted = false;

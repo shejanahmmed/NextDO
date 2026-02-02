@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // DEFINITIVE FIX: Upgrading the database to version 2.
-@Database(entities = { Task.class }, version = 4, exportSchema = false)
+@Database(entities = { Task.class }, version = 5, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract TaskDao taskDao();
 
@@ -42,13 +42,20 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE tasks ADD COLUMN reminderType TEXT DEFAULT 'notification'");
+        }
+    };
+
     public static AppDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabase.class, "task_database")
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                             .build();
                 }
             }

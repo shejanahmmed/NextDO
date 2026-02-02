@@ -9,6 +9,7 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.widget.CompoundButton;
 
 import com.shejan.nextdo.databinding.ActivityNewTaskBinding;
 
@@ -27,6 +28,7 @@ public class NewTaskActivity extends AppCompatActivity {
 
     public static final String EXTRA_REMINDER_TIME = "com.shejan.nextdo.REMINDER_TIME";
     public static final String EXTRA_REPEAT = "com.shejan.nextdo.REPEAT";
+    public static final String EXTRA_REMINDER_TYPE = "com.shejan.nextdo.REMINDER_TYPE";
     public static final int RESULT_DELETE = 2;
 
     private ActivityNewTaskBinding binding;
@@ -36,6 +38,7 @@ public class NewTaskActivity extends AppCompatActivity {
     private boolean isReminderSet = false;
     private AlarmScheduler alarmScheduler;
     private String selectedRepeatDays = "";
+    private String selectedReminderType = "notification";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,6 +80,12 @@ public class NewTaskActivity extends AppCompatActivity {
                 isReminderSet = true;
                 updateReminderTimeText();
             }
+
+            // Load reminder type
+            String reminderType = intent.getStringExtra(EXTRA_REMINDER_TYPE);
+            if (reminderType != null) {
+                selectedReminderType = reminderType;
+            }
         } else {
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setTitle("Add Todo");
@@ -86,6 +95,12 @@ public class NewTaskActivity extends AppCompatActivity {
         binding.buttonSetReminder.setOnClickListener(v -> showDateTimePicker());
 
         setupBackButton();
+
+        // Setup Reminder Type Selection (Radio button behavior)
+        setupReminderTypeSelection();
+
+        // Restore reminder type selection state (must be after setup)
+        restoreReminderTypeSelection();
 
         binding.buttonSave.setOnClickListener(view -> {
             try {
@@ -112,6 +127,7 @@ public class NewTaskActivity extends AppCompatActivity {
 
                     task.reminderTime = reminderTime;
                     task.repeat = repeat;
+                    task.reminderType = selectedReminderType;
 
                     Log.d(TAG, "Task details: id=" + task.id + ", alarmId=" + task.alarmId +
                             ", reminderTime=" + reminderTime);
@@ -128,6 +144,7 @@ public class NewTaskActivity extends AppCompatActivity {
 
                     replyIntent.putExtra(EXTRA_REMINDER_TIME, reminderTime);
                     replyIntent.putExtra(EXTRA_REPEAT, repeat);
+                    replyIntent.putExtra(EXTRA_REMINDER_TYPE, selectedReminderType);
 
                     setResult(RESULT_OK, replyIntent);
                 }
@@ -419,7 +436,24 @@ public class NewTaskActivity extends AppCompatActivity {
             updateReminderTimeText();
         });
 
+        // Position time picker at bottom like calendar
+        timePicker.addOnDismissListener(dialog -> {
+            // Cleanup if needed
+        });
+
         timePicker.show(getSupportFragmentManager(), "TIME_PICKER");
+
+        // Position dialog at bottom after it's shown
+        getSupportFragmentManager().executePendingTransactions();
+        android.app.Dialog dialog = timePicker.getDialog();
+        if (dialog != null && dialog.getWindow() != null) {
+            android.view.Window window = dialog.getWindow();
+            window.setGravity(android.view.Gravity.BOTTOM);
+            android.view.WindowManager.LayoutParams params = window.getAttributes();
+            params.width = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+            params.y = 0; // No offset from bottom
+            window.setAttributes(params);
+        }
     }
 
     private void updateReminderTimeText() {
@@ -436,6 +470,61 @@ public class NewTaskActivity extends AppCompatActivity {
             findViewById(R.id.back_arrow).setOnClickListener(v -> finish());
         } catch (Exception e) {
             // Handle back button setup failure
+        }
+    }
+
+    private void setupReminderTypeSelection() {
+        // Radio button behavior - only one can be selected at a time
+        CompoundButton.OnCheckedChangeListener typeListener = (buttonView, isChecked) -> {
+            if (isChecked) {
+                // Uncheck others
+                if (buttonView.getId() == R.id.checkbox_type_notification) {
+                    binding.checkboxTypeAlarm.setChecked(false);
+                    binding.checkboxTypeVoice.setChecked(false);
+                    selectedReminderType = "notification";
+                } else if (buttonView.getId() == R.id.checkbox_type_alarm) {
+                    binding.checkboxTypeNotification.setChecked(false);
+                    binding.checkboxTypeVoice.setChecked(false);
+                    selectedReminderType = "alarm";
+                } else if (buttonView.getId() == R.id.checkbox_type_voice) {
+                    binding.checkboxTypeNotification.setChecked(false);
+                    binding.checkboxTypeAlarm.setChecked(false);
+                    selectedReminderType = "voice";
+                }
+            } else {
+                // Prevent unchecking all - at least one must be selected
+                if (!binding.checkboxTypeNotification.isChecked() &&
+                        !binding.checkboxTypeAlarm.isChecked() &&
+                        !binding.checkboxTypeVoice.isChecked()) {
+                    buttonView.setChecked(true);
+                }
+            }
+        };
+
+        binding.checkboxTypeNotification.setOnCheckedChangeListener(typeListener);
+        binding.checkboxTypeAlarm.setOnCheckedChangeListener(typeListener);
+        binding.checkboxTypeVoice.setOnCheckedChangeListener(typeListener);
+    }
+
+    private void restoreReminderTypeSelection() {
+        // Update UI to match the loaded reminderType
+        switch (selectedReminderType) {
+            case "alarm":
+                binding.checkboxTypeAlarm.setChecked(true);
+                binding.checkboxTypeNotification.setChecked(false);
+                binding.checkboxTypeVoice.setChecked(false);
+                break;
+            case "voice":
+                binding.checkboxTypeVoice.setChecked(true);
+                binding.checkboxTypeNotification.setChecked(false);
+                binding.checkboxTypeAlarm.setChecked(false);
+                break;
+            case "notification":
+            default:
+                binding.checkboxTypeNotification.setChecked(true);
+                binding.checkboxTypeAlarm.setChecked(false);
+                binding.checkboxTypeVoice.setChecked(false);
+                break;
         }
     }
 }

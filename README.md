@@ -32,10 +32,18 @@
 *   **👆 Gesture Controls**: 
     *   **Swipe Left**: Delete tasks with a custom animation.
     *   **Swipe Right**: Quick edit mode.
-*   **🔔 Smart Reminders**: Set precise deadlines and receive timely, non-intrusive notifications.
+*   **🔔 Smart Reminders**: Three powerful reminder types:
+    *   **📱 Notification**: Standard notification reminders
+    *   **⏰ Alarm**: Full-screen alarm reminders  
+    *   **🗣️ Voice**: Spoken reminders using Text-to-Speech (NEW!)
+        *   🎤 Voice preview with animated equalizer
+        *   🗣️ Male voice preference
+        *   📲 Smart TTS installation prompts
+        *   🔄 Automatic fallback to notification if TTS unavailable
+*   **🔁 Flexible Repeat Patterns**: Daily, Weekly, Monthly, Weekday, or Custom days
 *   **🌗 Customization**: Personalize your experience with custom accent colors and background themes (including gallery images).
 *   **🏠 Widgets**: Stay updated at a glance with home screen widgets.
-*   **♻️ Recycle Bin**: Never lose a task accidentally; recover deleted items instantly.
+*   **♻️ Recycle Bin**: Never lose a task accidentally; recover deleted items instantly (15-day retention).
 
 ## 📸 Screenshots
 
@@ -65,6 +73,7 @@ This project follows modern Android development practices:
     *   `RecyclerView` with `ListAdapter` and `DiffUtil`
     *   `ItemTouchHelper` for gestures
     *   `AlarmManager` for accurate scheduling
+    *   `TextToSpeech` API for voice reminders
 
 ## 🚀 Getting Started
 

@@ -64,6 +64,7 @@ public class SettingsActivity extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         setupBackButton();
+        setupThemeSettings();
         setupAccentColorSettings();
         setupBackgroundSettings();
         setupNotificationSettings();
@@ -72,6 +73,107 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void setupBackButton() {
         binding.backArrow.setOnClickListener(v -> finish());
+    }
+
+    private void setupThemeSettings() {
+        String currentTheme = sharedPreferences.getString("app_theme", "auto");
+        updateCurrentThemeText(currentTheme);
+
+        binding.themeButton.setOnClickListener(v -> showThemePicker(currentTheme));
+    }
+
+    private void showThemePicker(String currentTheme) {
+        String[] themeNames = { "Auto (System Default)", "Light", "Dark" };
+        String[] themeValues = { "auto", "light", "dark" };
+
+        android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_theme_choice, null);
+        LinearLayout container = customView.findViewById(R.id.theme_options_container);
+        TextView title = customView.findViewById(R.id.dialog_title);
+        if (title != null)
+            title.setText("Choose Theme");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(customView);
+        builder.setNegativeButton("Cancel", null);
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            binding.getRoot().setRenderEffect(
+                    android.graphics.RenderEffect.createBlurEffect(10f, 10f, android.graphics.Shader.TileMode.MIRROR));
+        }
+
+        dialog.setOnDismissListener(d -> {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                binding.getRoot().setRenderEffect(null);
+            }
+        });
+
+        for (int i = 0; i < themeNames.length; i++) {
+            final int index = i;
+            android.view.View optionView = getLayoutInflater().inflate(R.layout.theme_option_item, container, false);
+            TextView textView = optionView.findViewById(R.id.theme_text);
+            RadioButton radioButton = optionView.findViewById(R.id.theme_radio);
+            android.view.View colorCircle = optionView.findViewById(R.id.color_circle);
+
+            textView.setText(themeNames[i]);
+            radioButton.setChecked(themeValues[i].equals(currentTheme));
+
+            // Hide color circle for theme options
+            if (colorCircle != null) {
+                colorCircle.setVisibility(android.view.View.GONE);
+            }
+
+            optionView.setOnClickListener(view -> {
+                sharedPreferences.edit().putString("app_theme", themeValues[index]).apply();
+                updateCurrentThemeText(themeValues[index]);
+
+                // Apply theme immediately
+                applyTheme(themeValues[index]);
+
+                dialog.dismiss();
+                Toast.makeText(this, "Theme changed to " + themeNames[index], Toast.LENGTH_SHORT).show();
+            });
+            container.addView(optionView);
+        }
+        dialog.show();
+    }
+
+    private void applyTheme(String theme) {
+        int nightMode;
+        switch (theme) {
+            case "light":
+                nightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
+                break;
+            case "dark":
+                nightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
+                break;
+            case "auto":
+            default:
+                nightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                break;
+        }
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(nightMode);
+    }
+
+    private void updateCurrentThemeText(String theme) {
+        String displayText;
+        switch (theme) {
+            case "light":
+                displayText = "Light";
+                break;
+            case "dark":
+                displayText = "Dark";
+                break;
+            case "auto":
+            default:
+                displayText = "Auto";
+                break;
+        }
+        binding.currentThemeText.setText(displayText);
     }
 
     private void setupAccentColorSettings() {

@@ -76,7 +76,7 @@ public class NewTaskActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_ID)) {
             if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle("Edit Todo");
+                getSupportActionBar().setTitle(R.string.edit_task);
             }
             taskId = intent.getIntExtra(EXTRA_ID, 0);
             alarmId = intent.getIntExtra(EXTRA_ALARM_ID, 0);
@@ -104,13 +104,34 @@ public class NewTaskActivity extends AppCompatActivity {
             if (reminderType != null) {
                 selectedReminderType = reminderType;
             }
+
+            // Update header text to Edit Reminder if editing
+            binding.addTaskTitle.setText(R.string.edit_task);
+
         } else {
             if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle("Add Todo");
+                getSupportActionBar().setTitle(R.string.add_task);
             }
+            // Header text defaults to "New Reminder" via XML
         }
 
-        binding.buttonSetReminder.setOnClickListener(v -> showDateTimePicker());
+        // Enable Edge-to-Edge to remove black nav bar box
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        // Apply insets to the Root Layout (handles both Status Bar and Nav Bar)
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout, (v, windowInsets) -> {
+            androidx.core.graphics.Insets insets = windowInsets
+                    .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
+
+            // Apply padding to root so content sits inside system bars
+            // Background will still draw behind the padding (Edge-to-Edge)
+            v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+
+            return androidx.core.view.WindowInsetsCompat.CONSUMED;
+        });
+
+        // binding.buttonSetReminder.setOnClickListener(v -> showDateTimePicker());
+        binding.warmReminderView.setOnClickListener(v -> showDateTimePicker());
 
         setupBackButton();
 
@@ -474,18 +495,36 @@ public class NewTaskActivity extends AppCompatActivity {
         android.app.Dialog dialog = timePicker.getDialog();
         if (dialog != null && dialog.getWindow() != null) {
             android.view.Window window = dialog.getWindow();
-            window.setGravity(android.view.Gravity.BOTTOM);
+            window.setGravity(android.view.Gravity.CENTER_HORIZONTAL | android.view.Gravity.BOTTOM);
             android.view.WindowManager.LayoutParams params = window.getAttributes();
-            params.width = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-            params.y = 0; // No offset from bottom
+
+            // Reduce width to 90% for a "smaller" floating look
+            android.util.DisplayMetrics displayMetrics = new android.util.DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            params.width = (int) (displayMetrics.widthPixels * 0.90);
+
+            // Add margin from bottom
+            params.y = (int) (24 * getResources().getDisplayMetrics().density);
+
             window.setAttributes(params);
         }
     }
 
     private void updateReminderTimeText() {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
-            binding.textReminderTime.setText(sdf.format(calendar.getTime()));
+            // WarmReminderView expects Time ("10:00") and Subtitle ("AM • Oct 25")
+            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm", Locale.getDefault());
+            SimpleDateFormat amPmFormat = new SimpleDateFormat("a", Locale.getDefault());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d", Locale.getDefault());
+
+            String time = timeFormat.format(calendar.getTime());
+            String amPm = amPmFormat.format(calendar.getTime());
+            String date = dateFormat.format(calendar.getTime());
+
+            // Combine AM/PM and Date for the subtitle
+            String subtitle = amPm + " • " + date;
+
+            binding.warmReminderView.setTime(time, subtitle);
         } catch (Exception e) {
             // Handle date formatting failure
         }

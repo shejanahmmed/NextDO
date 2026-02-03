@@ -27,7 +27,7 @@
         android:id="@+id/add_task_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Task"
+        android:text="@string/add_task"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="?attr/colorOnSurface"
@@ -262,76 +262,47 @@
                     android:background="?attr/selectableItemBackground" />
             </LinearLayout>
 
-            <!-- Reminder Card -->
+            <!-- Reminder Card - Border Removed -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp"
+                android:padding="0dp"
                 android:layout_marginBottom="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Reminder"
+                    android:text="Date &amp; Time"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface"
                     android:layout_marginBottom="16dp" />
 
-                <LinearLayout
-                    android:id="@+id/button_set_reminder"
+                <com.shejan.nextdo.WarmReminderView
+                    android:id="@+id/warm_reminder_view"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Set reminder"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textSize="20sp"
-                        android:textColor="?attr/colorOnSurface" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/text_reminder_time"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="No reminder set"
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    android:clickable="true"
+                    android:focusable="true"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
-    <!-- Minimal style save button -->
-    <TextView
+    <!-- Material style save button -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button_save"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:layout_margin="24dp"
-        android:background="@drawable/bg_button_save_minimal"
-        android:text="Save Task"
-        android:textColor="#FFFFFF"
+        android:text="SET REMINDER"
+        android:textColor="?attr/colorOnPrimary"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:gravity="center"
-        android:clickable="true"
-        android:focusable="true"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:backgroundTint="?attr/colorPrimary"
+        app:cornerRadius="28dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

@@ -112,6 +112,48 @@
                     android:layout_marginVertical="8dp" />
 
                 <LinearLayout
+                    android:id="@+id/theme_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Theme"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <TextView
+                        android:id="@+id/current_theme_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Auto"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textSize="20sp"
+                        android:textColor="?attr/colorOnSurface" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?attr/colorOnSurface"
+                    android:alpha="0.2"
+                    android:layout_marginVertical="8dp" />
+
+                <LinearLayout
                     android:id="@+id/background_button"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
@@ -194,9 +236,7 @@
                     android:alpha="0.2"
                     android:layout_marginVertical="16dp" />
 
-                <LinearLayout
-                    android:alpha="0.2"
-                    android:layout_marginVertical="16dp" />
+
 
                 <LinearLayout
                     android:id="@+id/snooze_setting"

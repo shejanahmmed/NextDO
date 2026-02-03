@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // DEFINITIVE FIX: Upgrading the database to version 2.
-@Database(entities = { Task.class }, version = 5, exportSchema = false)
+@Database(entities = { Task.class }, version = 6, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract TaskDao taskDao();
 
@@ -45,7 +45,47 @@ public abstract class AppDatabase extends RoomDatabase {
     static final Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE tasks ADD COLUMN reminderType TEXT DEFAULT 'notification'");
+            // This migration previously tried to add the column, but schema mismatch
+            // occurred.
+            // We'll keep it for legacy support, but the real fix is ensuring non-null
+            // constraint matches in v6.
+            try {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN reminderType TEXT DEFAULT 'notification'");
+            } catch (Exception e) {
+                // Column might already exist from failed previous attempt, ignore
+            }
+        }
+    };
+
+    static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            // Create a new table with the correct schema
+            database.execSQL("CREATE TABLE IF NOT EXISTS `tasks_new` (" +
+                    "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`title` TEXT, " +
+                    "`description` TEXT, " +
+                    "`priority` TEXT, " +
+                    "`reminderTime` INTEGER NOT NULL, " +
+                    "`repeat` TEXT, " +
+                    "`reminderType` TEXT NOT NULL DEFAULT 'notification', " +
+                    "`isCompleted` INTEGER NOT NULL, " +
+                    "`alarmId` INTEGER NOT NULL, " +
+                    "`isDeleted` INTEGER NOT NULL, " +
+                    "`deletedTimestamp` INTEGER NOT NULL, " +
+                    "`completedTimestamp` INTEGER NOT NULL)");
+
+            // Copy data from old table to new table
+            database.execSQL(
+                    "INSERT INTO tasks_new (id, title, description, priority, reminderTime, repeat, reminderType, isCompleted, alarmId, isDeleted, deletedTimestamp, completedTimestamp) "
+                            +
+                            "SELECT id, title, description, priority, reminderTime, repeat, IFNULL(reminderType, 'notification'), isCompleted, alarmId, isDeleted, deletedTimestamp, completedTimestamp FROM tasks");
+
+            // Drop old table
+            database.execSQL("DROP TABLE tasks");
+
+            // Rename new table to old table name
+            database.execSQL("ALTER TABLE tasks_new RENAME TO tasks");
         }
     };
 
@@ -55,7 +95,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabase.class, "task_database")
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                             .build();
                 }
             }

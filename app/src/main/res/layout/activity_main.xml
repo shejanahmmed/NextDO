@@ -89,18 +89,20 @@
             </LinearLayout>
 
             <!-- Minimal FAB -->
-            <ImageButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:background="@drawable/bg_fab_minimal"
                 android:src="@drawable/ic_add"
                 android:contentDescription="@string/add_task"
-                android:elevation="6dp"
+                app:backgroundTint="#319499"
+                app:tint="@color/white"
+                app:borderWidth="0dp"
+                app:elevation="6dp"
+                app:pressedTranslationZ="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:tint="@color/minimal_white" />
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

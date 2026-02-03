@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         taskViewModel.deleteOldCompletedTasks(threshold);
         int accentColor = prefs.getInt("accent_color", 0xFF34C759);
 
-        binding.fab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accentColor));
+        // binding.fab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accentColor));
 
         if (adapter != null) {
             adapter.setAccentColor(accentColor);
@@ -152,7 +152,11 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ThemeManager.applyTheme(this);
+
+        applyThemePreference();
+
+        // ThemeManager.applyTheme(this); // REMOVED: Conflicting with
+        // applyThemePreference
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -191,6 +195,12 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         taskViewModel.getActiveTasks().observe(this, tasks -> {
             if (tasks != null) {
                 adapter.submitList(tasks, () -> {
+                    // Force refresh because colors depend on position, which DiffUtil might not
+                    // update
+                    // if content is same but position changed.
+                    // Wrap in post to ensure it runs after any internal processing
+                    binding.recyclerview.post(() -> adapter.notifyDataSetChanged());
+
                     if (shouldScrollToTop) {
                         binding.recyclerview.smoothScrollToPosition(0);
                         shouldScrollToTop = false;
@@ -475,6 +485,31 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         });
 
         dialog.show();
+    }
+
+    private void applyThemePreference() {
+        android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
+                .getDefaultSharedPreferences(this);
+        String theme = prefs.getString("app_theme", "auto");
+
+        int nightMode;
+        switch (theme) {
+            case "light":
+                nightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
+                break;
+            case "dark":
+                nightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
+                break;
+            case "auto":
+            default:
+                nightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                break;
+        }
+
+        // CRITICAL FIX: Only apply if different to avoid infinite recreation loops
+        if (androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode() != nightMode) {
+            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(nightMode);
+        }
     }
 
 }

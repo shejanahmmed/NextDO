@@ -138,6 +138,45 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             // Checkbox - Use passed accent color
             binding.checkboxCompleted.setButtonTintList(android.content.res.ColorStateList.valueOf(accentColor));
 
+            // Alternating Background Colors
+            int colorResId;
+            int adapterPosition = getBindingAdapterPosition();
+            if (adapterPosition == RecyclerView.NO_POSITION) {
+                adapterPosition = 0;
+            }
+            // Use modulo arithmetic to cycle through 3 colors
+            switch (adapterPosition % 3) {
+                case 0:
+                    colorResId = R.color.task_card_bg_1;
+                    break;
+                case 1:
+                    colorResId = R.color.task_card_bg_2;
+                    break;
+                case 2:
+                    colorResId = R.color.task_card_bg_3;
+                    break;
+                default:
+                    colorResId = R.color.task_card_bg_1;
+                    break;
+            }
+
+            // Apply color to the task card container's background
+            // We must invalidate the view to ensure the redraw happens
+            int color = androidx.core.content.ContextCompat.getColor(itemView.getContext(), colorResId);
+
+            // Fix: Target the taskCardContainer which actually has the background
+            if (binding.taskCardContainer.getBackground() instanceof android.graphics.drawable.GradientDrawable) {
+                android.graphics.drawable.GradientDrawable bg = (android.graphics.drawable.GradientDrawable) binding.taskCardContainer
+                        .getBackground().mutate();
+                bg.setColor(color);
+                binding.taskCardContainer.setBackground(bg);
+            } else {
+                // Fallback for simple shapes or ColorDrawables if GradientDrawable cast fails
+                // Using tint list is safer for generic drawables, but setColor on
+                // GradientDrawable is most robust for Shapes
+                binding.taskCardContainer.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
+            }
+
             binding.checkboxCompleted.setOnCheckedChangeListener(null);
             binding.checkboxCompleted.setChecked(task.isCompleted);
             binding.checkboxCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {

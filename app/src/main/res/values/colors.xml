@@ -24,11 +24,15 @@
     <!-- Light Theme Colors -->
     <color name="light_primary">#FF000000</color>
     <color name="light_on_primary">#FFFFFFFF</color>
-    <color name="light_background">#FFF8F9FA</color>
-    <color name="light_surface">#FFFFFFFF</color>
-    <color name="light_on_surface">#FF212529</color>
-    <color name="light_on_surface_variant">#FF6C757D</color>
-    <color name="light_accent">#FF007BFF</color>
+    <color name="light_background">#fff9eb</color>
+    <color name="light_surface">#ffe5c8</color>
+    <color name="light_on_surface">#FF000000</color>
+    <color name="light_on_surface_variant">#FF000000</color>
+    <color name="task_card_bg">#d5e5ff</color>
+    <color name="task_card_bg_1">#d5e5ff</color>
+    <color name="task_card_bg_2">#fed6d7</color>
+    <color name="task_card_bg_3">#ffe4c7</color>
+    <color name="light_accent">#319499</color>
     
     <!-- FAB text color for light theme -->
     <color name="fab_text_color">@color/minimal_white</color>

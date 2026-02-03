@@ -3,4 +3,8 @@
     <!-- Override colors for dark theme -->
     <color name="fab_text_color">@color/minimal_black</color>
     <color name="drawer_background">#B3000000</color>
+    <color name="task_card_bg">@color/dark_surface</color>
+    <color name="task_card_bg_1">@color/dark_surface</color>
+    <color name="task_card_bg_2">@color/dark_surface</color>
+    <color name="task_card_bg_3">@color/dark_surface</color>
 </resources>

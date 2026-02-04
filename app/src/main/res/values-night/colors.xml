@@ -12,4 +12,15 @@
     <color name="floating_dialog_stroke">#33FFFFFF</color>
     <color name="repeat_button_active">#de7782</color>
     <color name="repeat_button_inactive_stroke">#66FFFFFF</color>
+    
+    <color name="input_background_color">@color/dark_surface</color>
+    
+    <color name="reminder_type_active">#ff8da1</color>
+    
+    <color name="page_background">@color/dark_background</color>
+    
+    <color name="reminder_type_inactive">#ffeadd</color>
+    
+    <color name="date_time_section_bg">@color/dark_surface</color>
+    <color name="action_button_color">@color/vibrant_matte_teal</color>
 </resources>

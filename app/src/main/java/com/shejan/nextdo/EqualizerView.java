@@ -3,6 +3,7 @@ package com.shejan.nextdo;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
@@ -42,7 +43,7 @@ public class EqualizerView extends View {
         paint.setStyle(Paint.Style.FILL);
 
         // Use theme color or default
-        paint.setColor(0xFF6200EE); // Purple color, you can change this
+        paint.setColor(Color.parseColor("#ff7b89")); // Warm Pink Wave
 
         barHeights = new float[BAR_COUNT];
         random = new Random();

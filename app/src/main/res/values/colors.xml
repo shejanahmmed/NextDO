@@ -40,9 +40,26 @@
     <color name="switch_track_color_custom">#FF34C759</color>
     
     <color name="drawer_background">#B3F8F9FA</color>
-    <color name="hint_text_color">#999999</color>
+    <color name="hint_text_color">#8E8E8E</color>
     <color name="floating_dialog_bg">@color/light_background</color>
     <color name="floating_dialog_stroke">#DAE2EA</color>
     <color name="repeat_button_active">#de7782</color>
     <color name="repeat_button_inactive_stroke">#80000000</color>
+    
+    <color name="peach_puff">#ffdcc7</color>
+    <color name="input_background_color">@color/peach_puff</color>
+    
+    <color name="cheerful_pastel_pink">#ff8da1</color>
+    <color name="reminder_type_active">@color/cheerful_pastel_pink</color>
+    
+    <color name="page_background">#FFF9EB</color>
+    
+    <color name="very_light_blush">#ffeadd</color>
+    <color name="reminder_type_inactive">@color/very_light_blush</color>
+    
+    <color name="matte_sky_blue">#A2D2FF</color>
+    <color name="date_time_section_bg">@color/matte_sky_blue</color>
+    
+    <color name="vibrant_matte_teal">#48C0B0</color>
+    <color name="action_button_color">@color/vibrant_matte_teal</color>
 </resources>

@@ -30,11 +30,11 @@ public class WarmReminderView extends LinearLayout {
     // Color Palette
     // Color Palette - Light (Warm Pastel) - UPDATED to Black per user request
     private static final int COLOR_ACCENT_LIGHT = 0xFF000000; // Black
-    private static final int COLOR_BACKGROUND_LIGHT = 0xFFffe5c8; // Peach/Orange Surface (Keeping background)
+    private static final int COLOR_BACKGROUND_LIGHT = 0xFFA2D2FF; // Matte Sky Blue (#A2D2FF)
     private static final int COLOR_ICON_BG_LIGHT = 0xFFf4e9dc; // Muted Clay
     private static final int COLOR_TEXT_LIGHT = 0xFF000000; // Black for Title
     private static final int COLOR_SUBTITLE_LIGHT = 0xFF666666; // Darker Gray for Subtitle
-    private static final int COLOR_ICON_GRAY_LIGHT = 0xFF808080; // Gray for right icons
+    private static final int COLOR_ICON_GRAY_LIGHT = 0xFF000000; // Black for right icons
 
     // Color Palette - Dark (High Contrast)
     private static final int COLOR_ACCENT_DARK = 0xFFFFFFFF; // White
@@ -79,7 +79,7 @@ public class WarmReminderView extends LinearLayout {
         int colorSubtitle = isNightMode ? COLOR_SUBTITLE_DARK : COLOR_SUBTITLE_LIGHT;
         int colorIconGray = isNightMode ? COLOR_ICON_GRAY_DARK : COLOR_ICON_GRAY_LIGHT;
 
-        cornerRadius = dpToPx(24);
+        cornerRadius = dpToPx(16);
         rectF = new RectF();
 
         // Setup Paints
@@ -100,10 +100,11 @@ public class WarmReminderView extends LinearLayout {
         iconParams.rightMargin = dpToPx(16);
         iconContainer.setLayoutParams(iconParams);
 
-        // Circular Background for Icon
+        // Circular Background for Icon - UPDATED to Rounded Square White Transparent
         android.graphics.drawable.GradientDrawable iconBg = new android.graphics.drawable.GradientDrawable();
-        iconBg.setShape(android.graphics.drawable.GradientDrawable.OVAL);
-        iconBg.setColor(colorIconBg);
+        iconBg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+        iconBg.setCornerRadius(dpToPx(12)); // Little bit rounded
+        iconBg.setColor(Color.parseColor("#66FFFFFF")); // White 40% Alpha
         iconContainer.setBackground(iconBg);
 
         // Icon
@@ -177,8 +178,8 @@ public class WarmReminderView extends LinearLayout {
         // Draw Background
         canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, backgroundPaint);
 
-        // Draw Dashed Border
-        canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, borderPaint);
+        // Draw Dashed Border (Removed per request)
+        // canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, borderPaint);
 
         super.onDraw(canvas);
     }

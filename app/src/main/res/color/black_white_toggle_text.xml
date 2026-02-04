@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Checked State: Black Text (on Pink Button) -->
-    <item android:state_checked="true" android:color="#000000" />
-    <!-- Unchecked State: Theme Text (Black on Peach, White on Dark) -->
-    <item android:color="?attr/colorOnSurface" />
+    <!-- Checked State: White Text (on Pink Button) -->
+    <item android:state_checked="true" android:color="@android:color/white" />
+    <!-- Unchecked State: Black Text -->
+    <item android:color="@android:color/black" />
 </selector>

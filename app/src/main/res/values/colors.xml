@@ -40,4 +40,9 @@
     <color name="switch_track_color_custom">#FF34C759</color>
     
     <color name="drawer_background">#B3F8F9FA</color>
+    <color name="hint_text_color">#999999</color>
+    <color name="floating_dialog_bg">@color/light_background</color>
+    <color name="floating_dialog_stroke">#DAE2EA</color>
+    <color name="repeat_button_active">#de7782</color>
+    <color name="repeat_button_inactive_stroke">#80000000</color>
 </resources>

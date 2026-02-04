@@ -98,6 +98,11 @@
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
+            android:name=".LicenseActivity"
+            android:exported="false"
+            android:label="License"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".AboutActivity"
             android:label="About"
             android:exported="false"

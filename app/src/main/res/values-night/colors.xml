@@ -7,4 +7,9 @@
     <color name="task_card_bg_1">@color/dark_surface</color>
     <color name="task_card_bg_2">@color/dark_surface</color>
     <color name="task_card_bg_3">@color/dark_surface</color>
+    <color name="hint_text_color">#80FFFFFF</color>
+    <color name="floating_dialog_bg">@color/task_card_bg</color>
+    <color name="floating_dialog_stroke">#33FFFFFF</color>
+    <color name="repeat_button_active">#de7782</color>
+    <color name="repeat_button_inactive_stroke">#66FFFFFF</color>
 </resources>

@@ -313,6 +313,9 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                 } catch (Exception e) {
                     // Handle potential errors
                 }
+            } else if (id == R.id.nav_license) {
+                Intent intent = new Intent(MainActivity.this, LicenseActivity.class);
+                startActivity(intent);
             } else if (id == R.id.nav_help) {
                 Intent intent = new Intent(MainActivity.this, HelpFAQActivity.class);
                 startActivity(intent);

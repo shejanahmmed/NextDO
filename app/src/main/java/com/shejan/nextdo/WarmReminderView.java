@@ -28,13 +28,13 @@ public class WarmReminderView extends LinearLayout {
     private TextView amPmTextView;
 
     // Color Palette
-    // Color Palette - Light (Warm Pastel)
-    private static final int COLOR_ACCENT_LIGHT = 0xFFdb7f67; // Matte Terracotta
-    private static final int COLOR_BACKGROUND_LIGHT = 0xFFffe5c8; // Peach/Orange Surface
+    // Color Palette - Light (Warm Pastel) - UPDATED to Black per user request
+    private static final int COLOR_ACCENT_LIGHT = 0xFF000000; // Black
+    private static final int COLOR_BACKGROUND_LIGHT = 0xFFffe5c8; // Peach/Orange Surface (Keeping background)
     private static final int COLOR_ICON_BG_LIGHT = 0xFFf4e9dc; // Muted Clay
-    private static final int COLOR_TEXT_LIGHT = 0xFFdb7f67; // Terracotta for Title
-    private static final int COLOR_SUBTITLE_LIGHT = 0xFF999999; // Gray for Subtitle
-    private static final int COLOR_ICON_GRAY_LIGHT = 0xFFa0a0a0; // Gray for right icons
+    private static final int COLOR_TEXT_LIGHT = 0xFF000000; // Black for Title
+    private static final int COLOR_SUBTITLE_LIGHT = 0xFF666666; // Darker Gray for Subtitle
+    private static final int COLOR_ICON_GRAY_LIGHT = 0xFF808080; // Gray for right icons
 
     // Color Palette - Dark (High Contrast)
     private static final int COLOR_ACCENT_DARK = 0xFFFFFFFF; // White

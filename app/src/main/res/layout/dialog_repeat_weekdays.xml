@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Repeat On"
-        android:textColor="#FFFFFF"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"
@@ -147,7 +147,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Cancel"
-            android:textColor="#99FFFFFF"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:padding="12dp"
             android:gravity="center"
             android:background="?attr/selectableItemBackground" />

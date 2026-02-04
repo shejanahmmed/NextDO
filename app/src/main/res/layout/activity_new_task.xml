@@ -60,8 +60,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp"
                 android:layout_marginBottom="16dp">
 
                 <TextView
@@ -73,15 +71,24 @@
                     android:textColor="?attr/colorOnSurface"
                     android:layout_marginBottom="12dp" />
 
-                <EditText
-                    android:id="@+id/edit_title"
+                <!-- Input Box Container -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@android:color/transparent"
-                    android:hint="Enter task title"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textColorHint="?attr/colorOnSurfaceVariant"
-                    android:textSize="16sp" />
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_minimal"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="12dp">
+
+                    <EditText
+                        android:id="@+id/edit_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@android:color/transparent"
+                        android:hint="Enter task title"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textColorHint="@color/hint_text_color"
+                        android:textSize="16sp" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Description Input Card -->
@@ -89,8 +96,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp"
                 android:layout_marginBottom="16dp">
 
                 <TextView
@@ -102,16 +107,25 @@
                     android:textColor="?attr/colorOnSurface"
                     android:layout_marginBottom="12dp" />
 
-                <EditText
-                    android:id="@+id/edit_description"
+                <!-- Input Box Container -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:background="@android:color/transparent"
-                    android:hint="Enter description (optional)"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textColorHint="?attr/colorOnSurfaceVariant"
-                    android:textSize="16sp"
-                    android:gravity="top" />
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_minimal"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="12dp">
+
+                    <EditText
+                        android:id="@+id/edit_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:background="@android:color/transparent"
+                        android:hint="Enter description (optional)"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textColorHint="@color/hint_text_color"
+                        android:textSize="16sp"
+                        android:gravity="top" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Reminder Type Selection -->
@@ -119,8 +133,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp"
                 android:layout_marginBottom="16dp">
 
                 <TextView
@@ -132,96 +144,110 @@
                     android:textColor="?attr/colorOnSurface"
                     android:layout_marginBottom="12dp" />
 
+                <!-- Options Container -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="3">
-
-                    <CheckBox
-                        android:id="@+id/checkbox_type_notification"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:button="@null"
-                        android:background="@drawable/bg_reminder_type_button"
-                        android:textColor="@color/black_white_toggle_text"
-                        android:layout_marginEnd="8dp"
-                        android:checked="true"
-                        android:paddingTop="12dp"
-                        android:paddingBottom="12dp"
-                        android:text="🔔\nNotification"
-                        android:textSize="11sp"
-                        android:lineSpacingExtra="4dp" />
-
-                    <CheckBox
-                        android:id="@+id/checkbox_type_alarm"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:button="@null"
-                        android:background="@drawable/bg_reminder_type_button"
-                        android:textColor="@color/black_white_toggle_text"
-                        android:layout_marginEnd="8dp"
-                        android:paddingTop="12dp"
-                        android:paddingBottom="12dp"
-                        android:text="⏰\nAlarm"
-                        android:textSize="11sp"
-                        android:lineSpacingExtra="4dp" />
-
-                    <CheckBox
-                        android:id="@+id/checkbox_type_voice"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:button="@null"
-                        android:background="@drawable/bg_reminder_type_button"
-                        android:textColor="@color/black_white_toggle_text"
-                        android:paddingTop="12dp"
-                        android:paddingBottom="12dp"
-                        android:text="🔊\nVoice"
-                        android:textSize="11sp"
-                        android:lineSpacingExtra="4dp" />
-                </LinearLayout>
-
-                <!-- Voice Preview Box (Initially Hidden) -->
-                <LinearLayout
-                    android:id="@+id/voice_preview_box"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:background="@drawable/bg_card_minimal"
-                    android:padding="16dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center_vertical"
-                    android:visibility="gone">
+                    android:padding="20dp">
 
-                    <com.shejan.nextdo.EqualizerView
-                        android:id="@+id/voice_equalizer"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="12dp" />
+                        android:orientation="horizontal"
+                        android:weightSum="3">
 
-                    <TextView
-                        android:layout_width="0dp"
+                        <CheckBox
+                            android:id="@+id/checkbox_type_notification"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:button="@null"
+                            android:background="@drawable/bg_reminder_type_button"
+                            android:textColor="@color/black_white_toggle_text"
+                            android:layout_marginEnd="8dp"
+                            android:checked="true"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp"
+                            android:text="Notification"
+                            android:textSize="11sp"
+                            android:drawableTop="@drawable/ic_notification"
+                            android:drawableTint="@color/black_white_toggle_text"
+                            android:drawablePadding="4dp" />
+
+                        <CheckBox
+                            android:id="@+id/checkbox_type_alarm"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:button="@null"
+                            android:background="@drawable/bg_reminder_type_button"
+                            android:textColor="@color/black_white_toggle_text"
+                            android:layout_marginEnd="8dp"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp"
+                            android:text="Alarm"
+                            android:textSize="11sp"
+                            android:drawableTop="@drawable/ic_alarm"
+                            android:drawableTint="@color/black_white_toggle_text"
+                            android:drawablePadding="4dp" />
+
+                        <CheckBox
+                            android:id="@+id/checkbox_type_voice"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:button="@null"
+                            android:background="@drawable/bg_reminder_type_button"
+                            android:textColor="@color/black_white_toggle_text"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp"
+                            android:text="Voice"
+                            android:textSize="11sp"
+                            android:drawableTop="@drawable/ic_mic"
+                            android:drawableTint="@color/black_white_toggle_text"
+                            android:drawablePadding="4dp" />
+                    </LinearLayout>
+
+                    <!-- Voice Preview Box (Initially Hidden) -->
+                    <LinearLayout
+                        android:id="@+id/voice_preview_box"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Listen"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:orientation="horizontal"
+                        android:background="@drawable/bg_card_minimal"
+                        android:padding="16dp"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:visibility="gone">
 
-                    <ImageView
-                        android:id="@+id/btn_play_voice"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_play"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:padding="8dp"
-                        android:contentDescription="Play voice preview" />
+                        <com.shejan.nextdo.EqualizerView
+                            android:id="@+id/voice_equalizer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Listen"
+                            android:textSize="16sp"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <ImageView
+                            android:id="@+id/btn_play_voice"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_play"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="8dp"
+                            android:contentDescription="Play voice preview" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
@@ -232,34 +258,38 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp"
-                android:gravity="center_vertical"
+                android:orientation="vertical"
                 android:layout_marginBottom="16dp">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:text="Repeat"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface" />
-
-                <TextView
-                    android:id="@+id/text_repeat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:minWidth="100dp"
-                    android:gravity="center_vertical|end"
-                    android:text="NONE"
-                    android:textSize="16sp"
                     android:textColor="?attr/colorOnSurface"
-                    android:paddingStart="8dp"
-                    android:drawablePadding="8dp"
-                    app:drawableEndCompat="@drawable/ic_arrow_down"
-                    android:background="?attr/selectableItemBackground" />
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Input Box Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_minimal"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="12dp">
+
+                    <TextView
+                        android:id="@+id/text_repeat"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:gravity="center_vertical"
+                        android:text="NONE"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSurface"
+                        android:drawablePadding="8dp"
+                        app:drawableEndCompat="@drawable/ic_arrow_down"
+                        android:background="?attr/selectableItemBackground" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Reminder Card - Border Removed -->

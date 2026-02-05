@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/drawer_premium_background"
+    android:padding="24dp">
+
+    <!-- User Profile Section -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp">
+
+        <!-- Avatar -->
+        <ImageView
+            android:id="@+id/drawer_avatar"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/bg_avatar_border"
+            android:src="@drawable/ic_person"
+            android:padding="16dp"
+            android:tint="@color/drawer_grey"
+            android:contentDescription="User Avatar" />
+
+        <!-- User Info -->
+        <LinearLayout
+            android:id="@+id/drawer_user_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/drawer_avatar"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:layout_toStartOf="@id/drawer_close_button"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/drawer_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Julian Barnes"
+                android:textColor="@color/drawer_navy"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+            <TextView
+                android:id="@+id/drawer_account_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pro Account"
+                android:textColor="@color/drawer_teal"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif" />
+        </LinearLayout>
+
+        <!-- Close Button -->
+        <ImageView
+            android:id="@+id/drawer_close_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_close_button"
+            android:src="@drawable/ic_close"
+            android:padding="8dp"
+            android:tint="@color/drawer_navy"
+            android:contentDescription="Close Drawer"
+            android:clickable="true"
+            android:focusable="true" />
+    </RelativeLayout>
+
+    <!-- Branding Section -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NextDO"
+            android:textColor="@color/drawer_navy"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="0.02" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="STAY ORGANIZED"
+            android:textColor="@color/drawer_grey"
+            android:textSize="10sp"
+            android:letterSpacing="0.15"
+            android:layout_marginTop="4dp"
+            android:fontFamily="sans-serif-light" />
+    </LinearLayout>
+
+</LinearLayout>

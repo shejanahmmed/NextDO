@@ -299,7 +299,11 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
         binding.navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_settings) {
+            if (id == R.id.nav_home) {
+                // Already on home, just close drawer
+                binding.drawerLayout.closeDrawer(GravityCompat.END);
+                return true;
+            } else if (id == R.id.nav_settings) {
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
             } else if (id == R.id.nav_about) {
@@ -313,9 +317,6 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                 } catch (Exception e) {
                     // Handle potential errors
                 }
-            } else if (id == R.id.nav_license) {
-                Intent intent = new Intent(MainActivity.this, LicenseActivity.class);
-                startActivity(intent);
             } else if (id == R.id.nav_help) {
                 Intent intent = new Intent(MainActivity.this, HelpFAQActivity.class);
                 startActivity(intent);
@@ -330,11 +331,29 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
             return true;
         });
 
-        // Setup Close Button in Header
+        // Setup Close Button in Premium Header
         android.view.View headerView = binding.navView.getHeaderView(0);
-        android.view.View closeButton = headerView.findViewById(R.id.close_drawer_button);
+        android.view.View closeButton = headerView.findViewById(R.id.drawer_close_button);
         if (closeButton != null) {
             closeButton.setOnClickListener(v -> binding.drawerLayout.closeDrawer(GravityCompat.END));
+        }
+
+        // Apply active state styling to Home item
+        applyActiveStateToMenuItem(R.id.nav_home);
+    }
+
+    private void applyActiveStateToMenuItem(int menuItemId) {
+        android.view.Menu menu = binding.navView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.getItemId() == menuItemId) {
+                item.setChecked(true);
+                // Apply lavender background to checked item
+                android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+                bg.setColor(getResources().getColor(R.color.drawer_lavender, null));
+                bg.setCornerRadius(24 * getResources().getDisplayMetrics().density);
+                // Note: NavigationView handles checked state styling automatically
+            }
         }
     }
 

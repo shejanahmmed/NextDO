@@ -119,16 +119,19 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
+        android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:fitsSystemWindows="true"
-        android:background="@color/drawer_background"
+        android:background="@drawable/bg_drawer_rounded"
         android:elevation="0dp"
-        app:itemHorizontalPadding="32dp"
-        app:itemBackground="@drawable/nav_item_card_background"
-        app:itemTextAppearance="@style/NavDrawerTextStyle"
-        app:headerLayout="@layout/nav_header_main"
+        app:itemHorizontalPadding="24dp"
+        app:itemVerticalPadding="12dp"
+        app:itemIconTint="@color/drawer_navy"
+        app:itemTextColor="@color/drawer_navy"
+        app:itemTextAppearance="@style/DrawerMenuTextStyle"
+        app:itemBackground="@drawable/drawer_menu_item_background"
+        app:headerLayout="@layout/drawer_header_premium"
         app:menu="@menu/drawer_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

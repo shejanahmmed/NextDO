@@ -62,4 +62,14 @@
     
     <color name="vibrant_matte_teal">#48C0B0</color>
     <color name="action_button_color">@color/vibrant_matte_teal</color>
+
+    <!-- Premium Drawer Colors -->
+    <color name="drawer_premium_background">#FAFAFA</color>
+    <color name="drawer_navy">#2C3E50</color>
+    <color name="drawer_grey">#8E8E8E</color>
+    <color name="drawer_lavender">#F3E8FF</color>
+    <color name="drawer_teal">#48C0B0</color>
+    <color name="drawer_blue_border">#A2D2FF</color>
+    <color name="drawer_divider">#EEEEEE</color>
+    <color name="drawer_close_bg">#E8E8E8</color>
 </resources>

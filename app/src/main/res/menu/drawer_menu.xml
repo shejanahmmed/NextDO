@@ -41,6 +41,11 @@
             android:title="Releases" />
         
         <item
+            android:id="@+id/nav_license"
+            android:icon="@drawable/ic_info"
+            android:title="License" />
+        
+        <item
             android:id="@+id/nav_help"
             android:icon="@drawable/ic_help"
             android:title="Help &amp; FAQ" />

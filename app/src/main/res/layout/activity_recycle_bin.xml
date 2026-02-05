@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@color/page_background"
     tools:context=".RecycleBinActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -16,6 +16,7 @@
         android:elevation="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIconTint="?attr/colorOnSurface"
         app:title="Recycle Bin"
         app:titleTextColor="?attr/colorOnSurface" />
 

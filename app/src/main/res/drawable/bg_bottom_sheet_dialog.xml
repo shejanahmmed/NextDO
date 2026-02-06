@@ -3,7 +3,7 @@
     android:shape="rectangle">
     
     <!-- Background color - theme aware -->
-    <solid android:color="@color/page_background" />
+    <solid android:color="@color/bottom_sheet_bg" />
     
     <!-- Rounded corners on all sides -->
     <corners android:radius="24dp" />

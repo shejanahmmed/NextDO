@@ -52,17 +52,23 @@ public class AlarmScheduler {
                         " (in " + delayMs + "ms)");
 
                 // For past times or very near times, schedule immediately
+                // For past times or very near times, schedule immediately
                 if (delayMs <= 0) {
                     // Trigger immediately for past times
                     Log.d(TAG, "Reminder time in past, triggering immediately");
                     alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, currentTime + 100, pendingIntent);
+                } else if ("alarm".equals(task.reminderType)) {
+                    // Use setAlarmClock for maximum reliability (Doze proof + System Alarm volume)
+                    Log.d(TAG, "Using setAlarmClock for type: " + task.reminderType);
+                    AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(
+                            task.reminderTime, pendingIntent);
+                    alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
                 } else if (delayMs < 5000) {
                     // For times within 5 seconds, trigger immediately
                     Log.d(TAG, "Near-future reminder, triggering immediately");
                     alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, currentTime + 100, pendingIntent);
                 } else if (canScheduleExactAlarms()) {
-                    // Use most reliable alarm method for future times
-                    // Use setExactAndAllowWhileIdle to avoid alarm icon
+                    // Use setExactAndAllowWhileIdle for standard notifications
                     Log.d(TAG, "Using setExactAndAllowWhileIdle");
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, task.reminderTime,
                             pendingIntent);

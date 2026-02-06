@@ -15,12 +15,45 @@
     
     <color name="input_background_color">@color/dark_surface</color>
     
-    <color name="reminder_type_active">#ff8da1</color>
+    <color name="reminder_type_active">@color/vibrant_matte_teal</color>
     
     <color name="page_background">@color/dark_background</color>
     
-    <color name="reminder_type_inactive">#ffeadd</color>
+    <color name="reminder_type_inactive">#333333</color>
     
     <color name="date_time_section_bg">@color/dark_surface</color>
     <color name="action_button_color">@color/vibrant_matte_teal</color>
+
+    <!-- Adaptive Icon Tints -->
+    <color name="icon_tint_generic">@color/white</color>
+    <color name="icon_tint_repeat">@color/white</color>
+    <color name="icon_tint_date">@color/white</color>
+    
+    <!-- Drawer Dark Mode Colors -->
+    <color name="drawer_premium_background">@color/dark_surface</color>
+    <color name="drawer_navy">@color/white</color>
+    
+    <color name="reminder_text_unchecked">@android:color/white</color>
+    
+    <color name="drawer_lavender">#33FFFFFF</color>
+    
+    <!-- Repeat Dialog Dark Mode Colors -->
+    <color name="dialog_title_text">@color/white</color>
+    <color name="preset_button_text">@color/white</color>
+    <color name="preset_icon_tint">@color/white</color>
+    <color name="info_box_background">@color/dark_surface</color>
+    <color name="info_box_text">#B0B0B0</color>
+    <color name="dialog_cancel_text">@color/white</color>
+    <color name="dialog_cancel_stroke">#33FFFFFF</color>
+    <color name="dialog_cancel_bg">@color/dark_surface</color>
+    
+    <color name="preset_bg_peach">#40FFD4B5</color>
+    <color name="preset_bg_blue">#40A8D5E2</color>
+    <color name="preset_bg_pink">#40FFB3C1</color>
+    <color name="preset_bg_green">#40B8E6B8</color>
+    
+    <color name="weekday_inactive_bg">#333333</color>
+    <color name="weekday_inactive_text">@color/white</color>
+    
+    <color name="bottom_sheet_bg">#1E1E1E</color>
 </resources>

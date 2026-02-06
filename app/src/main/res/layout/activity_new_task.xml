@@ -70,7 +70,7 @@
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface"
                     android:drawableStart="@drawable/ic_edit"
-                    android:drawableTint="@color/action_button_color"
+                    android:drawableTint="@color/icon_tint_generic"
                     android:drawablePadding="8dp"
                     android:layout_marginBottom="8dp" />
 
@@ -109,7 +109,7 @@
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface"
                     android:drawableStart="@drawable/ic_menu"
-                    android:drawableTint="@color/action_button_color"
+                    android:drawableTint="@color/icon_tint_generic"
                     android:drawablePadding="8dp"
                     android:layout_marginBottom="8dp" />
 
@@ -149,7 +149,7 @@
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface"
                     android:drawableStart="@drawable/ic_notification"
-                    android:drawableTint="@color/action_button_color"
+                    android:drawableTint="@color/icon_tint_generic"
                     android:drawablePadding="8dp"
                     android:layout_marginBottom="8dp" />
 
@@ -286,7 +286,7 @@
                     android:layout_marginBottom="8dp"
                     android:drawableStart="@drawable/ic_repeat"
                     android:drawablePadding="8dp"
-                    android:drawableTint="#99a0f5" />
+                    android:drawableTint="@color/icon_tint_repeat" />
 
                 <!-- Input Box Container -->
                 <LinearLayout
@@ -328,7 +328,7 @@
                     android:layout_marginBottom="8dp"
                     android:drawableStart="@drawable/ic_clock"
                     android:drawablePadding="8dp"
-                    android:drawableTint="#8cdcfa" />
+                    android:drawableTint="@color/icon_tint_date" />
 
                 <com.shejan.nextdo.WarmReminderView
                     android:id="@+id/warm_reminder_view"

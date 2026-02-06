@@ -50,9 +50,12 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 }
 
                 // Check DB for completion and reschedule
+                AppDatabase db = null;
+                Task foundTask = null;
                 try {
-                    AppDatabase db = AppDatabase.getDatabase(context);
-                    Task foundTask = db.taskDao().getTaskById(taskId);
+                    db = AppDatabase.getDatabase(context);
+                    TaskDao taskDao = db.taskDao();
+                    foundTask = taskDao.getTaskById(taskId);
 
                     if (foundTask != null && foundTask.isCompleted) {
                         Log.d(TAG, "Task " + taskId + " is already completed, not showing notification");
@@ -65,7 +68,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                                 foundTask.reminderTime, foundTask.repeat);
                         if (nextTime > System.currentTimeMillis()) {
                             foundTask.reminderTime = nextTime;
-                            db.taskDao().update(foundTask);
+                            taskDao.update(foundTask);
 
                             // Schedule the next alarm
                             new AlarmScheduler(context).schedule(foundTask);
@@ -83,10 +86,11 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     Log.d(TAG, "Voice reminder detected from intent for task " + taskId);
                     // Get full task from database for voice playback
                     try {
-                        AppDatabase db = AppDatabase.getDatabase(context);
-                        Task foundTask = db.taskDao().getTaskById(taskId);
-                        if (foundTask != null) {
-                            speakVoiceReminder(context, foundTask);
+                        AppDatabase voiceDb = AppDatabase.getDatabase(context);
+                        TaskDao voiceTaskDao = voiceDb.taskDao();
+                        Task voiceTask = voiceTaskDao.getTaskById(taskId);
+                        if (voiceTask != null) {
+                            speakVoiceReminder(context, voiceTask);
                             return; // Don't show notification for voice reminders
                         } else {
                             Log.w(TAG, "Task not found in database, cannot speak");
@@ -121,31 +125,22 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                         .setAutoCancel(true)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
-                // For ALARM type: Launch full-screen AlarmActivity (primary method)
-                if ("alarm".equals(reminderType)) {
-                    Log.d(TAG, "Launching AlarmActivity for task " + taskId);
-                    Intent alarmIntent = new Intent(context, AlarmActivity.class);
-                    alarmIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    alarmIntent.putExtra("task_id", taskId);
-                    alarmIntent.putExtra("task_title", taskTitle);
-                    alarmIntent.putExtra("task_description", taskDescription);
-                    alarmIntent.putExtra("alarm_id", intent.getIntExtra("alarm_id", 0));
-
-                    try {
-                        context.startActivity(alarmIntent);
-                        // Don't show notification for alarm type - activity handles it
-                        return;
-                    } catch (Exception e) {
-                        Log.e(TAG, "Failed to launch AlarmActivity: " + e.getMessage());
-                        // Fall through to show notification as backup
-                    }
-                }
-
-                // For ALARM type: Add full-screen intent to show over lockscreen
+                // For ALARM type: Use Full-Screen Intent (Standard Android 10+ way)
+                // We do NOT try to startActivity() directly as it fails in background
+                // For ALARM type: Use Full-Screen Intent (Standard Android 10+ way)
                 if ("alarm".equals(reminderType)) {
                     Log.d(TAG, "Setting up full-screen alarm for task " + taskId);
-                    Intent fullScreenIntent = new Intent(context, MainActivity.class);
+
+                    // CRITICAL FIX: Launch AlarmActivity, not MainActivity
+                    Intent fullScreenIntent = new Intent(context, AlarmActivity.class);
                     fullScreenIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                    // Pass necessary data to AlarmActivity
+                    fullScreenIntent.putExtra("task_id", taskId);
+                    fullScreenIntent.putExtra("task_title", taskTitle);
+                    fullScreenIntent.putExtra("task_description", taskDescription);
+                    fullScreenIntent.putExtra("alarm_id", intent.getIntExtra("alarm_id", 0));
+
                     PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(context, taskId + 10000,
                             fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 

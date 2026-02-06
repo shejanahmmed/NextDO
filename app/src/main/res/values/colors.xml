@@ -72,4 +72,31 @@
     <color name="drawer_blue_border">#A2D2FF</color>
     <color name="drawer_divider">#EEEEEE</color>
     <color name="drawer_close_bg">#E8E8E8</color>
+    
+    <!-- Adaptive Icon Tints -->
+    <color name="icon_tint_generic">@color/action_button_color</color>
+    <color name="icon_tint_repeat">#99a0f5</color>
+    <color name="icon_tint_date">#8cdcfa</color>
+    
+    <color name="reminder_text_unchecked">@android:color/black</color>
+    
+    <!-- Repeat Dialog Adaptive Colors -->
+    <color name="dialog_title_text">#333333</color>
+    <color name="preset_button_text">#333333</color>
+    <color name="preset_icon_tint">#333333</color>
+    <color name="info_box_background">#F1EEE7</color>
+    <color name="info_box_text">#666666</color>
+    <color name="dialog_cancel_text">#333333</color>
+    <color name="dialog_cancel_stroke">#E0E0E0</color>
+    <color name="dialog_cancel_bg">#FFFFFF</color>
+    
+    <color name="preset_bg_peach">#FFD4B5</color>
+    <color name="preset_bg_blue">#A8D5E2</color>
+    <color name="preset_bg_pink">#FFB3C1</color>
+    <color name="preset_bg_green">#B8E6B8</color>
+    
+    <color name="weekday_inactive_bg">#FDE2E4</color>
+    <color name="weekday_inactive_text">#333333</color>
+    
+    <color name="bottom_sheet_bg">@color/page_background</color>
 </resources>

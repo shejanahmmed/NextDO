@@ -350,8 +350,12 @@ public class NewTaskActivity extends AppCompatActivity {
             button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF48C0B0)); // Active teal
             button.setTextColor(0xFFFFFFFF);
         } else {
-            button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFFFDE2E4)); // Inactive light pink
-            button.setTextColor(0xFF333333); // Deep ash text for inactive
+            // Adaptive Inactive State
+            int bgColor = androidx.core.content.ContextCompat.getColor(this, R.color.weekday_inactive_bg);
+            int textColor = androidx.core.content.ContextCompat.getColor(this, R.color.weekday_inactive_text);
+
+            button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(bgColor));
+            button.setTextColor(textColor);
         }
     }
 

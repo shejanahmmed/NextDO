@@ -26,6 +26,7 @@ public class NotificationHelper {
     }
 
     @androidx.annotation.RequiresApi(api = Build.VERSION_CODES.O)
+    @android.annotation.SuppressLint("WrongConstant")
     private static NotificationChannel getNotificationChannel() {
         CharSequence name = "NextDO Reminders";
         String description = "Notifications for task reminders";

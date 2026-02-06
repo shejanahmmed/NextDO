@@ -14,8 +14,35 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-renamesourcefileattribute SourceFile
+
+# Room Database
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
+
+# Keep all model classes
+-keep class com.shejan.nextdo.Task { *; }
+-keep class com.shejan.nextdo.TaskDao { *; }
+-keep class com.shejan.nextdo.AppDatabase { *; }
+
+# Keep BroadcastReceivers
+-keep class com.shejan.nextdo.ReminderBroadcastReceiver { *; }
+-keep class com.shejan.nextdo.SnoozeReceiver { *; }
+-keep class com.shejan.nextdo.BootCompletedReceiver { *; }
+
+# Keep Widget Providers
+-keep class com.shejan.nextdo.UpcomingTasksWidgetProvider { *; }
+-keep class com.shejan.nextdo.UpcomingTasksLightWidgetProvider { *; }
+
+# Lifecycle
+-keepclassmembers class * extends androidx.lifecycle.ViewModel {
+    <init>(...);
+}
+-keepclassmembers class * extends androidx.lifecycle.AndroidViewModel {
+    <init>(android.app.Application);
+}

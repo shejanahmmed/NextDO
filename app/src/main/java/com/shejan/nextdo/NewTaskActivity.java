@@ -171,9 +171,6 @@ public class NewTaskActivity extends AppCompatActivity {
                     task.repeat = repeat;
                     task.reminderType = selectedReminderType;
 
-                    Log.d(TAG, "SAVE DEBUG: selectedReminderType = " + selectedReminderType);
-                    Log.d(TAG, "SAVE DEBUG: task.reminderType = " + task.reminderType);
-
                     Log.d(TAG, "Task details: id=" + task.id + ", alarmId=" + task.alarmId +
                             ", reminderTime=" + reminderTime);
 
@@ -190,8 +187,6 @@ public class NewTaskActivity extends AppCompatActivity {
                     replyIntent.putExtra(EXTRA_REMINDER_TIME, reminderTime);
                     replyIntent.putExtra(EXTRA_REPEAT, repeat);
                     replyIntent.putExtra(EXTRA_REMINDER_TYPE, selectedReminderType);
-
-                    Log.d(TAG, "SAVE DEBUG: Putting EXTRA_REMINDER_TYPE = " + selectedReminderType);
 
                     setResult(RESULT_OK, replyIntent);
                 }

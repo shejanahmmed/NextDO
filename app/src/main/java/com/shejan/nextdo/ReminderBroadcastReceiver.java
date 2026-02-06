@@ -42,8 +42,6 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 int taskId = intent.getIntExtra(EXTRA_TASK_ID, 0);
                 String reminderType = intent.getStringExtra("reminder_type"); // CRITICAL: Get from intent
 
-                Log.d(TAG, "TRIGGER DEBUG: Received reminderType from intent: '" + reminderType + "'");
-
                 if (taskId == 0) {
                     Log.e(TAG, "Invalid taskId, aborting notification");
                     return;

@@ -14,11 +14,14 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import android.util.Log;
 
 import java.io.IOException;
 
 public class AlarmActivity extends AppCompatActivity {
+    private static final String TAG = "AlarmActivity";
     private MediaPlayer mediaPlayer;
     private Vibrator vibrator;
 
@@ -84,6 +87,15 @@ public class AlarmActivity extends AppCompatActivity {
 
             finish();
         });
+
+        // Handle back button press - prevent dismissing alarm
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Prevent back button from dismissing alarm
+                // User must explicitly dismiss or snooze
+            }
+        });
     }
 
     private void startAlarmSound() {
@@ -110,7 +122,7 @@ public class AlarmActivity extends AppCompatActivity {
             mediaPlayer.prepare();
             mediaPlayer.start();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to start alarm sound", e);
         }
     }
 
@@ -151,9 +163,4 @@ public class AlarmActivity extends AppCompatActivity {
         stopVibration();
     }
 
-    @Override
-    public void onBackPressed() {
-        // Prevent back button from dismissing alarm
-        // User must explicitly dismiss or snooze
-    }
 }

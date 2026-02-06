@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@color/page_background"
     android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-    android:background="#000000"
+    android:background="@android:color/transparent"
         app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
@@ -17,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIconTint="#000000"
             app:title="About"
             app:titleTextColor="?attr/colorOnSurface" />
 
@@ -25,13 +26,13 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000000"
+        android:background="@android:color/transparent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#000000"
+            android:background="@android:color/transparent"
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:padding="24dp">
@@ -53,7 +54,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="16dp"
                 android:layout_gravity="center_horizontal"
-                app:cardBackgroundColor="#000000"
+                app:cardBackgroundColor="@color/page_background"
                 app:cardCornerRadius="90dp"
                 app:strokeColor="#FFFFFF"
                 app:strokeWidth="6dp"

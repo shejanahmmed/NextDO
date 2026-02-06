@@ -62,15 +62,31 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             // Today -> Hollow White Circle (Text White)
             // Normal -> No background (Text White)
 
+            // Resolve theme colors
+            android.content.Context context = holder.itemView.getContext();
+            android.util.TypedValue typedValue = new android.util.TypedValue();
+
+            // Default text color (onSurface)
+            context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true);
+            int colorOnSurface = typedValue.data;
+
+            // Secondary color (Accent)
+            context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorSecondary, typedValue, true);
+            int colorSecondary = typedValue.data;
+
+            // Text on Secondary (OnSecondary)
+            context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorOnSecondary, typedValue, true);
+            int colorOnSecondary = typedValue.data;
+
             if (isSelected) {
                 holder.textDay.setBackgroundResource(R.drawable.bg_calendar_selected);
-                holder.textDay.setTextColor(holder.itemView.getContext().getColor(R.color.black));
+                holder.textDay.setTextColor(colorOnSecondary);
             } else if (isToday) {
                 holder.textDay.setBackgroundResource(R.drawable.bg_calendar_today);
-                holder.textDay.setTextColor(holder.itemView.getContext().getColor(R.color.white));
+                holder.textDay.setTextColor(colorSecondary);
             } else {
                 holder.textDay.setBackground(null);
-                holder.textDay.setTextColor(holder.itemView.getContext().getColor(R.color.white));
+                holder.textDay.setTextColor(colorOnSurface);
             }
 
             holder.itemView.setOnClickListener(v -> {

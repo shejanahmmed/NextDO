@@ -203,129 +203,127 @@ public class NewTaskActivity extends AppCompatActivity {
     }
 
     private void showWeekdayRepeatDialog() {
-        applyBlurEffect(true);
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        // Inflate custom view
-        android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_repeat_weekdays, null);
-        builder.setView(dialogView);
-        android.app.AlertDialog dialog = builder.create();
+        // Create dialog
+        android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_repeat_weekdays);
+
+        // Allow dismissing by clicking outside
+        dialog.setCanceledOnTouchOutside(true);
+
+        // Make dialog full screen with transparent background
         if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(
-                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-
-            // Side-Sheet Behavior
-            android.view.WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-            params.gravity = android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL;
-
-            // Use 25% of screen width for compact side-sheet
-            android.util.DisplayMetrics displayMetrics = new android.util.DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            params.width = (int) (displayMetrics.widthPixels * 0.25);
-            params.height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-            // Add some margin from the edge
-            params.x = 32; // 32px margin from right
-
-            dialog.getWindow().setAttributes(params);
-            dialog.getWindow().setDimAmount(0.3f); // Subtle dim
+            dialog.getWindow().setLayout(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
 
-        // Checkboxes
-        android.widget.CheckBox cbSun = dialogView.findViewById(R.id.checkbox_sun);
-        android.widget.CheckBox cbMon = dialogView.findViewById(R.id.checkbox_mon);
-        android.widget.CheckBox cbTue = dialogView.findViewById(R.id.checkbox_tue);
-        android.widget.CheckBox cbWed = dialogView.findViewById(R.id.checkbox_wed);
-        android.widget.CheckBox cbThu = dialogView.findViewById(R.id.checkbox_thu);
-        android.widget.CheckBox cbFri = dialogView.findViewById(R.id.checkbox_fri);
-        android.widget.CheckBox cbSat = dialogView.findViewById(R.id.checkbox_sat);
+        // Get all views
+        android.widget.LinearLayout btnNone = dialog.findViewById(R.id.btn_none);
+        android.widget.LinearLayout btnEveryDay = dialog.findViewById(R.id.btn_every_day);
+        android.widget.LinearLayout btnWeekdays = dialog.findViewById(R.id.btn_weekdays);
+        android.widget.LinearLayout btnWeekends = dialog.findViewById(R.id.btn_weekends);
 
-        // Pre-select
-        if (!TextUtils.isEmpty(selectedRepeatDays)) {
+        com.google.android.material.button.MaterialButton btnDaySun = dialog.findViewById(R.id.btn_day_sun);
+        com.google.android.material.button.MaterialButton btnDayMon = dialog.findViewById(R.id.btn_day_mon);
+        com.google.android.material.button.MaterialButton btnDayTue = dialog.findViewById(R.id.btn_day_tue);
+        com.google.android.material.button.MaterialButton btnDayWed = dialog.findViewById(R.id.btn_day_wed);
+        com.google.android.material.button.MaterialButton btnDayThu = dialog.findViewById(R.id.btn_day_thu);
+        com.google.android.material.button.MaterialButton btnDayFri = dialog.findViewById(R.id.btn_day_fri);
+        com.google.android.material.button.MaterialButton btnDaySat = dialog.findViewById(R.id.btn_day_sat);
+
+        com.google.android.material.button.MaterialButton btnConfirm = dialog.findViewById(R.id.btn_confirm);
+        com.google.android.material.button.MaterialButton btnCancel = dialog.findViewById(R.id.btn_cancel);
+
+        // Store selected days
+        final java.util.Set<Integer> selectedDays = new java.util.HashSet<>();
+
+        // Pre-select based on current selection
+        if (!android.text.TextUtils.isEmpty(selectedRepeatDays)) {
             String[] parts = selectedRepeatDays.split(",");
             for (String day : parts) {
                 try {
-                    int dayInt = Integer.parseInt(day.trim());
-                    if (dayInt == Calendar.SUNDAY)
-                        cbSun.setChecked(true);
-                    else if (dayInt == Calendar.MONDAY)
-                        cbMon.setChecked(true);
-                    else if (dayInt == Calendar.TUESDAY)
-                        cbTue.setChecked(true);
-                    else if (dayInt == Calendar.WEDNESDAY)
-                        cbWed.setChecked(true);
-                    else if (dayInt == Calendar.THURSDAY)
-                        cbThu.setChecked(true);
-                    else if (dayInt == Calendar.FRIDAY)
-                        cbFri.setChecked(true);
-                    else if (dayInt == Calendar.SATURDAY)
-                        cbSat.setChecked(true);
+                    selectedDays.add(Integer.parseInt(day.trim()));
                 } catch (NumberFormatException e) {
-                    // Ignore legacy or malformed
+                    // Ignore
                 }
             }
         }
 
-        // Select All Logic
-        android.widget.CheckBox cbSelectAll = dialogView.findViewById(R.id.checkbox_select_all);
-
-        // Listener for Select All
-        cbSelectAll.setOnClickListener(v -> {
-            boolean isChecked = cbSelectAll.isChecked();
-            cbSun.setChecked(isChecked);
-            cbMon.setChecked(isChecked);
-            cbTue.setChecked(isChecked);
-            cbWed.setChecked(isChecked);
-            cbThu.setChecked(isChecked);
-            cbFri.setChecked(isChecked);
-            cbSat.setChecked(isChecked);
-        });
-
-        // Listeners for individual checkboxes to update Select All
-        android.widget.CompoundButton.OnCheckedChangeListener individualListener = (buttonView, isChecked) -> {
-            if (!isChecked) {
-                cbSelectAll.setChecked(false);
-            } else {
-                if (cbSun.isChecked() && cbMon.isChecked() && cbTue.isChecked() &&
-                        cbWed.isChecked() && cbThu.isChecked() && cbFri.isChecked() && cbSat.isChecked()) {
-                    cbSelectAll.setChecked(true);
-                }
-            }
+        // Update weekday button states
+        final Runnable updateWeekdayButtons = () -> {
+            updateDayButtonState(btnDaySun, selectedDays.contains(java.util.Calendar.SUNDAY));
+            updateDayButtonState(btnDayMon, selectedDays.contains(java.util.Calendar.MONDAY));
+            updateDayButtonState(btnDayTue, selectedDays.contains(java.util.Calendar.TUESDAY));
+            updateDayButtonState(btnDayWed, selectedDays.contains(java.util.Calendar.WEDNESDAY));
+            updateDayButtonState(btnDayThu, selectedDays.contains(java.util.Calendar.THURSDAY));
+            updateDayButtonState(btnDayFri, selectedDays.contains(java.util.Calendar.FRIDAY));
+            updateDayButtonState(btnDaySat, selectedDays.contains(java.util.Calendar.SATURDAY));
         };
 
-        cbSun.setOnCheckedChangeListener(individualListener);
-        cbMon.setOnCheckedChangeListener(individualListener);
-        cbTue.setOnCheckedChangeListener(individualListener);
-        cbWed.setOnCheckedChangeListener(individualListener);
-        cbThu.setOnCheckedChangeListener(individualListener);
-        cbFri.setOnCheckedChangeListener(individualListener);
-        cbSat.setOnCheckedChangeListener(individualListener);
+        updateWeekdayButtons.run();
 
-        // Initial state for Select All
-        if (cbSun.isChecked() && cbMon.isChecked() && cbTue.isChecked() &&
-                cbWed.isChecked() && cbThu.isChecked() && cbFri.isChecked() && cbSat.isChecked()) {
-            cbSelectAll.setChecked(true);
-        }
+        // NONE preset
+        btnNone.setOnClickListener(v -> {
+            selectedDays.clear();
+            updateWeekdayButtons.run();
+        });
 
-        // Listeners
-        dialogView.findViewById(R.id.btn_cancel).setOnClickListener(v -> dialog.dismiss());
-        dialogView.findViewById(R.id.btn_done).setOnClickListener(v -> {
+        // EVERY DAY preset
+        btnEveryDay.setOnClickListener(v -> {
+            selectedDays.clear();
+            selectedDays.add(java.util.Calendar.SUNDAY);
+            selectedDays.add(java.util.Calendar.MONDAY);
+            selectedDays.add(java.util.Calendar.TUESDAY);
+            selectedDays.add(java.util.Calendar.WEDNESDAY);
+            selectedDays.add(java.util.Calendar.THURSDAY);
+            selectedDays.add(java.util.Calendar.FRIDAY);
+            selectedDays.add(java.util.Calendar.SATURDAY);
+            updateWeekdayButtons.run();
+        });
+
+        // WEEKDAYS preset (Mon-Fri)
+        btnWeekdays.setOnClickListener(v -> {
+            selectedDays.clear();
+            selectedDays.add(java.util.Calendar.MONDAY);
+            selectedDays.add(java.util.Calendar.TUESDAY);
+            selectedDays.add(java.util.Calendar.WEDNESDAY);
+            selectedDays.add(java.util.Calendar.THURSDAY);
+            selectedDays.add(java.util.Calendar.FRIDAY);
+            updateWeekdayButtons.run();
+        });
+
+        // WEEKENDS preset (Sat-Sun)
+        btnWeekends.setOnClickListener(v -> {
+            selectedDays.clear();
+            selectedDays.add(java.util.Calendar.SATURDAY);
+            selectedDays.add(java.util.Calendar.SUNDAY);
+            updateWeekdayButtons.run();
+        });
+
+        // Individual weekday buttons
+        btnDaySun.setOnClickListener(v -> toggleDay(selectedDays, java.util.Calendar.SUNDAY, btnDaySun));
+        btnDayMon.setOnClickListener(v -> toggleDay(selectedDays, java.util.Calendar.MONDAY, btnDayMon));
+        btnDayTue.setOnClickListener(v -> toggleDay(selectedDays, java.util.Calendar.TUESDAY, btnDayTue));
+        btnDayWed.setOnClickListener(v -> toggleDay(selectedDays, java.util.Calendar.WEDNESDAY, btnDayWed));
+        btnDayThu.setOnClickListener(v -> toggleDay(selectedDays, java.util.Calendar.THURSDAY, btnDayThu));
+        btnDayFri.setOnClickListener(v -> toggleDay(selectedDays, java.util.Calendar.FRIDAY, btnDayFri));
+        btnDaySat.setOnClickListener(v -> toggleDay(selectedDays, java.util.Calendar.SATURDAY, btnDaySat));
+
+        // CANCEL button
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        // CONFIRM button
+        btnConfirm.setOnClickListener(v -> {
+            // Build comma-separated string of selected days
             StringBuilder sb = new StringBuilder();
-            if (cbSun.isChecked())
-                sb.append(Calendar.SUNDAY).append(",");
-            if (cbMon.isChecked())
-                sb.append(Calendar.MONDAY).append(",");
-            if (cbTue.isChecked())
-                sb.append(Calendar.TUESDAY).append(",");
-            if (cbWed.isChecked())
-                sb.append(Calendar.WEDNESDAY).append(",");
-            if (cbThu.isChecked())
-                sb.append(Calendar.THURSDAY).append(",");
-            if (cbFri.isChecked())
-                sb.append(Calendar.FRIDAY).append(",");
-            if (cbSat.isChecked())
-                sb.append(Calendar.SATURDAY).append(",");
+            java.util.List<Integer> sortedDays = new java.util.ArrayList<>(selectedDays);
+            java.util.Collections.sort(sortedDays);
 
-            if (sb.length() > 0) {
-                sb.setLength(sb.length() - 1); // remove last comma
+            for (Integer day : sortedDays) {
+                if (sb.length() > 0)
+                    sb.append(",");
+                sb.append(day);
             }
 
             selectedRepeatDays = sb.toString();
@@ -333,22 +331,27 @@ public class NewTaskActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
-        dialog.setOnDismissListener(d -> applyBlurEffect(false));
         dialog.show();
+    }
 
-        // IMPORTANT: Set window parameters AFTER show() so window exists
-        if (dialog.getWindow() != null) {
-            android.view.WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-            params.gravity = android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL;
+    private void toggleDay(java.util.Set<Integer> selectedDays, int day,
+            com.google.android.material.button.MaterialButton button) {
+        if (selectedDays.contains(day)) {
+            selectedDays.remove(day);
+            updateDayButtonState(button, false);
+        } else {
+            selectedDays.add(day);
+            updateDayButtonState(button, true);
+        }
+    }
 
-            // Use 35% of screen width for compact side-sheet
-            android.util.DisplayMetrics displayMetrics = new android.util.DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            params.width = (int) (displayMetrics.widthPixels * 0.35);
-            params.height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-            params.x = 32; // 32px margin from right
-
-            dialog.getWindow().setAttributes(params);
+    private void updateDayButtonState(com.google.android.material.button.MaterialButton button, boolean isSelected) {
+        if (isSelected) {
+            button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF48C0B0)); // Active teal
+            button.setTextColor(0xFFFFFFFF);
+        } else {
+            button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFFFDE2E4)); // Inactive light pink
+            button.setTextColor(0xFF333333); // Deep ash text for inactive
         }
     }
 

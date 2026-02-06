@@ -342,26 +342,14 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         // Apply active state styling to Home item
         applyActiveStateToMenuItem(R.id.nav_home);
 
-        // Setup close button in drawer header
-        binding.navView.post(() -> {
-            android.view.View headerView = binding.navView.getHeaderView(0);
-            android.util.Log.d(TAG, "Header view: " + headerView);
-            if (headerView != null) {
-                android.widget.ImageButton btnCloseDrawer = headerView.findViewById(R.id.btn_close_drawer);
-                android.util.Log.d(TAG, "Close button found: " + btnCloseDrawer);
-                if (btnCloseDrawer != null) {
-                    btnCloseDrawer.setOnClickListener(v -> {
-                        android.util.Log.d(TAG, "Close button clicked!");
-                        binding.drawerLayout.closeDrawer(GravityCompat.END);
-                    });
-                    android.util.Log.d(TAG, "Click listener set successfully");
-                } else {
-                    android.util.Log.e(TAG, "Close button is NULL!");
-                }
-            } else {
-                android.util.Log.e(TAG, "Header view is NULL!");
-            }
-        });
+        // Setup close button click listener for XML footer
+        com.google.android.material.button.MaterialButton btnCloseDrawer = findViewById(R.id.btn_close_drawer_footer);
+        if (btnCloseDrawer != null) {
+            btnCloseDrawer.setOnClickListener(v -> {
+                binding.drawerLayout.closeDrawer(GravityCompat.END);
+            });
+        }
+
     }
 
     private void applyActiveStateToMenuItem(int menuItemId) {

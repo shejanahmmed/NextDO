@@ -1,156 +1,456 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="80dp"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp"
-    android:background="@drawable/bg_floating_dialog">
+<!-- Bottom Sheet Dialog for Repeat Selection -->
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Repeat On"
-        android:textColor="?attr/colorOnSurface"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"
-        android:gravity="center" />
-
-    <!-- Select All -->
-    <CheckBox
-        android:id="@+id/checkbox_select_all"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:text="Select All"
-        android:textColor="@color/black_white_toggle_text"
-        android:textStyle="bold"
-        android:textSize="14sp"
-        android:gravity="center"
-        android:button="@null"
-        android:background="@drawable/bg_toggle_button"
-        android:layout_marginBottom="12dp" />
-
-    <!-- Days Container -->
+    <!-- Dialog Container (70% of screen height, 95% width, positioned at bottom) -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/dialog_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:orientation="vertical"
-        android:divider="?android:attr/dividerVertical"
-        android:showDividers="middle"
-        android:dividerPadding="4dp">
+        android:background="@drawable/bg_bottom_sheet_dialog"
+        android:elevation="8dp"
+        android:padding="24dp"
+        app:layout_constraintWidth_percent="0.95"
+        app:layout_constraintHeight_percent="0.70"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp">
 
-        <CheckBox
-            android:id="@+id/checkbox_sun"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="Sunday"
-            android:textColor="@color/black_white_toggle_text"
-            android:gravity="center"
-            android:button="@null"
-            android:textSize="14sp"
-            android:background="@drawable/bg_toggle_button"
-            android:layout_marginBottom="8dp" />
-
-        <CheckBox
-            android:id="@+id/checkbox_mon"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="Monday"
-            android:textColor="@color/black_white_toggle_text"
-            android:gravity="center"
-            android:button="@null"
-            android:textSize="14sp"
-            android:background="@drawable/bg_toggle_button"
-            android:layout_marginBottom="8dp" />
-
-        <CheckBox
-            android:id="@+id/checkbox_tue"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="Tuesday"
-            android:textColor="@color/black_white_toggle_text"
-            android:gravity="center"
-            android:button="@null"
-            android:textSize="14sp"
-            android:background="@drawable/bg_toggle_button"
-            android:layout_marginBottom="8dp" />
-
-        <CheckBox
-            android:id="@+id/checkbox_wed"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="Wednesday"
-            android:textColor="@color/black_white_toggle_text"
-            android:gravity="center"
-            android:button="@null"
-            android:textSize="14sp"
-            android:background="@drawable/bg_toggle_button"
-            android:layout_marginBottom="8dp" />
-
-        <CheckBox
-            android:id="@+id/checkbox_thu"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="Thursday"
-            android:textColor="@color/black_white_toggle_text"
-            android:gravity="center"
-            android:button="@null"
-            android:textSize="14sp"
-            android:background="@drawable/bg_toggle_button"
-            android:layout_marginBottom="8dp" />
-
-        <CheckBox
-            android:id="@+id/checkbox_fri"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="Friday"
-            android:textColor="@color/black_white_toggle_text"
-            android:gravity="center"
-            android:button="@null"
-            android:textSize="14sp"
-            android:background="@drawable/bg_toggle_button"
-            android:layout_marginBottom="8dp" />
-
-        <CheckBox
-            android:id="@+id/checkbox_sat"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="Saturday"
-            android:textColor="@color/black_white_toggle_text"
-            android:gravity="center"
-            android:button="@null"
-            android:textSize="14sp"
-            android:background="@drawable/bg_toggle_button"
-            android:layout_marginBottom="16dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="8dp">
-
+        <!-- Title -->
         <TextView
-            android:id="@+id/btn_done"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Done"
-            android:textColor="#34C759"
+            android:text="Repeat Reminder"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:padding="12dp"
-            android:gravity="center"
-            android:layout_marginBottom="8dp"
-            android:background="?attr/selectableItemBackground" />
+            android:textColor="#333333"
+            android:layout_marginBottom="24dp" />
 
-        <TextView
-            android:id="@+id/btn_cancel"
+        <!-- Preset Options Grid -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cancel"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:padding="12dp"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp">
+
+            <!-- Row 1: NONE and EVERY DAY -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <!-- NONE Button -->
+                <LinearLayout
+                    android:id="@+id/btn_none"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/bg_preset_button_peach"
+                    android:layout_marginEnd="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_circle"
+                        android:layout_marginBottom="4dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_close"
+                            app:tint="#333333" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NONE"
+                        android:textColor="#333333"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- EVERY DAY Button -->
+                <LinearLayout
+                    android:id="@+id/btn_every_day"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/bg_preset_button_blue"
+                    android:layout_marginStart="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_circle"
+                        android:layout_marginBottom="4dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_calendar"
+                            app:tint="#333333" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="EVERY DAY"
+                        android:textColor="#333333"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 2: WEEKDAYS and WEEKENDS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- WEEKDAYS Button -->
+                <LinearLayout
+                    android:id="@+id/btn_weekdays"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/bg_preset_button_pink"
+                    android:layout_marginEnd="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_circle"
+                        android:layout_marginBottom="4dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_briefcase"
+                            app:tint="#333333" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WEEKDAYS"
+                        android:textColor="#333333"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- WEEKENDS Button -->
+                <LinearLayout
+                    android:id="@+id/btn_weekends"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/bg_preset_button_green"
+                    android:layout_marginStart="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icon_circle"
+                        android:layout_marginBottom="4dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_coffee"
+                            app:tint="#333333" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WEEKENDS"
+                        android:textColor="#333333"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Custom Selection Label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CUSTOM SELECTION"
+            android:textSize="11sp"
+            android:textColor="#999999"
+            android:letterSpacing="0.1"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Weekday Buttons Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:gravity="center"
-            android:background="?attr/selectableItemBackground" />
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:layout_marginBottom="24dp">
+
+            <!-- Sunday -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_day_sun"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="S"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:backgroundTint="#FDE2E4"
+                app:cornerRadius="22dp"
+                android:layout_marginEnd="4dp"
+                app:elevation="0dp"
+                app:strokeWidth="0dp"
+                android:stateListAnimator="@null"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp" />
+
+            <!-- Monday -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_day_mon"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="M"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:backgroundTint="#FDE2E4"
+                app:cornerRadius="22dp"
+                android:layout_marginEnd="4dp"
+                app:elevation="0dp"
+                app:strokeWidth="0dp"
+                android:stateListAnimator="@null"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp" />
+
+            <!-- Tuesday -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_day_tue"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="T"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:backgroundTint="#FDE2E4"
+                app:cornerRadius="22dp"
+                android:layout_marginEnd="4dp"
+                app:elevation="0dp"
+                app:strokeWidth="0dp"
+                android:stateListAnimator="@null"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp" />
+
+            <!-- Wednesday -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_day_wed"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="W"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:backgroundTint="#FDE2E4"
+                app:cornerRadius="22dp"
+                android:layout_marginEnd="4dp"
+                app:elevation="0dp"
+                app:strokeWidth="0dp"
+                android:stateListAnimator="@null"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp" />
+
+            <!-- Thursday -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_day_thu"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="T"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:backgroundTint="#FDE2E4"
+                app:cornerRadius="22dp"
+                android:layout_marginEnd="4dp"
+                app:elevation="0dp"
+                app:strokeWidth="0dp"
+                android:stateListAnimator="@null"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp" />
+
+            <!-- Friday -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_day_fri"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="F"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:backgroundTint="#FDE2E4"
+                app:cornerRadius="22dp"
+                android:layout_marginEnd="4dp"
+                app:elevation="0dp"
+                app:strokeWidth="0dp"
+                android:stateListAnimator="@null"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp" />
+
+            <!-- Saturday -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_day_sat"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="S"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:backgroundTint="#FDE2E4"
+                app:cornerRadius="22dp"
+                app:elevation="0dp"
+                app:strokeWidth="0dp"
+                android:stateListAnimator="@null"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp" />
+        </LinearLayout>
+
+        <!-- Info Message -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/bg_info_box"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <!-- Info Label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="info"
+                android:textSize="14sp"
+                android:textColor="#48C0B0"
+                android:textStyle="bold"
+                android:layout_marginEnd="12dp" />
+
+            <!-- Info Text -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="This reminder will trigger on selected days at your specified time"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:lineSpacingExtra="2dp" />
+        </LinearLayout>
+
+        <!-- Action Buttons Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- CONFIRM Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_confirm"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:text="CONFIRM"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:backgroundTint="#5DBEAA"
+                app:cornerRadius="28dp"
+                android:layout_marginEnd="8dp"
+                app:elevation="0dp"
+                app:strokeWidth="0dp"
+                android:stateListAnimator="@null"
+                android:insetTop="0dp"
+                android:insetBottom="0dp" />
+
+            <!-- CANCEL Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_cancel"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:text="CANCEL"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                app:backgroundTint="#FFFFFF"
+                app:strokeColor="#E0E0E0"
+                app:strokeWidth="2dp"
+                app:cornerRadius="28dp"
+                android:layout_marginStart="8dp"
+                app:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:insetTop="0dp"
+                android:insetBottom="0dp" />
+        </LinearLayout>
+
     </LinearLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

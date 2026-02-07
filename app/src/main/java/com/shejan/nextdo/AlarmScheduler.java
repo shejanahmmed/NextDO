@@ -21,10 +21,6 @@ public class AlarmScheduler {
     }
 
     public void schedule(Task task) {
-        if (!areNotificationsEnabled()) {
-            Log.d(TAG, "Notifications disabled, skipping schedule for task " + task.id);
-            return;
-        }
 
         if (task.reminderTime > 0 && task.alarmId != 0) {
             // Cancel any existing alarm first
@@ -105,11 +101,6 @@ public class AlarmScheduler {
                 Log.e(TAG, "Error cancelling alarm: " + e.getMessage());
             }
         }
-    }
-
-    private boolean areNotificationsEnabled() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getBoolean("notifications", true);
     }
 
     private boolean canScheduleExactAlarms() {

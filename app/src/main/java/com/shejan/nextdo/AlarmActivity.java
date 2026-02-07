@@ -42,6 +42,12 @@ public class AlarmActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_alarm);
 
+        // Set status bar color to match background
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(
+                    androidx.core.content.ContextCompat.getColor(this, R.color.alarm_background_color));
+        }
+
         // Get task details from intent
         String taskTitle = getIntent().getStringExtra("task_title");
         String taskDescription = getIntent().getStringExtra("task_description");
@@ -54,12 +60,8 @@ public class AlarmActivity extends AppCompatActivity {
         Button snoozeButton = findViewById(R.id.btn_snooze);
 
         titleText.setText(taskTitle != null ? taskTitle : "Reminder");
-        if (taskDescription != null && !taskDescription.isEmpty()) {
-            descText.setText(taskDescription);
-            descText.setVisibility(android.view.View.VISIBLE);
-        } else {
-            descText.setVisibility(android.view.View.GONE);
-        }
+        // Description is now hidden by default in XML as requested
+        descText.setVisibility(android.view.View.GONE);
 
         // Start alarm sound and vibration
         startAlarmSound();

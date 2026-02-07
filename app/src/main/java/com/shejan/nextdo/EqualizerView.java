@@ -44,8 +44,8 @@ public class EqualizerView extends View {
 
         // Use theme color or default
         // Use theme color or default
-        paint.setColor(androidx.core.content.ContextCompat.getColor(getContext(), R.color.vibrant_matte_teal)); // Teal
-                                                                                                                // Wave
+        paint.setColor(androidx.core.content.ContextCompat.getColor(getContext(), R.color.equalizer_wave_color)); // Themed
+                                                                                                                  // Wave
 
         barHeights = new float[BAR_COUNT];
         random = new Random();

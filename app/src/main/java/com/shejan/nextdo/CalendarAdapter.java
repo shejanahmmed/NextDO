@@ -74,13 +74,13 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorSecondary, typedValue, true);
             int colorSecondary = typedValue.data;
 
-            // Text on Secondary (OnSecondary)
-            context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorOnSecondary, typedValue, true);
-            int colorOnSecondary = typedValue.data;
+            // Text on Secondary (Themed)
+            int colorSelectedText = androidx.core.content.ContextCompat.getColor(context,
+                    R.color.calendar_selected_text_color);
 
             if (isSelected) {
                 holder.textDay.setBackgroundResource(R.drawable.bg_calendar_selected);
-                holder.textDay.setTextColor(colorOnSecondary);
+                holder.textDay.setTextColor(colorSelectedText);
             } else if (isToday) {
                 holder.textDay.setBackgroundResource(R.drawable.bg_calendar_today);
                 holder.textDay.setTextColor(colorSecondary);

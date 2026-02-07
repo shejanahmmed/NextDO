@@ -28,6 +28,8 @@
         <item name="preferenceTheme">@style/App.Preference.Theme</item>
     </style>
 
+
+
     <style name="App.Preference.Theme" parent="@style/PreferenceThemeOverlay.v14.Material">
         <!-- This forces the category title text to be black in light mode -->
         <item name="colorAccent">@color/black</item>

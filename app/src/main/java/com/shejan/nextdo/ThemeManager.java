@@ -10,7 +10,7 @@ public class ThemeManager {
 
     public static void applyTheme(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String theme = sharedPreferences.getString("app_theme", "auto");
+        String theme = sharedPreferences.getString("app_theme", "light");
         int nightMode;
         switch (theme) {
             case "light":

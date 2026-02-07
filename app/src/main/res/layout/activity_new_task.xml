@@ -70,7 +70,8 @@
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface"
                     android:drawableStart="@drawable/ic_edit"
-                    android:drawableTint="@color/icon_tint_generic"
+                    android:drawableTint="@color/icon_tint_title"
+
                     android:drawablePadding="8dp"
                     android:layout_marginBottom="8dp" />
 
@@ -109,7 +110,7 @@
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface"
                     android:drawableStart="@drawable/ic_menu"
-                    android:drawableTint="@color/icon_tint_generic"
+                    android:drawableTint="@color/icon_tint_description"
                     android:drawablePadding="8dp"
                     android:layout_marginBottom="8dp" />
 
@@ -149,7 +150,7 @@
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface"
                     android:drawableStart="@drawable/ic_notification"
-                    android:drawableTint="@color/icon_tint_generic"
+                    android:drawableTint="@color/icon_tint_reminder_type"
                     android:drawablePadding="8dp"
                     android:layout_marginBottom="8dp" />
 
@@ -345,14 +346,14 @@
                 android:layout_height="56dp"
                 android:layout_marginTop="24dp"
                 android:text="SET REMINDER"
-                android:textColor="?attr/colorOnPrimary"
+                android:textColor="@color/save_button_text"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:elevation="0dp"
                 android:stateListAnimator="@null"
-                app:backgroundTint="@color/action_button_color"
+                app:backgroundTint="@color/save_button_background"
                 app:cornerRadius="12dp"
                 app:elevation="0dp" />
         </LinearLayout>

@@ -20,7 +20,6 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
     private static final String REPEAT_NEVER = "NEVER";
 
     private final OnTaskInteractionListener listener;
-    private int accentColor = 0xFF34C759; // Default green
 
     // Cache SimpleDateFormat
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
@@ -38,23 +37,18 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
         this.listener = listener;
     }
 
-    public void setAccentColor(int color) {
-        this.accentColor = color;
-        notifyDataSetChanged();
-    }
-
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemTaskMinimalBinding binding = ItemTaskMinimalBinding.inflate(LayoutInflater.from(parent.getContext()),
                 parent, false);
-        return new TaskViewHolder(binding, accentColor, dateFormat);
+        return new TaskViewHolder(binding, dateFormat);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task current = getItem(position);
-        holder.bind(current, listener, accentColor);
+        holder.bind(current, listener);
     }
 
     public Task getTaskAt(int position) {
@@ -82,16 +76,18 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
         private final ItemTaskMinimalBinding binding;
         private final SimpleDateFormat dateFormat;
 
-        private TaskViewHolder(ItemTaskMinimalBinding binding, int accentColor, SimpleDateFormat dateFormat) {
+        private TaskViewHolder(ItemTaskMinimalBinding binding, SimpleDateFormat dateFormat) {
             super(binding.getRoot());
             this.binding = binding;
             this.dateFormat = dateFormat;
 
             // Set initial accent color
+            int accentColor = androidx.core.content.ContextCompat.getColor(binding.getRoot().getContext(),
+                    R.color.action_button_color);
             binding.checkboxCompleted.setButtonTintList(android.content.res.ColorStateList.valueOf(accentColor));
         }
 
-        public void bind(final Task task, final OnTaskInteractionListener listener, int accentColor) {
+        public void bind(final Task task, final OnTaskInteractionListener listener) {
             if (task == null)
                 return;
 
@@ -135,7 +131,9 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             boolean hasDetails = isRecurring || (task.reminderTime > 0);
             binding.detailsLayout.setVisibility(hasDetails ? View.VISIBLE : View.GONE);
 
-            // Checkbox - Use passed accent color
+            // Checkbox - Use static accent color
+            int accentColor = androidx.core.content.ContextCompat.getColor(binding.getRoot().getContext(),
+                    R.color.action_button_color);
             binding.checkboxCompleted.setButtonTintList(android.content.res.ColorStateList.valueOf(accentColor));
 
             // Alternating Background Colors

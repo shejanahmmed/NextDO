@@ -74,7 +74,14 @@
     <color name="drawer_close_bg">#E8E8E8</color>
     
     <!-- Adaptive Icon Tints -->
+    <!-- Adaptive Icon Tints -->
     <color name="icon_tint_generic">@color/action_button_color</color>
+    
+    <!-- Pastel Icon Tints for Reminder Page -->
+    <color name="icon_tint_title">#FF8A80</color> <!-- Matte Salmon -->
+    <color name="icon_tint_description">#FFD180</color> <!-- Matte Peach -->
+    <color name="icon_tint_reminder_type">#AED581</color> <!-- Matte Light Green -->
+    
     <color name="icon_tint_repeat">#99a0f5</color>
     <color name="icon_tint_date">#8cdcfa</color>
     
@@ -99,4 +106,27 @@
     <color name="weekday_inactive_text">#333333</color>
     
     <color name="bottom_sheet_bg">@color/page_background</color>
+    
+    <!-- FAB Colors -->
+    <color name="fab_background_color">#319499</color>
+    <color name="fab_icon_color">@color/white</color>
+    
+    <!-- Save Button Colors -->
+    <color name="save_button_background">@color/action_button_color</color>
+    <color name="save_button_text">@color/white</color>
+    
+    <!-- Equalizer Colors -->
+    <color name="equalizer_wave_color">#319499</color>
+    
+    <!-- Date Picker Colors -->
+    <color name="calendar_selected_bg_color">@color/light_accent</color>
+    <color name="calendar_selected_text_color">@color/white</color>
+    
+    <!-- Alarm Screen Colors -->
+    <color name="alarm_background_color">@color/page_background</color>
+    <color name="alarm_text_color">#333333</color>
+    <color name="alarm_snooze_bg_color">@color/light_accent</color>
+    <color name="alarm_snooze_text_color">@color/white</color>
+    <color name="alarm_dismiss_bg_color">@color/light_accent</color>
+    <color name="alarm_dismiss_text_color">@color/white</color>
 </resources>

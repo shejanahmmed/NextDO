@@ -52,6 +52,14 @@ public class ModernCalendarBottomSheet extends BottomSheetDialogFragment {
                     .findViewById(com.google.android.material.R.id.design_bottom_sheet);
             if (bottomSheet != null) {
                 bottomSheet.setBackgroundResource(android.R.color.transparent);
+
+                // Calculate height to match time picker (approx 50% of screen)
+                com.google.android.material.bottomsheet.BottomSheetBehavior<android.widget.FrameLayout> behavior = com.google.android.material.bottomsheet.BottomSheetBehavior
+                        .from(bottomSheet);
+
+                int screenHeight = getResources().getDisplayMetrics().heightPixels;
+                behavior.setPeekHeight((int) (screenHeight * 0.5)); // 50% height
+                behavior.setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
             }
         });
         return dialog;

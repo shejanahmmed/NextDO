@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     @Override
     protected void onResume() {
         super.onResume();
-        applyBackground();
 
         // Refresh accent color
         android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
@@ -138,15 +137,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         long fifteenDaysInMillis = 15L * 24 * 60 * 60 * 1000;
         long threshold = System.currentTimeMillis() - fifteenDaysInMillis;
         taskViewModel.deleteOldCompletedTasks(threshold);
-        int accentColor = prefs.getInt("accent_color", 0xFF34C759);
 
-        // binding.fab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(accentColor));
-
-        if (adapter != null) {
-            adapter.setAccentColor(accentColor);
-            // noinspection NotifyDataSetChanged
-            adapter.notifyDataSetChanged();
-        }
     }
 
     @Override
@@ -378,62 +369,6 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         }
     }
 
-    private void applyBackground() {
-        android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
-                .getDefaultSharedPreferences(this);
-        String background = prefs.getString("app_background", "default");
-
-        // Find the ConstraintLayout inside the DrawerLayout
-        View content = binding.drawerLayout.getChildAt(0);
-
-        if ("custom".equals(background)) {
-            try {
-                java.io.File file = new java.io.File(getFilesDir(), "custom_background.jpg");
-                if (file.exists()) {
-                    android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeFile(file.getAbsolutePath());
-                    android.graphics.drawable.BitmapDrawable drawable = new android.graphics.drawable.BitmapDrawable(
-                            getResources(), bitmap);
-                    content.setBackground(drawable);
-                    return;
-                }
-            } catch (Exception e) {
-                // Fallback to default if loading fails
-            }
-        }
-
-        int drawableId;
-        switch (background) {
-            case "bg_night_cottage":
-                drawableId = R.drawable.bg_night_cottage;
-                break;
-            case "bg_urban_sketch":
-                drawableId = R.drawable.bg_urban_sketch;
-                break;
-            case "bg_mystic_tree":
-                drawableId = R.drawable.bg_mystic_tree;
-                break;
-            case "bg_dark_waves":
-                drawableId = R.drawable.bg_dark_waves;
-                break;
-            default:
-                drawableId = 0;
-                break;
-        }
-
-        if (drawableId != 0) {
-            content.setBackground(ContextCompat.getDrawable(this, drawableId));
-        } else {
-            // Default background (theme attribute)
-            android.util.TypedValue typedValue = new android.util.TypedValue();
-            getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
-            if (typedValue.resourceId != 0) {
-                content.setBackgroundResource(typedValue.resourceId);
-            } else {
-                content.setBackgroundColor(typedValue.data);
-            }
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -522,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     private void applyThemePreference() {
         android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
                 .getDefaultSharedPreferences(this);
-        String theme = prefs.getString("app_theme", "auto");
+        String theme = prefs.getString("app_theme", "light");
 
         int nightMode;
         switch (theme) {

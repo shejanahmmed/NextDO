@@ -129,4 +129,15 @@
     <color name="alarm_snooze_text_color">@color/white</color>
     <color name="alarm_dismiss_bg_color">@color/light_accent</color>
     <color name="alarm_dismiss_text_color">@color/white</color>
+
+    <!-- Dashboard Colors -->
+    <color name="dashboard_background">#FFF9EB</color>
+    <color name="dashboard_text_navy">#2C3E50</color>
+    <color name="dashboard_matte_teal">#48C0B0</color>
+    <color name="dashboard_matte_pink">#FF9AA2</color>
+    <color name="dashboard_matte_blue">#A2D2FF</color>
+    <color name="dashboard_matte_peach">#FDE2E4</color>
+    <color name="dashboard_matte_orange">#FFDAB9</color>
+    <color name="dashboard_grey">#8E8E8E</color>
+    <color name="dashboard_secondary_progress">#ff8da1</color>
 </resources>

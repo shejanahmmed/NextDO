@@ -290,8 +290,13 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
         binding.navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                // Already on home, just close drawer
+            if (id == R.id.nav_dashboard) {
+                Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish(); // Optional, but Cleaner
+            } else if (id == R.id.nav_tasks) {
+                // Already on "My Tasks" (Main Task List), just close drawer
                 binding.drawerLayout.closeDrawer(GravityCompat.END);
                 return true;
             } else if (id == R.id.nav_settings) {
@@ -331,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         });
 
         // Apply active state styling to Home item
-        applyActiveStateToMenuItem(R.id.nav_home);
+        applyActiveStateToMenuItem(R.id.nav_tasks);
 
         // Setup close button click listener for XML footer
         com.google.android.material.button.MaterialButton btnCloseDrawer = findViewById(R.id.btn_close_drawer_footer);

@@ -4,12 +4,16 @@
     <!-- Primary Navigation -->
     <group android:id="@+id/group_primary"
         android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/ic_calendar"
+            android:title="Dashboard" />
         
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/nav_tasks"
             android:icon="@drawable/ic_home"
-            android:title="Home"
-            android:checked="true" />
+            android:title="My Tasks" />
         
         <item
             android:id="@+id/nav_completed_tasks"

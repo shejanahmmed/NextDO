@@ -83,11 +83,8 @@
 
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:exported="true"
+            android:parentActivityName=".DashboardActivity">
         </activity>
         <activity
             android:name=".NewTaskActivity"
@@ -96,27 +93,36 @@
             android:name=".SettingsActivity"
             android:label="Settings"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".DashboardActivity" />
         <activity
             android:name=".AboutActivity"
             android:label="About"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".DashboardActivity" />
         <activity
             android:name=".HelpFAQActivity"
             android:label="Help &amp; FAQ"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".DashboardActivity" />
         <activity
             android:name=".RecycleBinActivity"
             android:label="Recycle Bin"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".DashboardActivity" />
         <activity
             android:name=".CompletedTasksActivity"
             android:label="Completed Tasks"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".DashboardActivity" />
+        <activity
+            android:name=".DashboardActivity"
+            android:exported="true"
+            android:label="My Dashboard">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

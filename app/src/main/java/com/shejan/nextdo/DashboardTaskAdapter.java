@@ -14,11 +14,14 @@ import java.util.List;
 
 public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdapter.TaskViewHolder> {
 
-    private final List<TaskItem> tasks = Arrays.asList(
-            new TaskItem("Project Kickoff Meeting", "10:00 AM", R.drawable.bg_dashboard_card_blue, false),
-            new TaskItem("Project Kickoff Meeting", "10:00 AM", R.drawable.bg_dashboard_card_pink, false),
-            new TaskItem("Check Emails", "09:00 AM", R.drawable.bg_dashboard_card_orange, true), // Completed
-            new TaskItem("Project Kickoff Meeting", "10:00 AM", R.drawable.bg_dashboard_card_blue, false));
+    private List<Task> tasks = new java.util.ArrayList<>();
+    private final java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a",
+            java.util.Locale.getDefault());
+
+    public void setTasks(List<Task> newTasks) {
+        this.tasks = newTasks;
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
@@ -29,35 +32,43 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
-        TaskItem item = tasks.get(position);
+        Task task = tasks.get(position);
 
-        holder.textTitle.setText(item.title);
-        holder.textTime.setText(item.time);
-        holder.cardContainer.setBackgroundResource(item.bgResId);
+        holder.textTitle.setText(task.title);
 
-        // Update dot color to match card (or keep generic blue dot as per layout?
-        // HTML has different dot colors: #D1E4FF, Matte Blue, Gray, Matte Pink)
-        // Let's match the dot to the card usage or specific colors.
-        // For simplicity, let's set dot color based on the card background but standard
-        // dot drawable is blue.
-        // I'll create a generic circle drawable and set color filter.
+        if (task.reminderTime > 0) {
+            holder.textTime.setText(timeFormat.format(new java.util.Date(task.reminderTime)));
+        } else {
+            holder.textTime.setText("");
+        }
 
+        // Rotate Card Backgrounds based on position
+        int bgResId;
         int color;
-        if (item.bgResId == R.drawable.bg_dashboard_card_blue)
+        int mod = position % 3;
+        if (mod == 0) {
+            bgResId = R.drawable.bg_dashboard_card_blue;
             color = 0xFFA2D2FF;
-        else if (item.bgResId == R.drawable.bg_dashboard_card_pink)
+        } else if (mod == 1) {
+            bgResId = R.drawable.bg_dashboard_card_pink;
             color = 0xFFFF9AA2;
-        else
+        } else {
+            bgResId = R.drawable.bg_dashboard_card_orange; // Assuming orange exists or fallback
             color = 0xFFFFDAB9;
+        }
 
-        // Actually, let's just use the card background drawable for the dot too, but
-        // rounded 16dp is a circle for 16x16 view.
-        // Or better, set tint.
-        holder.timelineDot.setBackgroundResource(R.drawable.circle_black); // Reusing existing circle or create new?
-        // Let's use bg_dashboard_card_blue structure but override tint
+        // Ensure orange resource exists, otherwise fallback to blue
+        try {
+            holder.cardContainer.setBackgroundResource(bgResId);
+        } catch (Exception e) {
+            holder.cardContainer.setBackgroundResource(R.drawable.bg_dashboard_card_blue);
+            color = 0xFFA2D2FF;
+        }
+
+        holder.timelineDot.setBackgroundResource(R.drawable.circle_black);
         holder.timelineDot.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
 
-        if (item.isCompleted) {
+        if (task.isCompleted) {
             holder.textTitle
                     .setPaintFlags(holder.textTitle.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
             holder.imgCheck.setVisibility(View.VISIBLE);
@@ -86,20 +97,6 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             imgCheck = itemView.findViewById(R.id.img_check);
             cardContainer = itemView.findViewById(R.id.card_container);
             timelineDot = itemView.findViewById(R.id.timeline_dot);
-        }
-    }
-
-    static class TaskItem {
-        String title;
-        String time;
-        int bgResId;
-        boolean isCompleted;
-
-        TaskItem(String title, String time, int bgResId, boolean isCompleted) {
-            this.title = title;
-            this.time = time;
-            this.bgResId = bgResId;
-            this.isCompleted = isCompleted;
         }
     }
 }

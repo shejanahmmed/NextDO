@@ -4,6 +4,8 @@
     <string name="edit_task">Edit Reminder</string>
     <string name="action_settings">Settings</string>
     <string name="empty_not_saved">Task not saved because it is empty.</string>
+    <string name="todays_timeline">Today\'s Timeline</string>
+    <string name="no_reminders_today">No Reminder For Today</string>
 
 
     <string-array name="theme_entries">

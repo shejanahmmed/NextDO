@@ -1,83 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Override colors for dark theme -->
-    <color name="fab_text_color">@color/minimal_black</color>
-    <color name="drawer_background">#B3000000</color>
-    <color name="task_card_bg">@color/dark_surface</color>
-    <color name="task_card_bg_1">@color/dark_surface</color>
-    <color name="task_card_bg_2">@color/dark_surface</color>
-    <color name="task_card_bg_3">@color/dark_surface</color>
-    <color name="hint_text_color">#80FFFFFF</color>
-    <color name="floating_dialog_bg">@color/task_card_bg</color>
-    <color name="floating_dialog_stroke">#33FFFFFF</color>
-    <color name="repeat_button_active">#de7782</color>
-    <color name="repeat_button_inactive_stroke">#66FFFFFF</color>
-    
-    <color name="input_background_color">@color/dark_surface</color>
-    
-    <color name="page_background">@color/dark_background</color>
-    
-    <color name="date_time_section_bg">@color/dark_surface</color>
-    <color name="action_button_color">@color/vibrant_matte_teal</color>
-
-    <!-- Adaptive Icon Tints -->
-    <color name="icon_tint_generic">@color/white</color>
-    
-    <!-- Pastel Icon Tints (White in Dark Mode) -->
-    <color name="icon_tint_title">@color/white</color>
-    <color name="icon_tint_description">@color/white</color>
-    <color name="icon_tint_reminder_type">@color/white</color>
-    
-    <color name="icon_tint_repeat">@color/white</color>
-    <color name="icon_tint_date">@color/white</color>
-    
-    <!-- Drawer Dark Mode Colors -->
-    <color name="drawer_premium_background">@color/dark_surface</color>
-    <color name="drawer_navy">@color/white</color>
-    
-    <color name="reminder_text_unchecked">@android:color/white</color>
-    
-    <color name="drawer_lavender">#33FFFFFF</color>
-    
-    <!-- Repeat Dialog Dark Mode Colors -->
-    <color name="dialog_title_text">@color/white</color>
-    <color name="preset_button_text">@color/white</color>
-    <color name="preset_icon_tint">@color/white</color>
-    <color name="info_box_background">@color/dark_surface</color>
-    <color name="info_box_text">#B0B0B0</color>
-    <color name="dialog_cancel_text">@color/white</color>
-    <color name="dialog_cancel_stroke">#33FFFFFF</color>
-    <color name="dialog_cancel_bg">@color/dark_surface</color>
-    
-    <color name="preset_bg_peach">#40FFD4B5</color>
-    <color name="preset_bg_blue">#40A8D5E2</color>
-    <color name="preset_bg_pink">#40FFB3C1</color>
-    <color name="preset_bg_green">#40B8E6B8</color>
-    
-    <color name="weekday_inactive_bg">#333333</color>
-    <color name="weekday_inactive_text">@color/white</color>
-    
-    <color name="bottom_sheet_bg">#1E1E1E</color>
-    
-    <!-- Dark Mode FAB Overrides -->
-    <color name="fab_background_color">#FFFFFF</color>
-    <color name="fab_icon_color">#000000</color>
-    <!-- Save Button Dark Mode Overrides -->
-    <color name="save_button_background">#FFFFFF</color>
-    <color name="save_button_text">#000000</color>
-    <!-- Equalizer Dark Mode Overrides -->
-    <color name="equalizer_wave_color">#FFFFFF</color>
-    <!-- Date Picker Dark Mode Overrides -->
-    <color name="calendar_selected_bg_color">#FFFFFF</color>
-    <color name="calendar_selected_text_color">#000000</color>
-    <!-- Alarm Screen Dark Mode Overrides -->
-    <color name="alarm_background_color">#000000</color>
-    <color name="alarm_text_color">#FFFFFF</color>
-    <color name="alarm_snooze_bg_color">#FFFFFF</color>
-    <color name="alarm_snooze_text_color">#000000</color>
-    <color name="alarm_dismiss_bg_color">#FFFFFF</color>
-    <color name="alarm_dismiss_text_color">#000000</color>
-    <!-- Reminder Type Dark Mode Overrides -->
-    <color name="reminder_type_active">#FFFFFF</color>
-    <color name="reminder_type_inactive">#333333</color>
+    <color name="dashboard_background">#000000</color>
+    <color name="dashboard_text_navy">#FFFFFF</color>
+    <color name="dashboard_section_header_color">#FFFFFF</color>
+    <color name="dashboard_arrow_color">#FFFFFF</color>
+    <color name="dashboard_grey">#B0B0B0</color>
+    <!-- Keep other colors same or define if needed -->
 </resources>

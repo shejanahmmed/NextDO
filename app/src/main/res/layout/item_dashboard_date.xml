@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/date_item_root"
     android:layout_width="56dp"
-    android:layout_height="64dp"
+    android:layout_height="wrap_content"
+    android:minHeight="70dp"
     android:orientation="vertical"
     android:gravity="center"
     android:background="@android:color/transparent"
@@ -26,5 +27,13 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@color/dashboard_text_navy" />
+
+    <View
+        android:id="@+id/indicator_dot"
+        android:layout_width="6dp"
+        android:layout_height="6dp"
+        android:background="@drawable/bg_dashboard_today_dot"
+        android:layout_marginTop="4dp"
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -140,4 +140,6 @@
     <color name="dashboard_matte_orange">#FFDAB9</color>
     <color name="dashboard_grey">#8E8E8E</color>
     <color name="dashboard_secondary_progress">#ff8da1</color>
+    <color name="dashboard_arrow_color">#2C3E50</color>
+    <color name="dashboard_section_header_color">#2C3E50</color>
 </resources>

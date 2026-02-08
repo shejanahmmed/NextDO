@@ -11,6 +11,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
@@ -39,13 +43,67 @@ public class DashboardActivity extends AppCompatActivity {
     private TextView textSummary;
     private TextView textProgressPercent;
 
+    private TaskViewModel taskViewModel;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
-    private TaskViewModel taskViewModel;
+    // Added for saving tasks
+    private AlarmScheduler alarmScheduler;
+    private static final String TAG = "DashboardActivity";
+
+    private final ActivityResultLauncher<Intent> taskActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Intent data = result.getData();
+                    int id = data.getIntExtra(NewTaskActivity.EXTRA_ID, 0);
+                    long reminderTime = data.getLongExtra(NewTaskActivity.EXTRA_REMINDER_TIME, 0);
+
+                    Task task = new Task();
+                    if (id != 0) {
+                        task.id = id;
+                        int existingAlarmId = data.getIntExtra(NewTaskActivity.EXTRA_ALARM_ID, 0);
+                        task.alarmId = existingAlarmId;
+                    } else {
+                        task.alarmId = (int) System.currentTimeMillis();
+                    }
+                    task.title = data.getStringExtra(NewTaskActivity.EXTRA_TITLE);
+                    task.description = data.getStringExtra(NewTaskActivity.EXTRA_DESCRIPTION);
+                    task.reminderTime = reminderTime;
+                    task.repeat = data.getStringExtra(NewTaskActivity.EXTRA_REPEAT);
+                    task.reminderType = data.getStringExtra(NewTaskActivity.EXTRA_REMINDER_TYPE);
+
+                    if (id != 0) {
+                        // Update existing (Future proofing, though FAB is usually for new)
+                        final Task taskForCallback = task;
+                        final long finalReminderTime = reminderTime;
+                        taskViewModel.update(task, () -> {
+                            if (finalReminderTime > 0 && taskForCallback.alarmId != 0) {
+                                alarmScheduler.schedule(taskForCallback);
+                            } else {
+                                alarmScheduler.cancel(taskForCallback);
+                            }
+                        });
+                    } else {
+                        // Insert New
+                        final Task taskForCallback = task;
+                        final long finalReminderTime = reminderTime;
+                        taskViewModel.insert(task, () -> {
+                            if (finalReminderTime > 0 && taskForCallback.alarmId != 0) {
+                                alarmScheduler.schedule(taskForCallback);
+                            }
+                        });
+                    }
+                }
+            });
+
     private Handler countdownHandler = new Handler(Looper.getMainLooper());
     private Task nextUpcomingTask = null;
     private Runnable countdownRunnable;
+
+    private Calendar selectedDate = Calendar.getInstance();
+    private List<Task> currentActiveTasks = new ArrayList<>();
+    private List<Task> currentCompletedTasks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +126,9 @@ public class DashboardActivity extends AppCompatActivity {
         textSummary = findViewById(R.id.text_summary_line1);
         textProgressPercent = findViewById(R.id.text_progress_percent);
 
+        TextView textMonthYear = findViewById(R.id.text_month_year);
+        TextView textViewAll = findViewById(R.id.text_view_all);
+
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
 
@@ -84,10 +145,42 @@ public class DashboardActivity extends AppCompatActivity {
         taskAdapter = new DashboardTaskAdapter();
         recyclerTasks.setAdapter(taskAdapter);
 
+        // Define Start and End Dates (Today - 15 to Today + 15)
+        List<DashboardDateAdapter.DateItem> dateItems = generateDates();
+        dateAdapter.setDates(dateItems);
+        // Scroll to Today (Index 15 + 1 for Arrow = 16)
+        recyclerDates.scrollToPosition(16);
+
+        // Initialize Month/Year Text
+        java.text.SimpleDateFormat monthYearFormat = new java.text.SimpleDateFormat("MMMM yyyy",
+                java.util.Locale.getDefault());
+        textMonthYear.setText(monthYearFormat.format(selectedDate.getTime()));
+
+        // Handle Date Clicks
+        dateAdapter.setOnDateClickListener((item, position) -> {
+            // Update Selected Date
+            selectedDate.setTimeInMillis(item.timestamp);
+
+            // Update Month/Year Header
+            textMonthYear.setText(monthYearFormat.format(selectedDate.getTime()));
+
+            // Refresh Filtered List
+            filterAndShowTasks();
+        });
+
+        textViewAll.setOnClickListener(v -> {
+            // Navigate to Main Task List (View All)
+            Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
+            startActivity(intent);
+        });
+
+        // Initialize AlarmScheduler
+        alarmScheduler = new AlarmScheduler(this);
+
         // Setup FAB
         fab.setOnClickListener(v -> {
             Intent intent = new Intent(DashboardActivity.this, NewTaskActivity.class);
-            startActivity(intent);
+            taskActivityLauncher.launch(intent);
         });
 
         // Ensure Status Bar is consistent with design
@@ -121,11 +214,13 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Observe Tasks
         taskViewModel.getActiveTasks().observe(this, activeTasks -> {
-            updateDashboard(activeTasks, taskViewModel.getCompletedTasks().getValue());
+            currentActiveTasks = (activeTasks != null) ? activeTasks : new ArrayList<>();
+            updateDashboard(currentActiveTasks, currentCompletedTasks);
         });
 
         taskViewModel.getCompletedTasks().observe(this, completedTasks -> {
-            updateDashboard(taskViewModel.getActiveTasks().getValue(), completedTasks);
+            currentCompletedTasks = (completedTasks != null) ? completedTasks : new ArrayList<>();
+            updateDashboard(currentActiveTasks, currentCompletedTasks);
         });
     }
 
@@ -296,6 +391,76 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Start Countdown for Secondary Circle
         startCountdown();
+
+        // After updating dashboard, filter tasks for the currently selected date
+        filterAndShowTasks();
+    }
+
+    private List<DashboardDateAdapter.DateItem> generateDates() {
+        List<DashboardDateAdapter.DateItem> items = new ArrayList<>();
+        Calendar cal = Calendar.getInstance();
+
+        // Normalize selected date to Start of Day for accurate comparison if needed,
+        // but for generation we act relative to "Today"
+
+        // Go back 15 days
+        cal.add(Calendar.DAY_OF_YEAR, -15);
+
+        // Generate 31 days (15 prev + 1 today + 15 next)
+        java.text.SimpleDateFormat dayFormat = new java.text.SimpleDateFormat("EEE", java.util.Locale.getDefault());
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd", java.util.Locale.getDefault());
+
+        for (int i = 0; i < 31; i++) {
+            boolean isToday = (i == 15); // Index 15 is Today
+            boolean isActive = (i == 15); // Index 15 is initially Active
+            String day = dayFormat.format(cal.getTime()).toUpperCase();
+            String date = dateFormat.format(cal.getTime());
+
+            items.add(new DashboardDateAdapter.DateItem(day, date, cal.getTimeInMillis(), isActive, isToday));
+
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        return items;
+    }
+
+    private void filterAndShowTasks() {
+        if (currentActiveTasks == null)
+            return;
+
+        List<Task> filteredTasks = new ArrayList<>();
+        Calendar taskCal = Calendar.getInstance();
+        Calendar selectedCal = Calendar.getInstance();
+        selectedCal.setTimeInMillis(selectedDate.getTimeInMillis());
+
+        int selYear = selectedCal.get(Calendar.YEAR);
+        int selDay = selectedCal.get(Calendar.DAY_OF_YEAR);
+
+        for (Task task : currentActiveTasks) {
+            if (task.reminderTime > 0) {
+                taskCal.setTimeInMillis(task.reminderTime);
+                if (taskCal.get(Calendar.YEAR) == selYear &&
+                        taskCal.get(Calendar.DAY_OF_YEAR) == selDay) {
+                    filteredTasks.add(task);
+                }
+            }
+        }
+
+        // update UI based on count
+        TextView textEmptyState = findViewById(R.id.text_empty_state);
+        if (filteredTasks.isEmpty()) {
+            recyclerTasks.setVisibility(View.GONE);
+            if (textEmptyState != null)
+                textEmptyState.setVisibility(View.VISIBLE);
+        } else {
+            recyclerTasks.setVisibility(View.VISIBLE);
+            if (textEmptyState != null)
+                textEmptyState.setVisibility(View.GONE);
+        }
+
+        // Sort by time (ASC) - Upcoming soon at top
+        java.util.Collections.sort(filteredTasks, (t1, t2) -> Long.compare(t1.reminderTime, t2.reminderTime));
+
+        taskAdapter.setTasks(filteredTasks);
     }
 
     private void startCountdown() {
@@ -339,6 +504,31 @@ public class DashboardActivity extends AppCompatActivity {
         };
 
         countdownHandler.post(countdownRunnable);
+    }
+
+    private void applyThemePreference() {
+        android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
+                .getDefaultSharedPreferences(this);
+        String theme = prefs.getString("app_theme", "light");
+
+        int nightMode;
+        switch (theme) {
+            case "light":
+                nightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
+                break;
+            case "dark":
+                nightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
+                break;
+            case "auto":
+            default:
+                nightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                break;
+        }
+
+        // Apply if different
+        if (androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode() != nightMode) {
+            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(nightMode);
+        }
     }
 
     @Override

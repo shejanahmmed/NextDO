@@ -55,13 +55,14 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     TaskDao taskDao = db.taskDao();
                     foundTask = taskDao.getTaskById(taskId);
 
-                    if (foundTask != null && foundTask.isCompleted) {
-                        Log.d(TAG, "Task " + taskId + " is already completed, not showing notification");
+                    if (foundTask != null && (foundTask.isCompleted || foundTask.isDeleted)) {
+                        Log.d(TAG, "Task " + taskId + " is completed or deleted, not showing notification");
                         return;
                     }
 
-                    // Auto-Reschedule logic for repeating tasks
-                    if (foundTask != null && !android.text.TextUtils.isEmpty(foundTask.repeat)) {
+                    // Auto-Reschedule logic for repeating tasks (only if not deleted)
+                    if (foundTask != null && !foundTask.isDeleted
+                            && !android.text.TextUtils.isEmpty(foundTask.repeat)) {
                         long nextTime = AlarmScheduler.getNextOccurrence(System.currentTimeMillis(),
                                 foundTask.reminderTime, foundTask.repeat);
                         if (nextTime > System.currentTimeMillis()) {

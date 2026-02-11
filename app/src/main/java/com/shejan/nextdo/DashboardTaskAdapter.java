@@ -17,6 +17,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
     private List<Task> tasks = new java.util.ArrayList<>();
     private final java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a",
             java.util.Locale.getDefault());
+    private final java.util.Set<Integer> expandedPositions = new java.util.HashSet<>();
 
     public void setTasks(List<Task> newTasks) {
         this.tasks = newTasks;
@@ -34,6 +35,10 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task task = tasks.get(position);
 
+        // Reset card position and animation state (fix ViewHolder recycling issue)
+        holder.cardContainer.setTranslationX(0f);
+        holder.cardContainer.setTag(R.id.card_container, false);
+
         holder.textTitle.setText(task.title);
 
         if (task.reminderTime > 0) {
@@ -41,6 +46,37 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         } else {
             holder.textTime.setText("");
         }
+
+        if (task.reminderType != null && !task.reminderType.isEmpty()) {
+            holder.textReminderType.setText(task.reminderType);
+            holder.textReminderType.setVisibility(View.VISIBLE);
+        } else {
+            holder.textReminderType.setVisibility(View.GONE);
+        }
+
+        // Handle description
+        if (task.description != null && !task.description.isEmpty()) {
+            holder.textDescription.setText(task.description);
+            boolean isExpanded = expandedPositions.contains(position);
+            holder.textDescription.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        } else {
+            holder.textDescription.setVisibility(View.GONE);
+        }
+
+        // Click listener for expand/collapse
+        holder.cardContainer.setOnClickListener(v -> {
+            if (task.description != null && !task.description.isEmpty()) {
+                if (expandedPositions.contains(position)) {
+                    // Collapse with animation
+                    expandedPositions.remove(position);
+                    collapseView(holder.textDescription);
+                } else {
+                    // Expand with animation
+                    expandedPositions.add(position);
+                    expandView(holder.textDescription);
+                }
+            }
+        });
 
         // Rotate Card Backgrounds based on position
         int bgResId;
@@ -79,13 +115,35 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         }
     }
 
+    private void expandView(View view) {
+        view.setVisibility(View.VISIBLE);
+        view.setAlpha(0f);
+        view.animate()
+                .alpha(1f)
+                .setDuration(200)
+                .setListener(null);
+    }
+
+    private void collapseView(View view) {
+        view.animate()
+                .alpha(0f)
+                .setDuration(200)
+                .setListener(new android.animation.AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(android.animation.Animator animation) {
+                        view.setVisibility(View.GONE);
+                        view.setAlpha(1f);
+                    }
+                });
+    }
+
     @Override
     public int getItemCount() {
         return tasks.size();
     }
 
     static class TaskViewHolder extends RecyclerView.ViewHolder {
-        TextView textTitle, textTime;
+        TextView textTitle, textTime, textReminderType, textDescription;
         ImageView imgCheck;
         LinearLayout cardContainer;
         View timelineDot;
@@ -94,6 +152,8 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             super(itemView);
             textTitle = itemView.findViewById(R.id.text_task_title);
             textTime = itemView.findViewById(R.id.text_task_time);
+            textReminderType = itemView.findViewById(R.id.text_reminder_type);
+            textDescription = itemView.findViewById(R.id.text_task_description);
             imgCheck = itemView.findViewById(R.id.img_check);
             cardContainer = itemView.findViewById(R.id.card_container);
             timelineDot = itemView.findViewById(R.id.timeline_dot);

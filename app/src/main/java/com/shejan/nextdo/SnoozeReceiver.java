@@ -34,6 +34,19 @@ public class SnoozeReceiver extends BroadcastReceiver {
             notificationManager.cancel(taskId);
         }
 
+        // CRITICAL: Check if task still exists and is not deleted
+        try {
+            AppDatabase db = AppDatabase.getDatabase(context);
+            Task task = db.taskDao().getTaskById(taskId);
+            if (task == null || task.isDeleted || task.isCompleted) {
+                Log.d(TAG, "Task " + taskId + " is deleted/completed, not snoozing");
+                return;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking task status: " + e.getMessage());
+            return;
+        }
+
         // Get snooze duration from preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String durationStr = prefs.getString("snooze_duration", "300000"); // Default 5 mins

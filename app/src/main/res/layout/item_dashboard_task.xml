@@ -25,6 +25,19 @@
         app:layout_constraintTop_toTopOf="@id/card_container"
         app:layout_constraintBottom_toBottomOf="@id/card_container" />
 
+    <!-- Hollow Circle Indicator (Initially Hidden) -->
+    <View
+        android:id="@+id/hollow_circle_indicator"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/hollow_circle_indicator"
+        android:visibility="gone"
+        android:alpha="0"
+        app:layout_constraintStart_toStartOf="@id/timeline_dot"
+        app:layout_constraintEnd_toEndOf="@id/timeline_dot"
+        app:layout_constraintTop_toTopOf="@id/timeline_dot"
+        app:layout_constraintBottom_toBottomOf="@id/timeline_dot" />
+
     <!-- Card -->
     <LinearLayout
         android:id="@+id/card_container"
@@ -87,7 +100,30 @@
                 android:text="10:00 AM"
                 android:textSize="14sp"
                 android:textColor="@color/dashboard_text_navy" />
+
+            <TextView
+                android:id="@+id/text_reminder_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pill"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/dashboard_text_navy"
+                android:layout_marginStart="12dp"
+                android:visibility="gone" />
         </LinearLayout>
+
+        <!-- Description (Initially Hidden) -->
+        <TextView
+            android:id="@+id/text_task_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Task description goes here"
+            android:textSize="14sp"
+            android:textColor="@color/dashboard_text_navy"
+            android:layout_marginTop="8dp"
+            android:alpha="0.7"
+            android:visibility="gone" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

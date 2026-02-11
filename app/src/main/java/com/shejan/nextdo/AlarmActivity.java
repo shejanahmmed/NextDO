@@ -76,18 +76,46 @@ public class AlarmActivity extends AppCompatActivity {
 
         // Snooze button
         snoozeButton.setOnClickListener(v -> {
-            stopAlarmSound();
-            stopVibration();
+            // CRITICAL: Check if task is still valid (not deleted) before snoozing
+            new Thread(() -> {
+                try {
+                    AppDatabase db = AppDatabase.getDatabase(this);
+                    Task task = db.taskDao().getTaskById(taskId);
+                    if (task == null || task.isDeleted) {
+                        runOnUiThread(() -> {
+                            android.widget.Toast.makeText(this, "This reminder has been deleted",
+                                    android.widget.Toast.LENGTH_SHORT).show();
+                            stopAlarmSound();
+                            stopVibration();
+                            finish();
+                        });
+                        return;
+                    }
 
-            // Send broadcast to SnoozeReceiver
-            Intent snoozeIntent = new Intent(this, SnoozeReceiver.class);
-            snoozeIntent.putExtra("task_id", taskId);
-            snoozeIntent.putExtra("task_title", taskTitle);
-            snoozeIntent.putExtra("task_description", taskDescription);
-            snoozeIntent.putExtra("alarm_id", getIntent().getIntExtra("alarm_id", 0));
-            sendBroadcast(snoozeIntent);
+                    // Proceed with snooze
+                    runOnUiThread(() -> {
+                        stopAlarmSound();
+                        stopVibration();
 
-            finish();
+                        // Send broadcast to SnoozeReceiver
+                        Intent snoozeIntent = new Intent(this, SnoozeReceiver.class);
+                        snoozeIntent.putExtra("task_id", taskId);
+                        snoozeIntent.putExtra("task_title", taskTitle);
+                        snoozeIntent.putExtra("task_description", taskDescription);
+                        snoozeIntent.putExtra("alarm_id", getIntent().getIntExtra("alarm_id", 0));
+                        sendBroadcast(snoozeIntent);
+
+                        finish();
+                    });
+                } catch (Exception e) {
+                    Log.e(TAG, "Error checking task status: " + e.getMessage());
+                    runOnUiThread(() -> {
+                        stopAlarmSound();
+                        stopVibration();
+                        finish();
+                    });
+                }
+            }).start();
         });
 
         // Handle back button press - prevent dismissing alarm

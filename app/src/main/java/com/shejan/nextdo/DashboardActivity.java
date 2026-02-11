@@ -104,6 +104,7 @@ public class DashboardActivity extends AppCompatActivity {
     private Calendar selectedDate = Calendar.getInstance();
     private List<Task> currentActiveTasks = new ArrayList<>();
     private List<Task> currentCompletedTasks = new ArrayList<>();
+    private RecyclerView.ViewHolder currentlySwipedViewHolder = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -222,6 +223,9 @@ public class DashboardActivity extends AppCompatActivity {
             currentCompletedTasks = (completedTasks != null) ? completedTasks : new ArrayList<>();
             updateDashboard(currentActiveTasks, currentCompletedTasks);
         });
+
+        // Setup Swipe Animation for Task Cards
+        setupSwipeAnimation();
     }
 
     private void setupDrawer() {
@@ -528,6 +532,156 @@ public class DashboardActivity extends AppCompatActivity {
         // Apply if different
         if (androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode() != nightMode) {
             androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(nightMode);
+        }
+    }
+
+    private void setupSwipeAnimation() {
+        androidx.recyclerview.widget.ItemTouchHelper itemTouchHelper = new androidx.recyclerview.widget.ItemTouchHelper(
+                new androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(0,
+                        androidx.recyclerview.widget.ItemTouchHelper.RIGHT) {
+
+                    @Override
+                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                            RecyclerView.ViewHolder target) {
+                        return false; // Not supporting drag
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                        // Clear the currently swiped ViewHolder
+                        currentlySwipedViewHolder = null;
+                    }
+
+                    @Override
+                    public void onChildDraw(android.graphics.Canvas c, RecyclerView recyclerView,
+                            RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState,
+                            boolean isCurrentlyActive) {
+                        if (actionState == androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE && dX > 0) {
+                            // Track which ViewHolder is currently being swiped
+                            if (isCurrentlyActive) {
+                                currentlySwipedViewHolder = viewHolder;
+                            }
+
+                            // ONLY process this card if it's the one being swiped
+                            if (viewHolder == currentlySwipedViewHolder) {
+                                // Get the card container
+                                View cardContainer = viewHolder.itemView.findViewById(R.id.card_container);
+                                if (cardContainer != null) {
+                                    // Use tag to track if animation was triggered for THIS specific card
+                                    Boolean animationTriggered = (Boolean) cardContainer.getTag(R.id.card_container);
+                                    if (animationTriggered == null)
+                                        animationTriggered = false;
+
+                                    // Limit swipe distance
+                                    float maxSwipe = 100f;
+                                    float actualDx = Math.min(dX, maxSwipe);
+
+                                    // Apply translation
+                                    cardContainer.setTranslationX(actualDx);
+
+                                    // If released and swiped enough, trigger bounce-back and toggle circle
+                                    if (!isCurrentlyActive && actualDx > 50f && !animationTriggered) {
+                                        // Mark this card as animated
+                                        cardContainer.setTag(R.id.card_container, true);
+
+                                        // Get hollow circle
+                                        View hollowCircle = viewHolder.itemView
+                                                .findViewById(R.id.hollow_circle_indicator);
+
+                                        // Start bounce-back animation
+                                        cardContainer.animate()
+                                                .translationX(0f)
+                                                .setDuration(500)
+                                                .setInterpolator(new android.view.animation.OvershootInterpolator(0.8f))
+                                                .withEndAction(() -> {
+                                                    // Reset card position and flag
+                                                    cardContainer.setTranslationX(0f);
+                                                    cardContainer.setTag(R.id.card_container, false);
+                                                    currentlySwipedViewHolder = null;
+                                                })
+                                                .start();
+
+                                        // Toggle circle immediately (don't wait for animation)
+                                        if (hollowCircle != null) {
+                                            toggleHollowCircle(hollowCircle);
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                        }
+                    }
+
+                    @Override
+                    public float getSwipeThreshold(RecyclerView.ViewHolder viewHolder) {
+                        return 0.9f; // Make it harder to actually swipe away
+                    }
+                });
+        itemTouchHelper.attachToRecyclerView(recyclerTasks);
+    }
+
+    private void triggerBounceBackAnimation(RecyclerView.ViewHolder viewHolder, View cardContainer) {
+        View hollowCircle = viewHolder.itemView.findViewById(R.id.hollow_circle_indicator);
+
+        // Smooth bounce back animation
+        cardContainer.animate()
+                .translationX(0f)
+                .setDuration(500)
+                .setInterpolator(new android.view.animation.OvershootInterpolator(0.8f))
+                .withEndAction(() -> {
+                    // Show toast to confirm this is called
+                    Toast.makeText(this, "Toggle called!", Toast.LENGTH_SHORT).show();
+
+                    // Toggle hollow circle after bounce completes
+                    if (hollowCircle != null) {
+                        toggleHollowCircle(hollowCircle);
+                    } else {
+                        Toast.makeText(this, "Circle is null!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .start();
+    }
+
+    private void toggleHollowCircle(View circle) {
+        // Use tag to track state reliably
+        Boolean isShown = (Boolean) circle.getTag();
+        if (isShown == null)
+            isShown = false;
+
+        // Cancel any ongoing animations
+        circle.animate().cancel();
+
+        if (isShown) {
+            // Hide circle
+            circle.setTag(false);
+            circle.animate()
+                    .scaleX(0f)
+                    .scaleY(0f)
+                    .alpha(0f)
+                    .setDuration(300)
+                    .setInterpolator(new android.view.animation.AccelerateInterpolator())
+                    .withEndAction(() -> {
+                        circle.setVisibility(View.GONE);
+                        circle.setScaleX(1f);
+                        circle.setScaleY(1f);
+                    })
+                    .start();
+        } else {
+            // Show circle
+            circle.setTag(true);
+            circle.setVisibility(View.VISIBLE);
+            circle.setScaleX(0f);
+            circle.setScaleY(0f);
+            circle.setAlpha(0f);
+
+            circle.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .alpha(1f)
+                    .setDuration(300)
+                    .setInterpolator(new android.view.animation.OvershootInterpolator(1.2f))
+                    .start();
         }
     }
 

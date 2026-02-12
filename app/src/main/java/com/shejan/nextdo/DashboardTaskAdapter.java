@@ -39,6 +39,17 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         holder.cardContainer.setTranslationX(0f);
         holder.cardContainer.setTag(R.id.card_container, false);
 
+        // Match hollow circle to task completion state
+        if (task.isCompleted) {
+            holder.hollowCircle.setVisibility(View.VISIBLE);
+            holder.hollowCircle.setAlpha(1f);
+            holder.hollowCircle.setTag(true);
+        } else {
+            holder.hollowCircle.setVisibility(View.GONE);
+            holder.hollowCircle.setAlpha(0f);
+            holder.hollowCircle.setTag(false);
+        }
+
         holder.textTitle.setText(task.title);
 
         if (task.reminderTime > 0) {
@@ -103,6 +114,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
 
         holder.timelineDot.setBackgroundResource(R.drawable.circle_black);
         holder.timelineDot.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
+        holder.hollowCircle.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
 
         if (task.isCompleted) {
             holder.textTitle
@@ -146,7 +158,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         TextView textTitle, textTime, textReminderType, textDescription;
         ImageView imgCheck;
         LinearLayout cardContainer;
-        View timelineDot;
+        View timelineDot, hollowCircle;
 
         TaskViewHolder(View itemView) {
             super(itemView);
@@ -157,6 +169,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             imgCheck = itemView.findViewById(R.id.img_check);
             cardContainer = itemView.findViewById(R.id.card_container);
             timelineDot = itemView.findViewById(R.id.timeline_dot);
+            hollowCircle = itemView.findViewById(R.id.hollow_circle_indicator);
         }
     }
 }

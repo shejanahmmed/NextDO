@@ -104,7 +104,8 @@ public class DashboardActivity extends AppCompatActivity {
     private Calendar selectedDate = Calendar.getInstance();
     private List<Task> currentActiveTasks = new ArrayList<>();
     private List<Task> currentCompletedTasks = new ArrayList<>();
-    private RecyclerView.ViewHolder currentlySwipedViewHolder = null;
+    private List<Task> dashboardShownTasks = new ArrayList<>(); // Track tasks shown in adapter
+    private int currentlySwipedPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -439,7 +440,13 @@ public class DashboardActivity extends AppCompatActivity {
         int selYear = selectedCal.get(Calendar.YEAR);
         int selDay = selectedCal.get(Calendar.DAY_OF_YEAR);
 
-        for (Task task : currentActiveTasks) {
+        List<Task> combinedTasks = new ArrayList<>();
+        if (currentActiveTasks != null)
+            combinedTasks.addAll(currentActiveTasks);
+        if (currentCompletedTasks != null)
+            combinedTasks.addAll(currentCompletedTasks);
+
+        for (Task task : combinedTasks) {
             if (task.reminderTime > 0) {
                 taskCal.setTimeInMillis(task.reminderTime);
                 if (taskCal.get(Calendar.YEAR) == selYear &&
@@ -464,6 +471,7 @@ public class DashboardActivity extends AppCompatActivity {
         // Sort by time (ASC) - Upcoming soon at top
         java.util.Collections.sort(filteredTasks, (t1, t2) -> Long.compare(t1.reminderTime, t2.reminderTime));
 
+        this.dashboardShownTasks = filteredTasks;
         taskAdapter.setTasks(filteredTasks);
     }
 
@@ -548,8 +556,8 @@ public class DashboardActivity extends AppCompatActivity {
 
                     @Override
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                        // Clear the currently swiped ViewHolder
-                        currentlySwipedViewHolder = null;
+                        // Clear the currently swiped position
+                        currentlySwipedPosition = -1;
                     }
 
                     @Override
@@ -557,13 +565,14 @@ public class DashboardActivity extends AppCompatActivity {
                             RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState,
                             boolean isCurrentlyActive) {
                         if (actionState == androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE && dX > 0) {
-                            // Track which ViewHolder is currently being swiped
+                            // Track which item is currently being swiped by position
+                            int pos = viewHolder.getBindingAdapterPosition();
                             if (isCurrentlyActive) {
-                                currentlySwipedViewHolder = viewHolder;
+                                currentlySwipedPosition = pos;
                             }
 
                             // ONLY process this card if it's the one being swiped
-                            if (viewHolder == currentlySwipedViewHolder) {
+                            if (pos == currentlySwipedPosition && pos != RecyclerView.NO_POSITION) {
                                 // Get the card container
                                 View cardContainer = viewHolder.itemView.findViewById(R.id.card_container);
                                 if (cardContainer != null) {
@@ -572,38 +581,54 @@ public class DashboardActivity extends AppCompatActivity {
                                     if (animationTriggered == null)
                                         animationTriggered = false;
 
-                                    // Limit swipe distance
-                                    float maxSwipe = 100f;
+                                    // Limit swipe distance (Increase for better visibility)
+                                    float maxSwipe = 150f;
                                     float actualDx = Math.min(dX, maxSwipe);
 
                                     // Apply translation
                                     cardContainer.setTranslationX(actualDx);
 
-                                    // If released and swiped enough, trigger bounce-back and toggle circle
-                                    if (!isCurrentlyActive && actualDx > 50f && !animationTriggered) {
+                                    // If released, always trigger bounce-back
+                                    if (!isCurrentlyActive && !animationTriggered) {
                                         // Mark this card as animated
                                         cardContainer.setTag(R.id.card_container, true);
 
-                                        // Get hollow circle
-                                        View hollowCircle = viewHolder.itemView
-                                                .findViewById(R.id.hollow_circle_indicator);
+                                        // Threshold for toggling (Increase for intentionality)
+                                        boolean shouldToggle = actualDx > 70f;
 
                                         // Start bounce-back animation
                                         cardContainer.animate()
                                                 .translationX(0f)
-                                                .setDuration(500)
+                                                .setDuration(400)
                                                 .setInterpolator(new android.view.animation.OvershootInterpolator(0.8f))
                                                 .withEndAction(() -> {
                                                     // Reset card position and flag
                                                     cardContainer.setTranslationX(0f);
                                                     cardContainer.setTag(R.id.card_container, false);
-                                                    currentlySwipedViewHolder = null;
+                                                    currentlySwipedPosition = -1;
                                                 })
                                                 .start();
 
-                                        // Toggle circle immediately (don't wait for animation)
-                                        if (hollowCircle != null) {
-                                            toggleHollowCircle(hollowCircle);
+                                        if (shouldToggle) {
+                                            // Get hollow circle
+                                            View hollowCircle = viewHolder.itemView
+                                                    .findViewById(R.id.hollow_circle_indicator);
+
+                                            // Toggle circle immediately
+                                            if (hollowCircle != null) {
+                                                toggleHollowCircle(hollowCircle);
+
+                                                // Update Task state in database
+                                                pos = viewHolder.getBindingAdapterPosition();
+                                                if (pos != RecyclerView.NO_POSITION
+                                                        && pos < dashboardShownTasks.size()) {
+                                                    Task task = dashboardShownTasks.get(pos);
+                                                    task.isCompleted = !task.isCompleted;
+                                                    taskViewModel.update(task, () -> {
+                                                        // List will refresh via Livedata
+                                                    });
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -615,32 +640,15 @@ public class DashboardActivity extends AppCompatActivity {
 
                     @Override
                     public float getSwipeThreshold(RecyclerView.ViewHolder viewHolder) {
-                        return 0.9f; // Make it harder to actually swipe away
+                        return 2.0f; // Disable system distance dismissal
+                    }
+
+                    @Override
+                    public float getSwipeEscapeVelocity(float defaultValue) {
+                        return Float.MAX_VALUE; // Disable flick dismissal
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerTasks);
-    }
-
-    private void triggerBounceBackAnimation(RecyclerView.ViewHolder viewHolder, View cardContainer) {
-        View hollowCircle = viewHolder.itemView.findViewById(R.id.hollow_circle_indicator);
-
-        // Smooth bounce back animation
-        cardContainer.animate()
-                .translationX(0f)
-                .setDuration(500)
-                .setInterpolator(new android.view.animation.OvershootInterpolator(0.8f))
-                .withEndAction(() -> {
-                    // Show toast to confirm this is called
-                    Toast.makeText(this, "Toggle called!", Toast.LENGTH_SHORT).show();
-
-                    // Toggle hollow circle after bounce completes
-                    if (hollowCircle != null) {
-                        toggleHollowCircle(hollowCircle);
-                    } else {
-                        Toast.makeText(this, "Circle is null!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .start();
     }
 
     private void toggleHollowCircle(View circle) {
@@ -653,35 +661,17 @@ public class DashboardActivity extends AppCompatActivity {
         circle.animate().cancel();
 
         if (isShown) {
-            // Hide circle
+            // Hide circle (Direct)
             circle.setTag(false);
-            circle.animate()
-                    .scaleX(0f)
-                    .scaleY(0f)
-                    .alpha(0f)
-                    .setDuration(300)
-                    .setInterpolator(new android.view.animation.AccelerateInterpolator())
-                    .withEndAction(() -> {
-                        circle.setVisibility(View.GONE);
-                        circle.setScaleX(1f);
-                        circle.setScaleY(1f);
-                    })
-                    .start();
+            circle.setVisibility(View.GONE);
+            circle.setAlpha(0f);
         } else {
-            // Show circle
+            // Show circle (Direct)
             circle.setTag(true);
             circle.setVisibility(View.VISIBLE);
-            circle.setScaleX(0f);
-            circle.setScaleY(0f);
-            circle.setAlpha(0f);
-
-            circle.animate()
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .alpha(1f)
-                    .setDuration(300)
-                    .setInterpolator(new android.view.animation.OvershootInterpolator(1.2f))
-                    .start();
+            circle.setAlpha(1f);
+            circle.setScaleX(1f);
+            circle.setScaleY(1f);
         }
     }
 

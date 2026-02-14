@@ -105,7 +105,7 @@ public class DashboardActivity extends AppCompatActivity {
     private List<Task> currentActiveTasks = new ArrayList<>();
     private List<Task> currentCompletedTasks = new ArrayList<>();
     private List<Task> dashboardShownTasks = new ArrayList<>(); // Track tasks shown in adapter
-    private int currentlySwipedPosition = -1;
+    private int currentlySwipedPosition = -1; // Track swipe by position for stability
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -561,17 +561,32 @@ public class DashboardActivity extends AppCompatActivity {
                     }
 
                     @Override
+                    public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                        super.clearView(recyclerView, viewHolder);
+                        // Ensure state is reset when interaction ends
+                        currentlySwipedPosition = -1;
+
+                        View cardContainer = viewHolder.itemView.findViewById(R.id.card_container);
+                        if (cardContainer != null) {
+                            cardContainer.setTranslationX(0f);
+                            cardContainer.setTag(R.id.card_container, false);
+                        }
+                    }
+
+                    @Override
                     public void onChildDraw(android.graphics.Canvas c, RecyclerView recyclerView,
                             RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState,
                             boolean isCurrentlyActive) {
                         if (actionState == androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE && dX > 0) {
                             // Track which item is currently being swiped by position
                             int pos = viewHolder.getBindingAdapterPosition();
+
+                            // Only capture position when user is actively touching
                             if (isCurrentlyActive) {
                                 currentlySwipedPosition = pos;
                             }
 
-                            // ONLY process this card if it's the one being swiped
+                            // Strict isolation: only move if this is the tracked position
                             if (pos == currentlySwipedPosition && pos != RecyclerView.NO_POSITION) {
                                 // Get the card container
                                 View cardContainer = viewHolder.itemView.findViewById(R.id.card_container);
@@ -582,24 +597,24 @@ public class DashboardActivity extends AppCompatActivity {
                                         animationTriggered = false;
 
                                     // Limit swipe distance (Increase for better visibility)
-                                    float maxSwipe = 150f;
+                                    float maxSwipe = 200f;
                                     float actualDx = Math.min(dX, maxSwipe);
+                                    float toggleThreshold = 100f;
 
                                     // Apply translation
                                     cardContainer.setTranslationX(actualDx);
 
-                                    // If released, always trigger bounce-back
+                                    // If released (finger up), trigger logic
                                     if (!isCurrentlyActive && !animationTriggered) {
-                                        // Mark this card as animated
+                                        // Mark this card as animated to prevent double-firing
                                         cardContainer.setTag(R.id.card_container, true);
 
-                                        // Threshold for toggling (Increase for intentionality)
-                                        boolean shouldToggle = actualDx > 70f;
+                                        boolean shouldToggle = actualDx > toggleThreshold;
 
                                         // Start bounce-back animation
                                         cardContainer.animate()
                                                 .translationX(0f)
-                                                .setDuration(400)
+                                                .setDuration(300)
                                                 .setInterpolator(new android.view.animation.OvershootInterpolator(0.8f))
                                                 .withEndAction(() -> {
                                                     // Reset card position and flag
@@ -614,19 +629,46 @@ public class DashboardActivity extends AppCompatActivity {
                                             View hollowCircle = viewHolder.itemView
                                                     .findViewById(R.id.hollow_circle_indicator);
 
-                                            // Toggle circle immediately
+                                            // Toggle circle visually immediately
                                             if (hollowCircle != null) {
                                                 toggleHollowCircle(hollowCircle);
 
-                                                // Update Task state in database
+                                                // Trigger database update
+                                                // NOTE: We update DATA, but Visual State returns to 0
                                                 pos = viewHolder.getBindingAdapterPosition();
                                                 if (pos != RecyclerView.NO_POSITION
                                                         && pos < dashboardShownTasks.size()) {
+                                                    // Data Update
                                                     Task task = dashboardShownTasks.get(pos);
                                                     task.isCompleted = !task.isCompleted;
-                                                    taskViewModel.update(task, () -> {
-                                                        // List will refresh via Livedata
-                                                    });
+                                                    taskViewModel.update(task);
+
+                                                    // 1. Cancel System Notification immediately (Syncs "System Tray")
+                                                    if (task.isCompleted) {
+                                                        try {
+                                                            androidx.core.app.NotificationManagerCompat notificationManager = androidx.core.app.NotificationManagerCompat
+                                                                    .from(DashboardActivity.this);
+                                                            notificationManager.cancel(task.id);
+
+                                                            // Optional: Cancel future alarm if strictly one-off
+                                                            // alarmScheduler.cancel(task);
+                                                        } catch (Exception e) {
+                                                            // Ignore
+                                                        }
+                                                    }
+
+                                                    // 2. Show Feedback (Syncs "User Confidence")
+                                                    String msg = task.isCompleted ? "Task completed"
+                                                            : "Task marked active";
+                                                    com.google.android.material.snackbar.Snackbar.make(
+                                                            findViewById(android.R.id.content),
+                                                            msg,
+                                                            com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+                                                            .setAction("UNDO", v -> {
+                                                                task.isCompleted = !task.isCompleted;
+                                                                taskViewModel.update(task);
+                                                            })
+                                                            .show();
                                                 }
                                             }
                                         }
@@ -640,12 +682,14 @@ public class DashboardActivity extends AppCompatActivity {
 
                     @Override
                     public float getSwipeThreshold(RecyclerView.ViewHolder viewHolder) {
-                        return 2.0f; // Disable system distance dismissal
+                        // Return unreachable threshold to disable system's "drag-to-dismiss"
+                        return 10.0f;
                     }
 
                     @Override
                     public float getSwipeEscapeVelocity(float defaultValue) {
-                        return Float.MAX_VALUE; // Disable flick dismissal
+                        // Return max value to disable system's "fling-to-dismiss"
+                        return Float.MAX_VALUE;
                     }
                 });
         itemTouchHelper.attachToRecyclerView(recyclerTasks);
@@ -670,8 +714,6 @@ public class DashboardActivity extends AppCompatActivity {
             circle.setTag(true);
             circle.setVisibility(View.VISIBLE);
             circle.setAlpha(1f);
-            circle.setScaleX(1f);
-            circle.setScaleY(1f);
         }
     }
 

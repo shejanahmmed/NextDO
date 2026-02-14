@@ -26,11 +26,12 @@
         app:layout_constraintBottom_toBottomOf="@id/card_container" />
 
     <!-- Hollow Circle Indicator (Initially Hidden) -->
-    <View
+    <ImageView
         android:id="@+id/hollow_circle_indicator"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:background="@drawable/hollow_circle_indicator"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/hollow_circle_indicator"
+        android:scaleType="center"
         android:visibility="gone"
         android:alpha="0"
         app:layout_constraintStart_toStartOf="@id/timeline_dot"

@@ -35,9 +35,9 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task task = tasks.get(position);
 
-        // Reset card position and animation state (fix ViewHolder recycling issue)
-        holder.cardContainer.setTranslationX(0f);
-        holder.cardContainer.setTag(R.id.card_container, false);
+        // Reset any leftover animation properties
+        holder.cardContainer.animate().cancel();
+        holder.cardContainer.setAlpha(1f);
 
         // Match hollow circle to task completion state
         if (task.isCompleted) {
@@ -114,15 +114,11 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
 
         holder.timelineDot.setBackgroundResource(R.drawable.circle_black);
         holder.timelineDot.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
-        holder.hollowCircle.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
+        holder.hollowCircle.setColorFilter(color);
 
         if (task.isCompleted) {
-            holder.textTitle
-                    .setPaintFlags(holder.textTitle.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
             holder.imgCheck.setVisibility(View.VISIBLE);
         } else {
-            holder.textTitle
-                    .setPaintFlags(holder.textTitle.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
             holder.imgCheck.setVisibility(View.GONE);
         }
     }
@@ -134,6 +130,10 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
                 .alpha(1f)
                 .setDuration(200)
                 .setListener(null);
+    }
+
+    private int dpToPx(int dp) {
+        return (int) (dp * android.content.res.Resources.getSystem().getDisplayMetrics().density);
     }
 
     private void collapseView(View view) {
@@ -158,7 +158,8 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         TextView textTitle, textTime, textReminderType, textDescription;
         ImageView imgCheck;
         LinearLayout cardContainer;
-        View timelineDot, hollowCircle;
+        ImageView hollowCircle;
+        View timelineDot;
 
         TaskViewHolder(View itemView) {
             super(itemView);

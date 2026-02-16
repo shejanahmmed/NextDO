@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends AppCompatActivity implements DashboardTaskAdapter.OnTaskCompletionListener {
 
     private RecyclerView recyclerDates;
     private RecyclerView recyclerTasks;
@@ -111,6 +111,9 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Apply theme preference immediately on launch
+        applyThemePreference();
+
         // Hide default Action Bar
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
@@ -144,7 +147,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Setup Timeline Tasks (Vertical)
         recyclerTasks.setLayoutManager(new LinearLayoutManager(this));
-        taskAdapter = new DashboardTaskAdapter();
+        taskAdapter = new DashboardTaskAdapter(this);
         recyclerTasks.setAdapter(taskAdapter);
 
         // Define Start and End Dates (Today - 15 to Today + 15)
@@ -225,8 +228,10 @@ public class DashboardActivity extends AppCompatActivity {
             updateDashboard(currentActiveTasks, currentCompletedTasks);
         });
 
-        // Setup Swipe Animation for Task Cards
-        setupSwipeAnimation();
+        taskViewModel.getCompletedTasks().observe(this, completedTasks -> {
+            currentCompletedTasks = (completedTasks != null) ? completedTasks : new ArrayList<>();
+            updateDashboard(currentActiveTasks, currentCompletedTasks);
+        });
     }
 
     private void setupDrawer() {
@@ -544,177 +549,87 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void setupSwipeAnimation() {
+        PremiumSwipeCallback.SwipeActionListener listener = new PremiumSwipeCallback.SwipeActionListener() {
+            @Override
+            public void onSwipeRight(Task task, int position) {
+                // Edit Action
+                Intent intent = new Intent(DashboardActivity.this, NewTaskActivity.class);
+                intent.putExtra(NewTaskActivity.EXTRA_ID, task.id);
+                intent.putExtra(NewTaskActivity.EXTRA_TITLE, task.title);
+                intent.putExtra(NewTaskActivity.EXTRA_DESCRIPTION, task.description);
+                try {
+                    intent.putExtra(NewTaskActivity.EXTRA_REMINDER_TIME, task.reminderTime);
+                } catch (Exception e) {
+                    // Ignore
+                }
+                intent.putExtra(NewTaskActivity.EXTRA_REMINDER_TYPE, task.reminderType);
+                intent.putExtra(NewTaskActivity.EXTRA_REPEAT, task.repeat);
+                // Removed EXTRA_URI and EXTRA_IS_COMPLETED as they don't exist
+
+                taskActivityLauncher.launch(intent);
+            }
+
+            @Override
+            public void onSwipeLeft(Task task, int position) {
+                // Delete Action
+                taskViewModel.softDelete(task);
+                showUndoSnackbar(task);
+            }
+        };
+
+        PremiumSwipeCallback.TaskAccessor accessor = new PremiumSwipeCallback.TaskAccessor() {
+            @Override
+            public Task getTaskAt(int position) {
+                if (position != androidx.recyclerview.widget.RecyclerView.NO_POSITION
+                        && position < dashboardShownTasks.size()) {
+                    return dashboardShownTasks.get(position);
+                }
+                return null;
+            }
+
+            @Override
+            public void notifyChanged(int position) {
+                if (taskAdapter != null) {
+                    taskAdapter.notifyItemChanged(position);
+                }
+            }
+        };
+
+        PremiumSwipeCallback swipeCallback = new PremiumSwipeCallback(this, accessor, listener);
         androidx.recyclerview.widget.ItemTouchHelper itemTouchHelper = new androidx.recyclerview.widget.ItemTouchHelper(
-                new androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(0,
-                        androidx.recyclerview.widget.ItemTouchHelper.RIGHT) {
-
-                    @Override
-                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-                            RecyclerView.ViewHolder target) {
-                        return false; // Not supporting drag
-                    }
-
-                    @Override
-                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                        // Clear the currently swiped position
-                        currentlySwipedPosition = -1;
-                    }
-
-                    @Override
-                    public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                        super.clearView(recyclerView, viewHolder);
-                        // Ensure state is reset when interaction ends
-                        currentlySwipedPosition = -1;
-
-                        View cardContainer = viewHolder.itemView.findViewById(R.id.card_container);
-                        if (cardContainer != null) {
-                            cardContainer.setTranslationX(0f);
-                            cardContainer.setTag(R.id.card_container, false);
-                        }
-                    }
-
-                    @Override
-                    public void onChildDraw(android.graphics.Canvas c, RecyclerView recyclerView,
-                            RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState,
-                            boolean isCurrentlyActive) {
-                        if (actionState == androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE && dX > 0) {
-                            // Track which item is currently being swiped by position
-                            int pos = viewHolder.getBindingAdapterPosition();
-
-                            // Only capture position when user is actively touching
-                            if (isCurrentlyActive) {
-                                currentlySwipedPosition = pos;
-                            }
-
-                            // Strict isolation: only move if this is the tracked position
-                            if (pos == currentlySwipedPosition && pos != RecyclerView.NO_POSITION) {
-                                // Get the card container
-                                View cardContainer = viewHolder.itemView.findViewById(R.id.card_container);
-                                if (cardContainer != null) {
-                                    // Use tag to track if animation was triggered for THIS specific card
-                                    Boolean animationTriggered = (Boolean) cardContainer.getTag(R.id.card_container);
-                                    if (animationTriggered == null)
-                                        animationTriggered = false;
-
-                                    // Limit swipe distance (Increase for better visibility)
-                                    float maxSwipe = 200f;
-                                    float actualDx = Math.min(dX, maxSwipe);
-                                    float toggleThreshold = 100f;
-
-                                    // Apply translation
-                                    cardContainer.setTranslationX(actualDx);
-
-                                    // If released (finger up), trigger logic
-                                    if (!isCurrentlyActive && !animationTriggered) {
-                                        // Mark this card as animated to prevent double-firing
-                                        cardContainer.setTag(R.id.card_container, true);
-
-                                        boolean shouldToggle = actualDx > toggleThreshold;
-
-                                        // Start bounce-back animation
-                                        cardContainer.animate()
-                                                .translationX(0f)
-                                                .setDuration(300)
-                                                .setInterpolator(new android.view.animation.OvershootInterpolator(0.8f))
-                                                .withEndAction(() -> {
-                                                    // Reset card position and flag
-                                                    cardContainer.setTranslationX(0f);
-                                                    cardContainer.setTag(R.id.card_container, false);
-                                                    currentlySwipedPosition = -1;
-                                                })
-                                                .start();
-
-                                        if (shouldToggle) {
-                                            // Get hollow circle
-                                            View hollowCircle = viewHolder.itemView
-                                                    .findViewById(R.id.hollow_circle_indicator);
-
-                                            // Toggle circle visually immediately
-                                            if (hollowCircle != null) {
-                                                toggleHollowCircle(hollowCircle);
-
-                                                // Trigger database update
-                                                // NOTE: We update DATA, but Visual State returns to 0
-                                                pos = viewHolder.getBindingAdapterPosition();
-                                                if (pos != RecyclerView.NO_POSITION
-                                                        && pos < dashboardShownTasks.size()) {
-                                                    // Data Update
-                                                    Task task = dashboardShownTasks.get(pos);
-                                                    task.isCompleted = !task.isCompleted;
-                                                    taskViewModel.update(task);
-
-                                                    // 1. Cancel System Notification immediately (Syncs "System Tray")
-                                                    if (task.isCompleted) {
-                                                        try {
-                                                            androidx.core.app.NotificationManagerCompat notificationManager = androidx.core.app.NotificationManagerCompat
-                                                                    .from(DashboardActivity.this);
-                                                            notificationManager.cancel(task.id);
-
-                                                            // Optional: Cancel future alarm if strictly one-off
-                                                            // alarmScheduler.cancel(task);
-                                                        } catch (Exception e) {
-                                                            // Ignore
-                                                        }
-                                                    }
-
-                                                    // 2. Show Feedback (Syncs "User Confidence")
-                                                    String msg = task.isCompleted ? "Task completed"
-                                                            : "Task marked active";
-                                                    com.google.android.material.snackbar.Snackbar.make(
-                                                            findViewById(android.R.id.content),
-                                                            msg,
-                                                            com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
-                                                            .setAction("UNDO", v -> {
-                                                                task.isCompleted = !task.isCompleted;
-                                                                taskViewModel.update(task);
-                                                            })
-                                                            .show();
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-                        }
-                    }
-
-                    @Override
-                    public float getSwipeThreshold(RecyclerView.ViewHolder viewHolder) {
-                        // Return unreachable threshold to disable system's "drag-to-dismiss"
-                        return 10.0f;
-                    }
-
-                    @Override
-                    public float getSwipeEscapeVelocity(float defaultValue) {
-                        // Return max value to disable system's "fling-to-dismiss"
-                        return Float.MAX_VALUE;
-                    }
-                });
+                swipeCallback);
         itemTouchHelper.attachToRecyclerView(recyclerTasks);
     }
 
-    private void toggleHollowCircle(View circle) {
-        // Use tag to track state reliably
-        Boolean isShown = (Boolean) circle.getTag();
-        if (isShown == null)
-            isShown = false;
+    private void showUndoSnackbar(Task task) {
+        String msg = "Task deleted";
+        com.google.android.material.snackbar.Snackbar.make(
+                findViewById(android.R.id.content),
+                msg,
+                com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+                .setAction("UNDO", v -> {
+                    taskViewModel.restore(task);
+                })
+                .show();
+    }
 
-        // Cancel any ongoing animations
-        circle.animate().cancel();
+    @Override
+    public void onTaskChecked(Task task, boolean isChecked) {
+        // Update database
+        task.isCompleted = isChecked;
+        taskViewModel.update(task);
 
-        if (isShown) {
-            // Hide circle (Direct)
-            circle.setTag(false);
-            circle.setVisibility(View.GONE);
-            circle.setAlpha(0f);
-        } else {
-            // Show circle (Direct)
-            circle.setTag(true);
-            circle.setVisibility(View.VISIBLE);
-            circle.setAlpha(1f);
-        }
+        // Show feedback
+        String msg = isChecked ? "Task completed" : "Task activated";
+        com.google.android.material.snackbar.Snackbar.make(
+                findViewById(android.R.id.content),
+                msg,
+                com.google.android.material.snackbar.Snackbar.LENGTH_SHORT)
+                .setAction("Undo", v -> {
+                    task.isCompleted = !isChecked; // Revert
+                    taskViewModel.update(task);
+                })
+                .show();
     }
 
     @Override

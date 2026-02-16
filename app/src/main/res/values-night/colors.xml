@@ -6,4 +6,8 @@
     <color name="dashboard_arrow_color">#FFFFFF</color>
     <color name="dashboard_grey">#B0B0B0</color>
     <!-- Keep other colors same or define if needed -->
+
+    <!-- Widget Colors -->
+    <color name="widget_title_text">@android:color/white</color>
+    <color name="widget_time_text">@color/text_secondary</color>
 </resources>

@@ -41,10 +41,6 @@ public class UpcomingTasksWidgetProvider extends AppWidgetProvider {
         Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         intent.setComponent(new android.content.ComponentName(context, UpcomingTasksWidgetProvider.class));
         context.sendBroadcast(intent);
-
-        Intent intentLight = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        intentLight.setComponent(new android.content.ComponentName(context, UpcomingTasksLightWidgetProvider.class));
-        context.sendBroadcast(intentLight);
     }
 
     @Override

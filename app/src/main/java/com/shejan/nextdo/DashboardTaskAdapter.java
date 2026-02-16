@@ -19,6 +19,16 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             java.util.Locale.getDefault());
     private final java.util.Set<Integer> expandedPositions = new java.util.HashSet<>();
 
+    public interface OnTaskCompletionListener {
+        void onTaskChecked(Task task, boolean isChecked);
+    }
+
+    private final OnTaskCompletionListener completionListener;
+
+    public DashboardTaskAdapter(OnTaskCompletionListener completionListener) {
+        this.completionListener = completionListener;
+    }
+
     public void setTasks(List<Task> newTasks) {
         this.tasks = newTasks;
         notifyDataSetChanged();
@@ -121,6 +131,21 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         } else {
             holder.imgCheck.setVisibility(View.GONE);
         }
+
+        // Click listeners for task completion
+        View.OnClickListener completionClickListener = v -> {
+            boolean newStatus = !task.isCompleted;
+            // Optimistic update
+            task.isCompleted = newStatus;
+            notifyItemChanged(position);
+
+            if (completionListener != null) {
+                completionListener.onTaskChecked(task, newStatus);
+            }
+        };
+
+        holder.hollowCircle.setOnClickListener(completionClickListener);
+        holder.imgCheck.setOnClickListener(completionClickListener);
     }
 
     private void expandView(View view) {
@@ -157,8 +182,9 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView textTitle, textTime, textReminderType, textDescription;
         ImageView imgCheck;
-        LinearLayout cardContainer;
+        android.widget.RelativeLayout cardContainer;
         ImageView hollowCircle;
+
         View timelineDot;
 
         TaskViewHolder(View itemView) {

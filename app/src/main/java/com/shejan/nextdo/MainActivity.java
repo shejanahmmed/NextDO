@@ -225,59 +225,21 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
     }
 
     private void setupSwipeGestures() {
-        TaskSwipeCallback swipeCallback = new TaskSwipeCallback(this, adapter,
-                new TaskSwipeCallback.SwipeActionReceiver() {
+        PremiumSwipeCallback swipeCallback = new PremiumSwipeCallback(this, adapter,
+                new PremiumSwipeCallback.SwipeActionListener() {
                     @Override
-                    public void onSwipedLeft(Task task, RecyclerView.ViewHolder viewHolder) {
-                        // DELETE ANIMATION
-                        viewHolder.itemView.animate()
-                                .alpha(0f)
-                                .scaleX(0.5f)
-                                .scaleY(0.5f)
-                                .rotation(15f)
-                                .translationX(-viewHolder.itemView.getWidth())
-                                .setDuration(400)
-                                .setInterpolator(new android.view.animation.AccelerateInterpolator())
-                                .withEndAction(() -> {
-                                    taskViewModel.softDelete(task);
-                                    // Reset view state
-                                    viewHolder.itemView.setAlpha(1f);
-                                    viewHolder.itemView.setScaleX(1f);
-                                    viewHolder.itemView.setScaleY(1f);
-                                    viewHolder.itemView.setRotation(0f);
-                                    viewHolder.itemView.setTranslationX(0f);
-
-                                    Snackbar.make(binding.getRoot(), "Task moved to Recycle Bin", Snackbar.LENGTH_LONG)
-                                            .setAction("Undo", v -> taskViewModel.restore(task))
-                                            .show();
-                                })
-                                .start();
+                    public void onSwipeRight(Task task, int position) {
+                        // Edit Action
+                        onTaskClicked(task);
                     }
 
                     @Override
-                    public void onSwipedRight(Task task, int position) {
-                        // Play bounce animation
-                        RecyclerView.ViewHolder viewHolder = binding.recyclerview
-                                .findViewHolderForAdapterPosition(position);
-                        if (viewHolder != null) {
-                            viewHolder.itemView.animate()
-                                    .scaleX(1.15f)
-                                    .scaleY(1.15f)
-                                    .rotation(-3f)
-                                    .setDuration(150)
-                                    .setInterpolator(new android.view.animation.OvershootInterpolator())
-                                    .withEndAction(() -> viewHolder.itemView.animate()
-                                            .scaleX(1f)
-                                            .scaleY(1f)
-                                            .rotation(0f)
-                                            .setDuration(150)
-                                            .start())
-                                    .start();
-                        }
-
-                        // Open edit screen after delay
-                        new android.os.Handler(android.os.Looper.getMainLooper())
-                                .postDelayed(() -> onTaskClicked(task), 100);
+                    public void onSwipeLeft(Task task, int position) {
+                        // Delete Action
+                        taskViewModel.softDelete(task);
+                        Snackbar.make(binding.getRoot(), "Task moved to Recycle Bin", Snackbar.LENGTH_LONG)
+                                .setAction("UNDO", v -> taskViewModel.restore(task))
+                                .show();
                     }
                 });
 

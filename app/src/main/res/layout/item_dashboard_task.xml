@@ -40,12 +40,11 @@
         app:layout_constraintBottom_toBottomOf="@id/timeline_dot" />
 
     <!-- Card -->
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/card_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_dashboard_card_blue"
-        android:orientation="vertical"
         android:padding="16dp"
         android:layout_marginStart="24dp"
         app:layout_constraintStart_toEndOf="@id/timeline_line"
@@ -54,77 +53,90 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="24dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-            
-            <TextView
-                android:id="@+id/text_task_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Task Title"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/dashboard_text_navy" />
-
-            <ImageView
-                android:id="@+id/img_check"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_check_circle"
-                app:tint="@color/dashboard_text_navy"
-                android:visibility="gone" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="4dp"
-            android:alpha="0.8">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_clock"
-                app:tint="@color/dashboard_text_navy"
-                android:layout_marginEnd="4dp" />
-
-            <TextView
-                android:id="@+id/text_task_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10:00 AM"
-                android:textSize="14sp"
-                android:textColor="@color/dashboard_text_navy" />
-
-            <TextView
-                android:id="@+id/text_reminder_type"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Pill"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/dashboard_text_navy"
-                android:layout_marginStart="12dp"
-                android:visibility="gone" />
-        </LinearLayout>
-
-        <!-- Description (Initially Hidden) -->
-        <TextView
-            android:id="@+id/text_task_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Task description goes here"
-            android:textSize="14sp"
-            android:textColor="@color/dashboard_text_navy"
-            android:layout_marginTop="8dp"
-            android:alpha="0.7"
+        <!-- Checkmark (Centered Vertically) -->
+        <ImageView
+            android:id="@+id/img_check"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_check_circle"
+            app:tint="@color/dashboard_text_navy"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:visibility="gone" />
-    </LinearLayout>
+
+        <!-- Content Wrapper -->
+        <LinearLayout
+            android:id="@+id/content_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toStartOf="@id/img_check"
+            android:layout_marginEnd="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                
+                <TextView
+                    android:id="@+id/text_task_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Task Title"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/dashboard_text_navy" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp"
+                android:alpha="0.8">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_clock"
+                    app:tint="@color/dashboard_text_navy"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:id="@+id/text_task_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10:00 AM"
+                    android:textSize="14sp"
+                    android:textColor="@color/dashboard_text_navy" />
+
+                <TextView
+                    android:id="@+id/text_reminder_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pill"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/dashboard_text_navy"
+                    android:layout_marginStart="12dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Description (Initially Hidden) -->
+            <TextView
+                android:id="@+id/text_task_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Task description goes here"
+                android:textSize="14sp"
+                android:textColor="@color/dashboard_text_navy"
+                android:layout_marginTop="8dp"
+                android:alpha="0.7"
+                android:visibility="gone" />
+        </LinearLayout>
+        
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,13 +16,11 @@ public class UpcomingTasksRemoteViewsFactory implements RemoteViewsService.Remot
     private final Context context;
     private final List<Task> upcomingTasks = new ArrayList<>();
     private final TaskDao taskDao;
-    private final String theme;
 
     public UpcomingTasksRemoteViewsFactory(Context context, android.content.Intent intent) {
         this.context = context;
         AppDatabase db = AppDatabase.getDatabase(context);
         this.taskDao = db.taskDao();
-        this.theme = intent.getStringExtra("THEME");
     }
 
     @Override
@@ -67,9 +65,7 @@ public class UpcomingTasksRemoteViewsFactory implements RemoteViewsService.Remot
 
         Task task = upcomingTasks.get(position);
         int layoutId = R.layout.widget_item_task;
-        if ("LIGHT".equals(theme)) {
-            layoutId = R.layout.widget_item_task_light;
-        }
+
         RemoteViews rv = new RemoteViews(context.getPackageName(), layoutId);
 
         rv.setTextViewText(R.id.widget_item_title, task.title);

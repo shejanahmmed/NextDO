@@ -124,17 +124,58 @@
                     android:visibility="gone" />
             </LinearLayout>
 
-            <!-- Description (Initially Hidden) -->
-            <TextView
-                android:id="@+id/text_task_description"
+            <!-- Expandable Content (Description + Buttons) -->
+            <LinearLayout
+                android:id="@+id/layout_expandable"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Task description goes here"
-                android:textSize="14sp"
-                android:textColor="@color/dashboard_text_navy"
-                android:layout_marginTop="8dp"
-                android:alpha="0.7"
-                android:visibility="gone" />
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/text_task_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Task description goes here"
+                    android:textSize="14sp"
+                    android:textColor="@color/dashboard_text_navy"
+                    android:layout_marginTop="8dp"
+                    android:alpha="0.7" />
+
+                <LinearLayout
+                    android:id="@+id/layout_buttons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp"
+                    android:gravity="end">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:text="Edit"
+                        android:textSize="12sp"
+                        android:backgroundTint="@android:color/transparent"
+                        android:textColor="@color/dashboard_text_navy"
+                        app:strokeColor="@color/dashboard_text_navy"
+                        app:strokeWidth="1dp"
+                        app:cornerRadius="8dp"
+                        android:layout_marginEnd="8dp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_done"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:text="Mark as Done"
+                        android:textSize="12sp"
+                        android:backgroundTint="@color/dashboard_text_navy"
+                        android:textColor="@android:color/white"
+                        app:cornerRadius="8dp"
+                        style="@style/Widget.MaterialComponents.Button" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
         
     </RelativeLayout>

@@ -9,7 +9,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import java.util.Arrays;
 import java.util.List;
 
 public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdapter.TaskViewHolder> {
@@ -17,20 +16,23 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
     private List<Task> tasks = new java.util.ArrayList<>();
     private final java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("hh:mm a",
             java.util.Locale.getDefault());
-    private final java.util.Set<Integer> expandedPositions = new java.util.HashSet<>();
+    private int expandedPosition = RecyclerView.NO_POSITION;
 
-    public interface OnTaskCompletionListener {
+    public interface OnTaskActionListener {
         void onTaskChecked(Task task, boolean isChecked);
+
+        void onTaskEdit(Task task);
     }
 
-    private final OnTaskCompletionListener completionListener;
+    private final OnTaskActionListener actionListener;
 
-    public DashboardTaskAdapter(OnTaskCompletionListener completionListener) {
-        this.completionListener = completionListener;
+    public DashboardTaskAdapter(OnTaskActionListener actionListener) {
+        this.actionListener = actionListener;
     }
 
     public void setTasks(List<Task> newTasks) {
         this.tasks = newTasks;
+        this.expandedPosition = RecyclerView.NO_POSITION;
         notifyDataSetChanged();
     }
 
@@ -75,26 +77,37 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             holder.textReminderType.setVisibility(View.GONE);
         }
 
-        // Handle description
+        // Handle Expandable Layout (Accordion Style)
+        boolean isExpanded = position == expandedPosition;
+
+        // Ensure "Edit" and "Mark as Done" buttons are visible within the expandable
+        // layout
+        holder.layoutExpandable.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        holder.layoutExpandable.setAlpha(isExpanded ? 1f : 0f);
+
+        // Handle description text specifically
         if (task.description != null && !task.description.isEmpty()) {
             holder.textDescription.setText(task.description);
-            boolean isExpanded = expandedPositions.contains(position);
-            holder.textDescription.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+            holder.textDescription.setVisibility(View.VISIBLE);
         } else {
             holder.textDescription.setVisibility(View.GONE);
         }
 
-        // Click listener for expand/collapse
+        // Click listener for expand/collapse on the ENTIRE card
         holder.cardContainer.setOnClickListener(v -> {
-            if (task.description != null && !task.description.isEmpty()) {
-                if (expandedPositions.contains(position)) {
-                    // Collapse with animation
-                    expandedPositions.remove(position);
-                    collapseView(holder.textDescription);
-                } else {
-                    // Expand with animation
-                    expandedPositions.add(position);
-                    expandView(holder.textDescription);
+            int previousExpandedPosition = expandedPosition;
+            if (expandedPosition == position) {
+                // Clicked the already expanded card -> Collapse it
+                expandedPosition = RecyclerView.NO_POSITION;
+                collapseView(holder.layoutExpandable);
+            } else {
+                // Clicked a different card -> Expand it
+                expandedPosition = position;
+                expandView(holder.layoutExpandable);
+
+                // Collapse the previously expanded card if it exists
+                if (previousExpandedPosition != RecyclerView.NO_POSITION) {
+                    notifyItemChanged(previousExpandedPosition);
                 }
             }
         });
@@ -139,13 +152,31 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             task.isCompleted = newStatus;
             notifyItemChanged(position);
 
-            if (completionListener != null) {
-                completionListener.onTaskChecked(task, newStatus);
+            if (actionListener != null) {
+                actionListener.onTaskChecked(task, newStatus);
             }
         };
 
         holder.hollowCircle.setOnClickListener(completionClickListener);
         holder.imgCheck.setOnClickListener(completionClickListener);
+
+        // Buttons
+        holder.btnEdit.setOnClickListener(v -> {
+            if (actionListener != null) {
+                actionListener.onTaskEdit(task);
+            }
+        });
+
+        holder.btnDone.setOnClickListener(v -> {
+            // "Mark as Done" implies setting checked to true
+            if (!task.isCompleted) {
+                task.isCompleted = true;
+                notifyItemChanged(position);
+                if (actionListener != null) {
+                    actionListener.onTaskChecked(task, true);
+                }
+            }
+        });
     }
 
     private void expandView(View view) {
@@ -184,6 +215,8 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         ImageView imgCheck;
         android.widget.RelativeLayout cardContainer;
         ImageView hollowCircle;
+        LinearLayout layoutExpandable;
+        com.google.android.material.button.MaterialButton btnEdit, btnDone;
 
         View timelineDot;
 
@@ -197,6 +230,10 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             cardContainer = itemView.findViewById(R.id.card_container);
             timelineDot = itemView.findViewById(R.id.timeline_dot);
             hollowCircle = itemView.findViewById(R.id.hollow_circle_indicator);
+
+            layoutExpandable = itemView.findViewById(R.id.layout_expandable);
+            btnEdit = itemView.findViewById(R.id.btn_edit);
+            btnDone = itemView.findViewById(R.id.btn_done);
         }
     }
 }

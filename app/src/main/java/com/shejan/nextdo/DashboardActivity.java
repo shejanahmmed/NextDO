@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class DashboardActivity extends AppCompatActivity implements DashboardTaskAdapter.OnTaskCompletionListener {
+public class DashboardActivity extends AppCompatActivity implements DashboardTaskAdapter.OnTaskActionListener {
 
     private RecyclerView recyclerDates;
     private RecyclerView recyclerTasks;
@@ -96,6 +96,8 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
                     }
                 }
             });
+
+    // ... (rest of class until setupSwipeAnimation)
 
     private Handler countdownHandler = new Handler(Looper.getMainLooper());
     private Task nextUpcomingTask = null;
@@ -548,69 +550,23 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         }
     }
 
-    private void setupSwipeAnimation() {
-        PremiumSwipeCallback.SwipeActionListener listener = new PremiumSwipeCallback.SwipeActionListener() {
-            @Override
-            public void onSwipeRight(Task task, int position) {
-                // Edit Action
-                Intent intent = new Intent(DashboardActivity.this, NewTaskActivity.class);
-                intent.putExtra(NewTaskActivity.EXTRA_ID, task.id);
-                intent.putExtra(NewTaskActivity.EXTRA_TITLE, task.title);
-                intent.putExtra(NewTaskActivity.EXTRA_DESCRIPTION, task.description);
-                try {
-                    intent.putExtra(NewTaskActivity.EXTRA_REMINDER_TIME, task.reminderTime);
-                } catch (Exception e) {
-                    // Ignore
-                }
-                intent.putExtra(NewTaskActivity.EXTRA_REMINDER_TYPE, task.reminderType);
-                intent.putExtra(NewTaskActivity.EXTRA_REPEAT, task.repeat);
-                // Removed EXTRA_URI and EXTRA_IS_COMPLETED as they don't exist
+    @Override
+    public void onTaskEdit(Task task) {
+        // Edit Action
+        Intent intent = new Intent(DashboardActivity.this, NewTaskActivity.class);
+        intent.putExtra(NewTaskActivity.EXTRA_ID, task.id);
+        intent.putExtra(NewTaskActivity.EXTRA_TITLE, task.title);
+        intent.putExtra(NewTaskActivity.EXTRA_DESCRIPTION, task.description);
+        try {
+            intent.putExtra(NewTaskActivity.EXTRA_REMINDER_TIME, task.reminderTime);
+        } catch (Exception e) {
+            // Ignore
+        }
+        intent.putExtra(NewTaskActivity.EXTRA_REMINDER_TYPE, task.reminderType);
+        intent.putExtra(NewTaskActivity.EXTRA_REPEAT, task.repeat);
+        // Removed EXTRA_URI and EXTRA_IS_COMPLETED as they don't exist
 
-                taskActivityLauncher.launch(intent);
-            }
-
-            @Override
-            public void onSwipeLeft(Task task, int position) {
-                // Delete Action
-                taskViewModel.softDelete(task);
-                showUndoSnackbar(task);
-            }
-        };
-
-        PremiumSwipeCallback.TaskAccessor accessor = new PremiumSwipeCallback.TaskAccessor() {
-            @Override
-            public Task getTaskAt(int position) {
-                if (position != androidx.recyclerview.widget.RecyclerView.NO_POSITION
-                        && position < dashboardShownTasks.size()) {
-                    return dashboardShownTasks.get(position);
-                }
-                return null;
-            }
-
-            @Override
-            public void notifyChanged(int position) {
-                if (taskAdapter != null) {
-                    taskAdapter.notifyItemChanged(position);
-                }
-            }
-        };
-
-        PremiumSwipeCallback swipeCallback = new PremiumSwipeCallback(this, accessor, listener);
-        androidx.recyclerview.widget.ItemTouchHelper itemTouchHelper = new androidx.recyclerview.widget.ItemTouchHelper(
-                swipeCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerTasks);
-    }
-
-    private void showUndoSnackbar(Task task) {
-        String msg = "Task deleted";
-        com.google.android.material.snackbar.Snackbar.make(
-                findViewById(android.R.id.content),
-                msg,
-                com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
-                .setAction("UNDO", v -> {
-                    taskViewModel.restore(task);
-                })
-                .show();
+        taskActivityLauncher.launch(intent);
     }
 
     @Override

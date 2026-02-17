@@ -150,6 +150,15 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                             .setVibrate(new long[] { 0, 1000, 500, 1000 });
                 }
 
+                // Add Mark as Done Action
+                Intent doneIntent = new Intent(context, MarkAsDoneReceiver.class);
+                doneIntent.putExtra(EXTRA_TASK_ID, taskId);
+                doneIntent.putExtra(EXTRA_TASK_TITLE, taskTitle);
+                PendingIntent donePendingIntent = PendingIntent.getBroadcast(context, taskId + 30000, doneIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                builder.addAction(R.drawable.ic_check, "Mark as done", donePendingIntent);
+
                 // Add Snooze Action
                 int alarmId = intent.getIntExtra("alarm_id", 0);
                 Intent snoozeIntent = new Intent(context, SnoozeReceiver.class);

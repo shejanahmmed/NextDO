@@ -36,6 +36,14 @@ public class DashboardDateAdapter extends RecyclerView.Adapter<RecyclerView.View
         return dates;
     }
 
+    public void setSelectedDate(long timestamp) {
+        // Normalize checking if needed, or exact match
+        for (DateItem item : dates) {
+            item.isActive = (item.timestamp == timestamp);
+        }
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemViewType(int position) {
         if (position == 0) {

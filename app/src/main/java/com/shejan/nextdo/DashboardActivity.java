@@ -17,12 +17,15 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -41,7 +44,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
 
     private TextView textTimelineHeader;
     private TextView textEmptyState;
-    private androidx.core.widget.NestedScrollView nestedScrollView;
 
     // Existing fields restored
     private RecyclerView recyclerDates;
@@ -150,8 +152,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         textHeaderCountDone = findViewById(R.id.text_header_count_done);
         textHeaderPill = findViewById(R.id.text_header_pill);
 
-        nestedScrollView = findViewById(R.id.dashboard_scroll_view);
-
         // Timeline Header Views for Scroll Effect
         textTimelineHeader = findViewById(R.id.text_timeline_header);
         textEmptyState = findViewById(R.id.text_empty_state);
@@ -235,39 +235,88 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
             updateDashboard(currentActiveTasks, currentCompletedTasks);
         });
 
-        // Setup Scroll Listener for Animation (NestedScrollView)
-        if (nestedScrollView != null) {
-            nestedScrollView
-                    .setOnScrollChangeListener((androidx.core.widget.NestedScrollView.OnScrollChangeListener) (v,
-                            scrollX, scrollY, oldScrollX, oldScrollY) -> {
+        // Initialize CoordinatorLayout behavior
+        AppBarLayout appBarLayout = findViewById(R.id.app_bar);
+        CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsing_toolbar);
 
-                        int scrollRange = 300; // Trigger point for transition (Fixed for snappy feel)
+        // Ensure initial state
+        if (layoutHeaderCollapsed != null) {
+            layoutHeaderCollapsed.setAlpha(0f);
+            layoutHeaderCollapsed.setVisibility(View.INVISIBLE);
+        }
 
-                        // Calculate progress (0.0 to 1.0) based on fixed range
-                        float fraction = Math.min(1f, Math.max(0f, (float) scrollY / scrollRange));
+        if (appBarLayout != null && collapsingToolbar != null) {
+            appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+                @Override
+                public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                    int totalScrollRange = appBarLayout.getTotalScrollRange();
+                    if (totalScrollRange == 0)
+                        return;
 
-                        // For parallax, we can use scrollY directly
-                        // layoutHeaderExpanded moves at half speed relative to scroll
+                    float percentage = (float) Math.abs(verticalOffset) / (float) totalScrollRange;
 
-                        // Animate Expanded Header (Fade Out & Parallax)
-                        if (layoutHeaderExpanded != null) {
-                            layoutHeaderExpanded.setAlpha(1f - fraction);
-                            layoutHeaderExpanded.setTranslationY(scrollY * 0.5f); // Parallax: Move slightly down
-                                                                                  // relative to scroll
-                            layoutHeaderExpanded.setVisibility(fraction >= 1f ? View.INVISIBLE : View.VISIBLE);
-                        }
+                    // Fade out the Expanded Header (Faster, to avoid overlap with Title)
+                    if (layoutHeaderExpanded != null) {
+                        float fadeOutLimit = 0.6f; // Fully invisible by 60% scroll
+                        float alpha = 1f - (percentage / fadeOutLimit);
+                        layoutHeaderExpanded.setAlpha(Math.max(0f, alpha));
+                        layoutHeaderExpanded.setVisibility(alpha > 0 ? View.VISIBLE : View.INVISIBLE);
+                    }
 
-                        // Animate Date Scroller (Horizontal Slide & Fade)
-                        if (recyclerDates != null) {
-                            recyclerDates.setTranslationX(-scrollY * 1.5f); // Slide left faster (Restore 1.5f)
-                            // Remove alpha here - Parent (layoutHeaderExpanded) fades already.
-                            recyclerDates.setVisibility(fraction >= 1f ? View.INVISIBLE : View.VISIBLE);
-                        }
+                    // Fade in the Collapsed Header (Sticky Card)
+                    if (layoutHeaderCollapsed != null) {
+                        layoutHeaderCollapsed.setAlpha(percentage);
+                        layoutHeaderCollapsed.setVisibility(percentage > 0.1f ? View.VISIBLE : View.INVISIBLE);
+                    }
 
-                        // Animate Collapsed Header (Fade In)
-                        if (layoutHeaderCollapsed != null) {
-                            layoutHeaderCollapsed.setAlpha(fraction);
-                            layoutHeaderCollapsed.setVisibility(fraction > 0 ? View.VISIBLE : View.INVISIBLE);
+                    // Adjust Title Alpha if needed (optional)
+                    // View titleView = findViewById(R.id.title_dashboard);
+                    // if (titleView != null) titleView.setAlpha(1f - percentage);
+                    // (User actually wanted title moved/pinned, keeping it simple for now)
+                }
+            });
+
+            // Calculate Minimum Height for Collapsing Toolbar to ensure Sticky Stack fits
+            // Stack = Title Spacer (80dp) + Header Card (wrap) + Timeline Header (wrap)
+            // We need to measure them to be exact.
+
+            collapsingToolbar.getViewTreeObserver()
+                    .addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            collapsingToolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                            int titleSpacerHeight = (int) (80 * getResources().getDisplayMetrics().density); // Matches
+                                                                                                             // XML
+                                                                                                             // spacer
+                            int headerCardHeight = (layoutHeaderCollapsed != null) ? layoutHeaderCollapsed.getHeight()
+                                    : 0;
+                            if (headerCardHeight == 0)
+                                headerCardHeight = (int) (100 * getResources().getDisplayMetrics().density);
+
+                            View timelineHeader = findViewById(R.id.text_timeline_header);
+                            int timelineHeaderHeight = (timelineHeader != null) ? timelineHeader.getHeight() : 0;
+                            if (timelineHeaderHeight == 0)
+                                timelineHeaderHeight = (int) (50 * getResources().getDisplayMetrics().density);
+
+                            // minHeight = Title + Pinned Header + Timeline Header
+                            // Actually, the Toolbar (pinned) inside XML handles the pinning.
+                            // We just need to make sure the Toolbar's minHeight is large enough OR
+                            // the CollapsingToolbar's scrimVisibleHeightTrigger is set.
+
+                            // The Toolbar in XML has `android:minHeight="140dp"` which is fixed.
+                            // Let's adjust it dynamically to match perfectly the items we pinned.
+
+                            androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+                            if (toolbar != null) {
+                                int totalPinnedHeight = titleSpacerHeight + headerCardHeight + timelineHeaderHeight;
+                                // Add some buffer for margins
+                                totalPinnedHeight += (int) (16 * getResources().getDisplayMetrics().density);
+
+                                toolbar.setMinimumHeight(totalPinnedHeight);
+                                collapsingToolbar.setMinimumHeight(totalPinnedHeight);
+                                collapsingToolbar.setScrimVisibleHeightTrigger(totalPinnedHeight);
+                            }
                         }
                     });
         }

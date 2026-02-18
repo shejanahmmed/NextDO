@@ -34,6 +34,10 @@
             android:enabled="true"
             android:exported="false" />
         <receiver
+            android:name=".MarkAsDoneReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <receiver
             android:name=".BootCompletedReceiver"
             android:enabled="true"
             android:exported="true"

@@ -165,8 +165,8 @@
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:minHeight="0dp"
                     app:layout_collapseMode="pin"
-                    android:minHeight="80dp"
                     android:padding="0dp"
                     app:contentInsetStart="0dp"
                     android:background="@android:color/transparent">
@@ -187,18 +187,17 @@
                             android:layout_marginStart="24dp"
                             android:layout_marginEnd="24dp"
                             android:background="@drawable/bg_header_collapsed"
-                            android:elevation="12dp"
                             android:visibility="invisible"
                             android:alpha="0"
                             android:orientation="horizontal"
                             android:gravity="center_vertical|start"
                             android:paddingHorizontal="16dp"
-                            android:paddingVertical="12dp">
+                            android:paddingVertical="10dp">
 
                             <TextView
                                 android:id="@+id/text_header_count"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
                                 android:background="@drawable/shape_hollow_circle_teal"
                                 android:gravity="center"
                                 android:text="0"
@@ -208,9 +207,9 @@
 
                             <TextView
                                 android:id="@+id/text_header_count_done"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_marginStart="16dp"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_marginStart="12dp"
                                 android:background="@drawable/shape_hollow_circle_pink"
                                 android:gravity="center"
                                 android:text="0"
@@ -221,8 +220,8 @@
                             <TextView
                                 android:id="@+id/text_header_pill"
                                 android:layout_width="wrap_content"
-                                android:layout_height="48dp"
-                                android:layout_marginStart="16dp"
+                                android:layout_height="50dp"
+                                android:layout_marginStart="12dp"
                                 android:minWidth="80dp"
                                 android:paddingHorizontal="12dp"
                                 android:background="@drawable/shape_hollow_pill_yellow"
@@ -254,7 +253,8 @@
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="4dp"
                                         android:text="Remaining"
-                                        android:textSize="10sp"
+                                        android:singleLine="true"
+                                        android:textSize="8sp"
                                         android:textColor="@color/dashboard_text_navy"
                                         android:textStyle="bold"/>
                                 </LinearLayout>
@@ -273,7 +273,8 @@
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="4dp"
                                         android:text="Completed"
-                                        android:textSize="10sp"
+                                        android:singleLine="true"
+                                        android:textSize="8sp"
                                         android:textColor="@color/dashboard_text_navy"
                                         android:textStyle="bold"/>
                                 </LinearLayout>
@@ -291,8 +292,9 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="4dp"
-                                        android:text="Progress/Wait"
-                                        android:textSize="10sp"
+                                        android:text="Upcoming"
+                                        android:singleLine="true"
+                                        android:textSize="8sp"
                                         android:textColor="@color/dashboard_text_navy"
                                         android:textStyle="bold"/>
                                 </LinearLayout>
@@ -356,7 +358,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
-        android:paddingBottom="16dp"
         android:elevation="8dp">
 
         <TextView

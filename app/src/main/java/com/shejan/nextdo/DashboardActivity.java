@@ -246,6 +246,10 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         }
 
         if (appBarLayout != null && collapsingToolbar != null) {
+            final Handler snapHandler = new Handler(Looper.getMainLooper());
+            final Runnable[] snapRunnable = { null };
+            final float[] lastPercentage = { 0f };
+
             appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
                 @Override
                 public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
@@ -254,6 +258,7 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
                         return;
 
                     float percentage = (float) Math.abs(verticalOffset) / (float) totalScrollRange;
+                    lastPercentage[0] = percentage;
 
                     // Fade out the Expanded Header (Faster, to avoid overlap with Title)
                     if (layoutHeaderExpanded != null) {
@@ -269,10 +274,17 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
                         layoutHeaderCollapsed.setVisibility(percentage > 0.1f ? View.VISIBLE : View.INVISIBLE);
                     }
 
-                    // Adjust Title Alpha if needed (optional)
-                    // View titleView = findViewById(R.id.title_dashboard);
-                    // if (titleView != null) titleView.setAlpha(1f - percentage);
-                    // (User actually wanted title moved/pinned, keeping it simple for now)
+                    // Quick-snap: debounce scroll stop, then snap at 25% threshold
+                    if (snapRunnable[0] != null)
+                        snapHandler.removeCallbacks(snapRunnable[0]);
+                    snapRunnable[0] = () -> {
+                        if (lastPercentage[0] > 0.25f && lastPercentage[0] < 1.0f) {
+                            appBarLayout.setExpanded(false, true);
+                        } else if (lastPercentage[0] > 0f && lastPercentage[0] <= 0.25f) {
+                            appBarLayout.setExpanded(true, true);
+                        }
+                    };
+                    snapHandler.postDelayed(snapRunnable[0], 150);
                 }
             });
 

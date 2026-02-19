@@ -192,7 +192,7 @@
                             android:orientation="horizontal"
                             android:gravity="center_vertical|start"
                             android:paddingHorizontal="16dp"
-                            android:paddingVertical="10dp">
+                            android:paddingVertical="12dp">
 
                             <TextView
                                 android:id="@+id/text_header_count"
@@ -327,7 +327,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            app:layout_behavior="com.shejan.nextdo.AppBarFirstScrollBehavior">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_tasks"
@@ -350,7 +350,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:textAlignment="center"
                 android:visibility="gone"
-                android:layout_marginTop="32dp" />
+                android:layout_marginTop="70dp" />
         </FrameLayout>
 
     <!-- Title and Menu Overlay (Fixed) -->

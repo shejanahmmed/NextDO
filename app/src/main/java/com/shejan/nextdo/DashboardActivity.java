@@ -41,6 +41,7 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
     private TextView textHeaderCount;
     private TextView textHeaderCountDone;
     private TextView textHeaderPill;
+    private AppBarLayout appBarLayout;
 
     private TextView textTimelineHeader;
     private TextView textEmptyState;
@@ -196,8 +197,8 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         taskAdapter = new DashboardTaskAdapter(this);
         recyclerTasks.setAdapter(taskAdapter);
 
-        // Disable nested scrolling on RecyclerView (it's inside NestedScrollView now)
-        recyclerTasks.setNestedScrollingEnabled(false);
+        // Enable nested scrolling so task list scroll collapses the header first
+        recyclerTasks.setNestedScrollingEnabled(true);
 
         // Drawer Setup
         btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.END));
@@ -236,7 +237,7 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         });
 
         // Initialize CoordinatorLayout behavior
-        AppBarLayout appBarLayout = findViewById(R.id.app_bar);
+        appBarLayout = findViewById(R.id.app_bar);
         CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsing_toolbar);
 
         // Ensure initial state
@@ -284,7 +285,7 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
                             appBarLayout.setExpanded(true, true);
                         }
                     };
-                    snapHandler.postDelayed(snapRunnable[0], 150);
+                    snapHandler.postDelayed(snapRunnable[0], 200);
                 }
             });
 

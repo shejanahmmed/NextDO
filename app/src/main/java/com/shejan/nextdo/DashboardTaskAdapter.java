@@ -22,6 +22,8 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         void onTaskChecked(Task task, boolean isChecked);
 
         void onTaskEdit(Task task);
+
+        void onTaskDelete(Task task);
     }
 
     private final OnTaskActionListener actionListener;
@@ -84,6 +86,10 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         // layout
         holder.layoutExpandable.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.layoutExpandable.setAlpha(isExpanded ? 1f : 0f);
+
+        // Show/hide delete button with expand state
+        holder.btnDelete.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        holder.btnDelete.setAlpha(isExpanded ? 0.6f : 0f);
 
         // Handle description text specifically
         if (task.description != null && !task.description.isEmpty()) {
@@ -177,6 +183,13 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
                 }
             }
         });
+
+        // Delete button
+        holder.btnDelete.setOnClickListener(v -> {
+            if (actionListener != null) {
+                actionListener.onTaskDelete(task);
+            }
+        });
     }
 
     private void expandView(View view) {
@@ -212,7 +225,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
 
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView textTitle, textTime, textReminderType, textDescription;
-        ImageView imgCheck;
+        ImageView imgCheck, btnDelete;
         android.widget.RelativeLayout cardContainer;
         ImageView hollowCircle;
         LinearLayout layoutExpandable;
@@ -234,6 +247,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             layoutExpandable = itemView.findViewById(R.id.layout_expandable);
             btnEdit = itemView.findViewById(R.id.btn_edit);
             btnDone = itemView.findViewById(R.id.btn_done);
+            btnDelete = itemView.findViewById(R.id.btn_delete_task);
         }
     }
 }

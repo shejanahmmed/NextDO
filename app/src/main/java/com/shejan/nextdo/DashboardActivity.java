@@ -495,7 +495,7 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
             if (progressCircleSecondary != null)
                 progressCircleSecondary.setProgress(0);
             if (textHeaderPill != null)
-                textHeaderPill.setText("--:--");
+                textHeaderPill.setText("00:00");
             return;
         }
 
@@ -504,7 +504,7 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
             public void run() {
                 if (nextUpcomingTask == null) {
                     if (textHeaderPill != null)
-                        textHeaderPill.setText("--:--");
+                        textHeaderPill.setText("00:00");
                     return;
                 }
 
@@ -606,6 +606,17 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
                     task.isCompleted = !isChecked; // Revert
                     taskViewModel.update(task);
                 })
+                .show();
+    }
+
+    @Override
+    public void onTaskDelete(Task task) {
+        taskViewModel.delete(task);
+        com.google.android.material.snackbar.Snackbar.make(
+                findViewById(android.R.id.content),
+                "Task deleted",
+                com.google.android.material.snackbar.Snackbar.LENGTH_SHORT)
+                .setAction("Undo", v -> taskViewModel.insert(task))
                 .show();
     }
 

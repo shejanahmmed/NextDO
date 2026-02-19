@@ -64,6 +64,20 @@
             android:layout_centerVertical="true"
             android:visibility="gone" />
 
+        <!-- Delete Icon (Top-Right Corner, shown when expanded) -->
+        <ImageView
+            android:id="@+id/btn_delete_task"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/dashboard_text_navy"
+            android:alpha="0.6"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:padding="2dp"
+            android:visibility="gone"
+            android:contentDescription="Delete task" />
+
         <!-- Content Wrapper -->
         <LinearLayout
             android:id="@+id/content_wrapper"

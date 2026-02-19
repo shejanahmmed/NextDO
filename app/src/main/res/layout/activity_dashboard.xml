@@ -5,6 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".DashboardActivity">
 
     <!-- Main Content with CoordinatorLayout -->
@@ -405,6 +406,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:orientation="vertical"
+        android:fitsSystemWindows="true"
         android:background="@drawable/bg_drawer_rounded">
 
         <com.google.android.material.navigation.NavigationView

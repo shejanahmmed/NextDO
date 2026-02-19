@@ -184,6 +184,15 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             }
         });
 
+        // Delete button (inline)
+        if (holder.btnDeleteBtn != null) {
+            holder.btnDeleteBtn.setOnClickListener(v -> {
+                if (actionListener != null) {
+                    actionListener.onTaskDelete(task);
+                }
+            });
+        }
+
         // Delete button
         holder.btnDelete.setOnClickListener(v -> {
             if (actionListener != null) {
@@ -229,7 +238,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         android.widget.RelativeLayout cardContainer;
         ImageView hollowCircle;
         LinearLayout layoutExpandable;
-        com.google.android.material.button.MaterialButton btnEdit, btnDone;
+        com.google.android.material.button.MaterialButton btnEdit, btnDone, btnDeleteBtn;
 
         View timelineDot;
 
@@ -248,6 +257,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             btnEdit = itemView.findViewById(R.id.btn_edit);
             btnDone = itemView.findViewById(R.id.btn_done);
             btnDelete = itemView.findViewById(R.id.btn_delete_task);
+            btnDeleteBtn = itemView.findViewById(R.id.btn_delete);
         }
     }
 }

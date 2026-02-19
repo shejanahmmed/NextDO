@@ -21,7 +21,7 @@
                 android:id="@+id/main_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="My Tasks"
+                android:text="My Reminders"
                 android:textSize="32sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorOnSurface"

@@ -5,7 +5,6 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".DashboardActivity">
 
     <!-- Main Content with CoordinatorLayout -->
@@ -388,25 +387,147 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_dashboard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="32dp"
-        android:backgroundTint="@color/dashboard_matte_teal"
-        app:tint="@android:color/white"
-        android:src="@drawable/ic_add"
-        android:layout_gravity="bottom|end" />
+    <!-- Bottom Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/bottom_nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:background="@color/dashboard_background"
+        android:elevation="12dp"
+        android:paddingHorizontal="8dp">
+
+        <!-- Dashboard -->
+        <LinearLayout
+            android:id="@+id/nav_dashboard"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_home"
+                app:tint="@color/dashboard_text_navy"
+                android:contentDescription="Dashboard" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dashboard"
+                android:textSize="9sp"
+                android:textColor="@color/dashboard_text_navy"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- Reminders -->
+        <LinearLayout
+            android:id="@+id/nav_reminders"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_alarm"
+                app:tint="@color/dashboard_grey"
+                android:contentDescription="Reminders" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reminders"
+                android:textSize="9sp"
+                android:textColor="@color/dashboard_grey"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- Add Task (Center raised button) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_dashboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_add"
+                android:backgroundTint="@color/dashboard_text_navy"
+                app:tint="@android:color/white"
+                app:fabSize="mini"
+                android:contentDescription="Add Task"
+                android:layout_marginBottom="20dp" />
+        </LinearLayout>
+
+        <!-- Completed -->
+        <LinearLayout
+            android:id="@+id/nav_completed"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle"
+                app:tint="@color/dashboard_grey"
+                android:contentDescription="Completed" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Completed"
+                android:textSize="9sp"
+                android:textColor="@color/dashboard_grey"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- Settings -->
+        <LinearLayout
+            android:id="@+id/nav_settings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_settings"
+                app:tint="@color/dashboard_grey"
+                android:contentDescription="Settings" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textSize="9sp"
+                android:textColor="@color/dashboard_grey"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!-- Drawer Container with Footer -->
     <LinearLayout
+        android:id="@+id/drawer_container"
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:orientation="vertical"
-        android:fitsSystemWindows="true"
         android:background="@drawable/bg_drawer_rounded">
 
         <com.google.android.material.navigation.NavigationView

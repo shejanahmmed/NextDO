@@ -168,7 +168,62 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
 
+        // Change status bar color to match drawer when open, dashboard bg when closed
+        int dashboardBg = androidx.core.content.ContextCompat.getColor(this, R.color.dashboard_background);
+        int drawerBg = androidx.core.content.ContextCompat.getColor(this, R.color.drawer_premium_background);
+        drawerLayout.addDrawerListener(new androidx.drawerlayout.widget.DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerOpened(android.view.View drawerView) {
+                getWindow().setStatusBarColor(drawerBg);
+            }
+
+            @Override
+            public void onDrawerClosed(android.view.View drawerView) {
+                getWindow().setStatusBarColor(dashboardBg);
+            }
+
+            @Override
+            public void onDrawerSlide(android.view.View drawerView, float slideOffset) {
+                // Blend colors as drawer slides
+                int blended = blendColors(dashboardBg, drawerBg, slideOffset);
+                getWindow().setStatusBarColor(blended);
+            }
+        });
+
         // --- Setup Adapters & Listeners ---
+
+        // Bottom Navigation clicks
+        if (fab != null) {
+            fab.setOnClickListener(v -> {
+                android.content.Intent intent = new android.content.Intent(this, NewTaskActivity.class);
+                startActivity(intent);
+            });
+        }
+        android.view.View navDashboard = findViewById(R.id.nav_dashboard);
+        if (navDashboard != null)
+            navDashboard.setOnClickListener(v -> {
+                /* already here */ });
+
+        android.view.View navReminders = findViewById(R.id.nav_reminders);
+        if (navReminders != null)
+            navReminders.setOnClickListener(v -> {
+                android.content.Intent intent = new android.content.Intent(this, MainActivity.class);
+                startActivity(intent);
+            });
+
+        android.view.View navCompleted = findViewById(R.id.nav_completed);
+        if (navCompleted != null)
+            navCompleted.setOnClickListener(v -> {
+                android.content.Intent intent = new android.content.Intent(this, CompletedTasksActivity.class);
+                startActivity(intent);
+            });
+
+        android.view.View navSettings = findViewById(R.id.nav_settings);
+        if (navSettings != null)
+            navSettings.setOnClickListener(v -> {
+                android.content.Intent intent = new android.content.Intent(this, SettingsActivity.class);
+                startActivity(intent);
+            });
 
         // Setup Date Scroller (Horizontal)
         recyclerDates.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -632,5 +687,14 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
     protected void onDestroy() {
         super.onDestroy();
         countdownHandler.removeCallbacksAndMessages(null);
+    }
+
+    private int blendColors(int from, int to, float ratio) {
+        float inverseRatio = 1f - ratio;
+        float a = android.graphics.Color.alpha(to) * ratio + android.graphics.Color.alpha(from) * inverseRatio;
+        float r = android.graphics.Color.red(to) * ratio + android.graphics.Color.red(from) * inverseRatio;
+        float g = android.graphics.Color.green(to) * ratio + android.graphics.Color.green(from) * inverseRatio;
+        float b = android.graphics.Color.blue(to) * ratio + android.graphics.Color.blue(from) * inverseRatio;
+        return android.graphics.Color.argb((int) a, (int) r, (int) g, (int) b);
     }
 }

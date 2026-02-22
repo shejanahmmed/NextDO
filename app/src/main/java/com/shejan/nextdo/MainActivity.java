@@ -153,9 +153,8 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         setContentView(binding.getRoot());
 
         // Enable Edge-to-Edge
-        binding.drawerLayout.setDrawerElevation(0f);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        ViewCompat.setOnApplyWindowInsetsListener(binding.drawerLayout, (v, windowInsets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.mainRoot, (v, windowInsets) -> {
             androidx.core.graphics.Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             // Apply padding to the main content container only
             View content = findViewById(R.id.main_content_container);
@@ -170,8 +169,6 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         Log.d(TAG, "AlarmScheduler initialized");
 
         // Remove toolbar for Nothing theme
-        // Remove toolbar for Nothing theme
-        setupDrawer();
         // setupBlurEffect() removed;
 
         askNotificationPermission();
@@ -245,59 +242,6 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeCallback);
         itemTouchHelper.attachToRecyclerView(binding.recyclerview);
-    }
-
-    private void setupDrawer() {
-        binding.menuIcon.setOnClickListener(v -> binding.drawerLayout.openDrawer(GravityCompat.END));
-
-        binding.navView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_dashboard) {
-                Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish(); // Optional, but Cleaner
-            } else if (id == R.id.nav_tasks) {
-                // Already on "My Tasks" (Main Task List), just close drawer
-                binding.drawerLayout.closeDrawer(GravityCompat.END);
-                return true;
-            } else if (id == R.id.nav_settings) {
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);
-            } else if (id == R.id.nav_completed_tasks) {
-                Intent intent = new Intent(MainActivity.this, CompletedTasksActivity.class);
-                startActivity(intent);
-            }
-            binding.drawerLayout.closeDrawer(GravityCompat.END);
-            return true;
-        });
-
-        // Apply active state styling to Home item
-        applyActiveStateToMenuItem(R.id.nav_tasks);
-
-        // Setup close button click listener for XML footer
-        com.google.android.material.button.MaterialButton btnCloseDrawer = findViewById(R.id.btn_close_drawer_footer);
-        if (btnCloseDrawer != null) {
-            btnCloseDrawer.setOnClickListener(v -> {
-                binding.drawerLayout.closeDrawer(GravityCompat.END);
-            });
-        }
-
-    }
-
-    private void applyActiveStateToMenuItem(int menuItemId) {
-        android.view.Menu menu = binding.navView.getMenu();
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            if (item.getItemId() == menuItemId) {
-                item.setChecked(true);
-                // Apply lavender background to checked item
-                android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-                bg.setColor(getResources().getColor(R.color.drawer_lavender, null));
-                bg.setCornerRadius(24 * getResources().getDisplayMetrics().density);
-                // Note: NavigationView handles checked state styling automatically
-            }
-        }
     }
 
     private void askNotificationPermission() {

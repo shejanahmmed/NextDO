@@ -51,7 +51,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
     private RecyclerView recyclerTasks;
     private DashboardDateAdapter dateAdapter;
     private DashboardTaskAdapter taskAdapter;
-    private ImageView btnMenu;
     private FloatingActionButton fab;
     private ProgressBar progressCircle;
     private ProgressBar progressCircleSecondary;
@@ -59,8 +58,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
     private TextView textProgressPercent;
 
     private TaskViewModel taskViewModel;
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
 
     // Added for saving tasks
     private AlarmScheduler alarmScheduler;
@@ -141,7 +138,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         // Initialize Views
         recyclerDates = findViewById(R.id.recycler_dates);
         recyclerTasks = findViewById(R.id.recycler_tasks);
-        btnMenu = findViewById(R.id.btn_menu);
         fab = findViewById(R.id.fab_dashboard);
         progressCircle = findViewById(R.id.progress_bar_circle);
         progressCircleSecondary = findViewById(R.id.progress_bar_circle_secondary);
@@ -164,31 +160,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         // Timeline Header Views for Scroll Effect
         textTimelineHeader = findViewById(R.id.text_timeline_header);
         textEmptyState = findViewById(R.id.text_empty_state);
-
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-
-        // Change status bar color to match drawer when open, dashboard bg when closed
-        int dashboardBg = androidx.core.content.ContextCompat.getColor(this, R.color.dashboard_background);
-        int drawerBg = androidx.core.content.ContextCompat.getColor(this, R.color.drawer_premium_background);
-        drawerLayout.addDrawerListener(new androidx.drawerlayout.widget.DrawerLayout.SimpleDrawerListener() {
-            @Override
-            public void onDrawerOpened(android.view.View drawerView) {
-                getWindow().setStatusBarColor(drawerBg);
-            }
-
-            @Override
-            public void onDrawerClosed(android.view.View drawerView) {
-                getWindow().setStatusBarColor(dashboardBg);
-            }
-
-            @Override
-            public void onDrawerSlide(android.view.View drawerView, float slideOffset) {
-                // Blend colors as drawer slides
-                int blended = blendColors(dashboardBg, drawerBg, slideOffset);
-                getWindow().setStatusBarColor(blended);
-            }
-        });
 
         // --- Setup Adapters & Listeners ---
 
@@ -262,21 +233,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
 
         // Enable nested scrolling so task list scroll collapses the header first
         recyclerTasks.setNestedScrollingEnabled(true);
-
-        // Drawer Setup
-        btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.END));
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_tasks) {
-                startActivity(new Intent(DashboardActivity.this, MainActivity.class));
-            } else if (id == R.id.nav_settings) {
-                startActivity(new Intent(DashboardActivity.this, SettingsActivity.class));
-            } else if (id == R.id.nav_completed_tasks) {
-                startActivity(new Intent(DashboardActivity.this, CompletedTasksActivity.class));
-            }
-            drawerLayout.closeDrawer(GravityCompat.END);
-            return true;
-        });
 
         // FAB Setup
         fab.setOnClickListener(v -> {

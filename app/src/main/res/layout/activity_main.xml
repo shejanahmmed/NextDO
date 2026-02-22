@@ -1,15 +1,11 @@
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
+    android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground"
     tools:context=".MainActivity">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?android:attr/windowBackground">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/main_content_container"
@@ -30,20 +26,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Menu icon -->
-            <ImageView
-                android:id="@+id/menu_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_menu"
-                android:layout_marginEnd="24dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="?attr/colorOnSurface"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/main_title"
-                app:layout_constraintBottom_toBottomOf="@id/main_title" />
+
 
             <com.shejan.nextdo.TopFadeRecyclerView
                 android:id="@+id/recyclerview"
@@ -115,36 +98,4 @@
             android:elevation="10dp"
             android:scaleType="centerCrop" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Drawer Container with Footer -->
-    <LinearLayout
-        android:layout_width="280dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:orientation="vertical"
-        android:background="@drawable/bg_drawer_rounded">
-
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:elevation="0dp"
-            app:itemHorizontalPadding="32dp"
-            app:itemVerticalPadding="12dp"
-            app:itemTextColor="@color/drawer_navy"
-            app:itemTextAppearance="@style/DrawerMenuTextStyle"
-            app:itemBackground="@drawable/drawer_menu_item_background"
-            app:headerLayout="@layout/drawer_header_premium"
-            app:menu="@menu/drawer_menu" />
-
-        <!-- Footer at bottom -->
-        <include
-            android:id="@+id/drawer_footer_include"
-            layout="@layout/drawer_footer" />
-
-    </LinearLayout>
-
-</androidx.drawerlayout.widget.DrawerLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

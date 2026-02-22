@@ -36,6 +36,8 @@ public class SettingsActivity extends AppCompatActivity {
         setupThemeSettings();
 
         setupNotificationSettings();
+        setupDataManagementSettings();
+        setupMoreInfoSettings();
 
     }
 
@@ -203,6 +205,37 @@ public class SettingsActivity extends AppCompatActivity {
             } catch (Exception e) {
                 // Handle dialog creation failure
             }
+        });
+    }
+
+    private void setupDataManagementSettings() {
+        binding.settingRecycleBin.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, RecycleBinActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private void setupMoreInfoSettings() {
+        binding.settingAbout.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, AboutActivity.class);
+            startActivity(intent);
+        });
+
+        binding.settingReleases.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
+            intent.setData(android.net.Uri.parse("https://github.com/Farjan-Ahmmed/NextDO/releases"));
+            startActivity(intent);
+        });
+
+        binding.settingLicense.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
+            intent.setData(android.net.Uri.parse("https://github.com/Farjan-Ahmmed/NextDO/blob/main/LICENSE"));
+            startActivity(intent);
+        });
+
+        binding.settingHelp.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, HelpFAQActivity.class);
+            startActivity(intent);
         });
     }
 

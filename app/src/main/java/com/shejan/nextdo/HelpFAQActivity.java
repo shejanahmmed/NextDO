@@ -22,7 +22,7 @@ public class HelpFAQActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
         // Set navigation icon color based on theme

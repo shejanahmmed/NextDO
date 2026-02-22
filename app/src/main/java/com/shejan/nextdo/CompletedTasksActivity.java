@@ -22,7 +22,7 @@ public class CompletedTasksActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
         // Enable Edge-to-Edge

@@ -463,8 +463,7 @@
                 android:backgroundTint="@color/dashboard_text_navy"
                 app:tint="@android:color/white"
                 app:fabSize="mini"
-                android:contentDescription="Add Task"
-                android:layout_marginBottom="20dp" />
+                android:contentDescription="Add Task" />
         </LinearLayout>
 
         <!-- Completed -->

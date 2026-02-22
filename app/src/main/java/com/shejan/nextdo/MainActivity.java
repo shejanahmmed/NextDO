@@ -264,33 +264,8 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
             } else if (id == R.id.nav_settings) {
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
-            } else if (id == R.id.nav_about) {
-                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
-                startActivity(intent);
-            } else if (id == R.id.nav_releases) {
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW,
-                            android.net.Uri.parse("https://github.com/shejanahmmed/NextDO/releases"));
-                    startActivity(intent);
-                } catch (Exception e) {
-                    // Handle potential errors
-                }
-            } else if (id == R.id.nav_license) {
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW,
-                            android.net.Uri.parse("https://github.com/shejanahmmed/NextDO/blob/main/LICENSE"));
-                    startActivity(intent);
-                } catch (Exception e) {
-                    // Handle potential errors
-                }
-            } else if (id == R.id.nav_help) {
-                Intent intent = new Intent(MainActivity.this, HelpFAQActivity.class);
-                startActivity(intent);
             } else if (id == R.id.nav_completed_tasks) {
                 Intent intent = new Intent(MainActivity.this, CompletedTasksActivity.class);
-                startActivity(intent);
-            } else if (id == R.id.nav_recycle_bin) {
-                Intent intent = new Intent(MainActivity.this, RecycleBinActivity.class);
                 startActivity(intent);
             }
             binding.drawerLayout.closeDrawer(GravityCompat.END);

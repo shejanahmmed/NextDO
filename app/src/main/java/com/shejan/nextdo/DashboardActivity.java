@@ -270,9 +270,9 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
             if (id == R.id.nav_tasks) {
                 startActivity(new Intent(DashboardActivity.this, MainActivity.class));
             } else if (id == R.id.nav_settings) {
-                // Settings
-            } else if (id == R.id.nav_about) {
-                // About
+                startActivity(new Intent(DashboardActivity.this, SettingsActivity.class));
+            } else if (id == R.id.nav_completed_tasks) {
+                startActivity(new Intent(DashboardActivity.this, CompletedTasksActivity.class));
             }
             drawerLayout.closeDrawer(GravityCompat.END);
             return true;

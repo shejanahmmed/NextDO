@@ -25,7 +25,7 @@ public class AboutActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
         TextView versionText = findViewById(R.id.version_text);

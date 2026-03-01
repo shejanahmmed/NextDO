@@ -1,376 +1,624 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground"
+    android:fitsSystemWindows="false"
     tools:context=".SettingsActivity">
 
-    <!-- Back arrow -->
-    <ImageView
-        android:id="@+id/back_arrow"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_arrow_back"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="24dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        app:tint="?attr/colorOnSurface"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- === Gradient Header Banner (edge-to-edge behind status bar) === -->
+    <LinearLayout
+        android:id="@+id/settings_header_banner"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@drawable/bg_settings_header"
+        android:orientation="vertical"
+        android:gravity="top"
+        android:fitsSystemWindows="true">
 
-    <!-- Minimal style header -->
-    <TextView
-        android:id="@+id/settings_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Settings"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textColor="?attr/colorOnSurface"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toEndOf="@id/back_arrow"
-        app:layout_constraintTop_toTopOf="@id/back_arrow"
-        app:layout_constraintBottom_toBottomOf="@id/back_arrow" />
+        <!-- Back arrow + Title in one horizontal row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="12dp">
+
+            <ImageView
+                android:id="@+id/back_arrow"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_arrow_back"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                app:tint="#FFFFFFFF" />
+
+            <TextView
+                android:id="@+id/settings_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFFFF"
+                android:letterSpacing="-0.02"
+                android:layout_marginStart="10dp" />
+
+        </LinearLayout>
+
+        <!-- Subtitle below the row -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Personalize your experience"
+            android:textSize="13sp"
+            android:textColor="#CCffffff"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="56dp" />
+
+    </LinearLayout>
 
 
-
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintTop_toBottomOf="@id/settings_title"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+    <!-- === Scrollable Content (overlaps header) === -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="158dp"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="32dp"
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp">
+            android:paddingHorizontal="16dp">
 
-            <!-- Theme Section -->
-            <LinearLayout
+            <!-- ── Customization Card ── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CUSTOMIZATION"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:letterSpacing="0.1"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp" />
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Customization"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginBottom="16dp" />
-
-
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
                 <LinearLayout
-                    android:id="@+id/theme_button"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Theme"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
+                    <!-- Theme Row -->
+                    <LinearLayout
+                        android:id="@+id/theme_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingHorizontal="12dp"
+                        android:clickable="true"
+                        android:focusable="true">
 
-                    <TextView
-                        android:id="@+id/current_theme_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Auto"
-                        android:textSize="14sp"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginEnd="8dp" />
+                        <!-- Icon Container -->
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_settings_icon_purple">
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_settings"
+                                app:tint="#FF7B54E8" />
+                        </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textSize="20sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        <!-- Text Column -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Theme"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Change app appearance"
+                                android:textSize="12sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <!-- Value + Chevron -->
+                        <TextView
+                            android:id="@+id/current_theme_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Auto"
+                            android:textSize="13sp"
+                            android:textColor="#FF7B54E8"
+                            android:layout_marginEnd="6dp" />
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
+            <!-- ── Notifications Card ── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NOTIFICATIONS"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:letterSpacing="0.1"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
 
-            </LinearLayout>
-
-            <!-- Notifications Section -->
-            <LinearLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Notifications"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginBottom="16dp" />
-
-
-
-
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
                 <LinearLayout
-                    android:id="@+id/snooze_setting"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Snooze duration"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
+                    <!-- Snooze Duration Row -->
+                    <LinearLayout
+                        android:id="@+id/snooze_setting"
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingHorizontal="12dp"
+                        android:clickable="true"
+                        android:focusable="true">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textSize="20sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_settings_icon_teal">
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_snooze"
+                                app:tint="#FF319499" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Snooze Duration"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Set alarm snooze length"
+                                android:textSize="12sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
-            </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-            <!-- Data Management Section -->
-            <LinearLayout
+            <!-- ── Data Management Card ── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DATA MANAGEMENT"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:letterSpacing="0.1"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Data Management"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- Recycle Bin -->
                 <LinearLayout
-                    android:id="@+id/setting_recycle_bin"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true">
-                    
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_delete_outline"
-                        app:tint="?attr/colorOnSurface"
-                        android:layout_marginEnd="16dp" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Recycle Bin"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
+                    <!-- Recycle Bin Row -->
+                    <LinearLayout
+                        android:id="@+id/setting_recycle_bin"
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingHorizontal="12dp"
+                        android:clickable="true"
+                        android:focusable="true">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textSize="20sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_settings_icon_pink">
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_delete_outline"
+                                app:tint="#FFFF8A80" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Recycle Bin"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="View and restore deleted tasks"
+                                android:textSize="12sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
-            </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-            <!-- More Information Section -->
-            <LinearLayout
+            <!-- ── More Information Card ── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MORE INFORMATION"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:letterSpacing="0.1"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- About Card -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp"
-                android:layout_marginBottom="32dp">
+                android:layout_marginBottom="10dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="More Information"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- About -->
                 <LinearLayout
                     android:id="@+id/setting_about"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="72dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:background="?attr/selectableItemBackground"
+                    android:paddingHorizontal="16dp"
                     android:clickable="true"
                     android:focusable="true">
-                    
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_info"
-                        app:tint="?attr/colorOnSurface"
-                        android:layout_marginEnd="16dp" />
 
-                    <TextView
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_settings_icon_teal">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_info"
+                            app:tint="#FF319499" />
+                    </FrameLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="About"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="14dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="About"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorOnSurface" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="App info &amp; developer"
+                            android:textSize="12sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textSize="20sp"
-                        android:textColor="?attr/colorOnSurface" />
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                <!-- Releases -->
+            <!-- Releases Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
                 <LinearLayout
                     android:id="@+id/setting_releases"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="72dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:background="?attr/selectableItemBackground"
+                    android:paddingHorizontal="16dp"
                     android:clickable="true"
                     android:focusable="true">
-                    
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_github"
-                        app:tint="?attr/colorOnSurface"
-                        android:layout_marginEnd="16dp" />
 
-                    <TextView
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_settings_icon_purple">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_github"
+                            app:tint="#FF7B54E8" />
+                    </FrameLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Releases"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="14dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Releases"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorOnSurface" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="View changelog on GitHub"
+                            android:textSize="12sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textSize="20sp"
-                        android:textColor="?attr/colorOnSurface" />
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                <!-- License -->
+            <!-- License Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
                 <LinearLayout
                     android:id="@+id/setting_license"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="72dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:background="?attr/selectableItemBackground"
+                    android:paddingHorizontal="16dp"
                     android:clickable="true"
                     android:focusable="true">
-                    
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_info"
-                        app:tint="?attr/colorOnSurface"
-                        android:layout_marginEnd="16dp" />
 
-                    <TextView
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_settings_icon_orange">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_info"
+                            app:tint="#FFFFD180" />
+                    </FrameLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="License"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="14dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="License"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorOnSurface" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="MIT Open Source License"
+                            android:textSize="12sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textSize="20sp"
-                        android:textColor="?attr/colorOnSurface" />
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                <!-- Help & FAQ -->
+            <!-- Help & FAQ Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
                 <LinearLayout
                     android:id="@+id/setting_help"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="72dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:background="?attr/selectableItemBackground"
+                    android:paddingHorizontal="16dp"
                     android:clickable="true"
                     android:focusable="true">
-                    
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_help"
-                        app:tint="?attr/colorOnSurface"
-                        android:layout_marginEnd="16dp" />
 
-                    <TextView
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_settings_icon_teal">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_help"
+                            app:tint="#FF319499" />
+                    </FrameLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Help &amp; FAQ"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="14dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Help &amp; FAQ"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorOnSurface" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Get support and answers"
+                            android:textSize="12sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="›"
-                        android:textSize="20sp"
-                        android:textColor="?attr/colorOnSurface" />
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-            </LinearLayout>
+            <!-- Version Footer -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="NextDO v1.3.0"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:alpha="0.6"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp" />
+
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

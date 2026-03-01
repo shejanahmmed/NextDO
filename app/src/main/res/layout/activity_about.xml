@@ -1,180 +1,411 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/page_background"
-    android:fitsSystemWindows="true">
+    android:background="?android:attr/windowBackground"
+    android:fitsSystemWindows="false">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <!-- ═══ Gradient Hero Header ═══ -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
-        app:elevation="0dp">
+        android:layout_height="220dp"
+        android:background="@drawable/bg_settings_header"
+        android:orientation="vertical"
+        android:gravity="top"
+        android:fitsSystemWindows="true">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <!-- Back row -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:navigationIconTint="#000000">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="12dp">
+
+            <ImageView
+                android:id="@+id/back_arrow"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_arrow_back"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                app:tint="#FFFFFFFF" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="About"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-        </androidx.appcompat.widget.Toolbar>
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFFFF"
+                android:letterSpacing="-0.02"
+                android:layout_marginStart="10dp" />
 
-    </com.google.android.material.appbar.AppBarLayout>
+        </LinearLayout>
 
+        <!-- App logo centred in hero -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher"
+                android:scaleType="fitCenter" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <!-- ═══ Scrollable Content ═══ -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_marginTop="188dp"
+        android:overScrollMode="never"
+        android:clipToPadding="false"
+        android:paddingBottom="40dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="12dp">
 
-
-
-
-
-            <LinearLayout
+            <!-- ── App identity card ── -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp">
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="180dp"
-                android:layout_height="180dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="16dp"
-                android:layout_gravity="center_horizontal"
-                app:cardBackgroundColor="@color/page_background"
-                app:cardCornerRadius="90dp"
-                app:strokeColor="#FFFFFF"
-                app:strokeWidth="6dp"
-                app:cardElevation="0dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="24dp"
-                    android:src="@drawable/ic_about_logo" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    android:id="@+id/version_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="Version 1.0.0"
-                    android:textColor="?attr/colorOnSurface"
-                    android:alpha="0.7" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:gravity="center"
-                    android:text="Stay organized and productive with NextDO.\nSimple, elegant and powerful task management."
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="16sp"
-                    android:lineSpacingMultiplier="1.2" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="32dp"
-                    android:layout_marginBottom="32dp"
-                    android:background="?attr/colorOnSurface"
-                    android:alpha="0.1" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="Developed by"
-                    android:textColor="?attr/colorSecondary"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:letterSpacing="0.1"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_gravity="center_horizontal"
-                    android:text="Farjan Ahmmed"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="?attr/colorOnSurface" />
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:padding="28dp">
 
-                    <ImageView
-                        android:id="@+id/github_icon"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginHorizontal="12dp"
-                        android:src="@drawable/ic_github"
-                        app:tint="?attr/colorOnSurface"
-                        android:clickable="true"
-                        android:focusable="true" />
+                    <!-- App name -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NextDO"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:letterSpacing="-0.03" />
 
-                    <ImageView
-                        android:id="@+id/instagram_icon"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginHorizontal="12dp"
-                        android:src="@drawable/ic_instagram"
-                        app:tint="?attr/colorOnSurface"
-                        android:clickable="true"
-                        android:focusable="true" />
+                    <!-- Version badge -->
+                    <TextView
+                        android:id="@+id/version_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Version 1.3.0"
+                        android:textSize="13sp"
+                        android:textColor="#FFFFFFFF"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="4dp"
+                        android:background="@drawable/bg_settings_header" />
 
-                    <ImageView
-                        android:id="@+id/linkedin_icon"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginHorizontal="12dp"
-                        android:src="@drawable/ic_linkedin"
-                        app:tint="?attr/colorOnSurface"
-                        android:clickable="true"
-                        android:focusable="true" />
+                    <!-- Tagline -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:gravity="center"
+                        android:text="Stay organized and productive.\nSimple, elegant and powerful task management."
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="14sp"
+                        android:lineSpacingMultiplier="1.5" />
+
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                <TextView
-                    android:layout_width="wrap_content"
+            <!-- ── Developer Card ── -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="48dp"
-                    android:layout_gravity="center_horizontal"
-                    android:text="© 2025 NextDO. All rights reserved."
-                    android:textColor="?attr/colorOnSurface"
-                    android:alpha="0.5"
-                    android:textSize="12sp" />
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-            </LinearLayout>
+                    <!-- Section label -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DEVELOPER"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:letterSpacing="0.12"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Developer identity row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="start">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Farjan Ahmmed"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Android Developer"
+                            android:textSize="13sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:layout_marginTop="2dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ── Social Links Card ── -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CONNECT"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:letterSpacing="0.12"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- GitHub row -->
+                    <LinearLayout
+                        android:id="@+id/github_icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginBottom="4dp">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_settings_icon_purple">
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_github"
+                                app:tint="#FF7B54E8" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="GitHub"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="github.com/shejanahmmed"
+                                android:textSize="12sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="1dp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#14000000"
+                        android:layout_marginBottom="4dp" />
+
+                    <!-- Instagram row -->
+                    <LinearLayout
+                        android:id="@+id/instagram_icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginBottom="4dp">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_settings_icon_pink">
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_instagram"
+                                app:tint="#FFEF5FA8" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Instagram"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@iamshejan"
+                                android:textSize="12sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="1dp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#14000000"
+                        android:layout_marginBottom="4dp" />
+
+                    <!-- LinkedIn row -->
+                    <LinearLayout
+                        android:id="@+id/linkedin_icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_settings_icon_teal">
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_linkedin"
+                                app:tint="#FF319499" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="14dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="LinkedIn"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="linkedin.com/in/farjan-ahmmed"
+                                android:textSize="12sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="1dp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ── Footer ── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text="© 2025 NextDO · All rights reserved"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:alpha="0.5"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
 
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

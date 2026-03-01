@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
 import androidx.preference.PreferenceManager;
 
 import com.shejan.nextdo.databinding.ActivitySettingsBinding;
@@ -28,6 +29,8 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
+        // Draw content behind status bar so gradient header is truly edge-to-edge
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(binding.getRoot());
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -55,6 +58,30 @@ public class SettingsActivity extends AppCompatActivity {
     private void showThemePicker(String currentTheme) {
         String[] themeNames = { "Auto (System Default)", "Light", "Dark" };
         String[] themeValues = { "auto", "light", "dark" };
+        String[] themeSubtitles = {
+                "Follows your device setting",
+                "Always bright & warm",
+                "Easy on the eyes at night"
+        };
+
+        // Icon resource per theme: phone (auto), sun (light), moon (dark)
+        int[] themeIcons = {
+                R.drawable.ic_theme_auto,
+                R.drawable.ic_theme_light,
+                R.drawable.ic_theme_dark
+        };
+        // Tint colour per theme icon
+        int[] iconTints = {
+                android.graphics.Color.parseColor("#FF319499"), // auto → teal
+                android.graphics.Color.parseColor("#FFFFA500"), // light → warm amber (sun)
+                android.graphics.Color.parseColor("#FF7B54E8") // dark → purple (moon)
+        };
+        // Background bubble per theme
+        int[] iconBgs = {
+                R.drawable.bg_settings_icon_teal,
+                R.drawable.bg_settings_icon_orange,
+                R.drawable.bg_settings_icon_purple
+        };
 
         android.view.View customView = getLayoutInflater().inflate(R.layout.dialog_theme_choice, null);
         LinearLayout container = customView.findViewById(R.id.theme_options_container);
@@ -64,7 +91,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(customView);
-        builder.setNegativeButton("Cancel", null);
         AlertDialog dialog = builder.create();
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(
@@ -85,25 +111,45 @@ public class SettingsActivity extends AppCompatActivity {
         for (int i = 0; i < themeNames.length; i++) {
             final int index = i;
             android.view.View optionView = getLayoutInflater().inflate(R.layout.theme_option_item, container, false);
+
             TextView textView = optionView.findViewById(R.id.theme_text);
+            TextView subtitleView = optionView.findViewById(R.id.theme_subtitle);
             RadioButton radioButton = optionView.findViewById(R.id.theme_radio);
             android.view.View colorCircle = optionView.findViewById(R.id.color_circle);
+            android.view.View checkIndicator = optionView.findViewById(R.id.check_indicator);
 
             textView.setText(themeNames[i]);
-            radioButton.setChecked(themeValues[i].equals(currentTheme));
+            if (subtitleView != null)
+                subtitleView.setText(themeSubtitles[i]);
 
-            // Hide color circle for theme options
-            if (colorCircle != null) {
-                colorCircle.setVisibility(android.view.View.GONE);
+            // Set theme icon, tint, and background bubble
+            android.widget.ImageView themeIcon = optionView.findViewById(R.id.theme_icon);
+            android.view.View iconBgView = optionView.findViewById(R.id.theme_icon_bg);
+            if (themeIcon != null) {
+                themeIcon.setImageResource(themeIcons[i]);
+                themeIcon.setColorFilter(iconTints[i]);
             }
+            if (iconBgView != null) {
+                iconBgView.setBackgroundResource(iconBgs[i]);
+            }
+
+            boolean isSelected = themeValues[i].equals(currentTheme);
+            if (radioButton != null)
+                radioButton.setChecked(isSelected);
+
+            // Show/hide check indicator and update border
+            if (checkIndicator != null) {
+                checkIndicator.setVisibility(isSelected ? android.view.View.VISIBLE : android.view.View.GONE);
+            }
+            optionView.setBackground(getDrawable(
+                    isSelected
+                            ? R.drawable.bg_theme_option_selected
+                            : R.drawable.bg_theme_option_unselected));
 
             optionView.setOnClickListener(view -> {
                 sharedPreferences.edit().putString("app_theme", themeValues[index]).apply();
                 updateCurrentThemeText(themeValues[index]);
-
-                // Apply theme immediately
                 applyTheme(themeValues[index]);
-
                 dialog.dismiss();
                 Toast.makeText(this, "Theme changed to " + themeNames[index], Toast.LENGTH_SHORT).show();
             });
@@ -163,7 +209,6 @@ public class SettingsActivity extends AppCompatActivity {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setView(customView);
-                builder.setNegativeButton("Cancel", null);
 
                 AlertDialog dialog = builder.create();
                 if (dialog.getWindow() != null) {
@@ -182,16 +227,47 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 });
 
+                // Build subtitles from values (convert ms → friendly description)
+                String[] snoozeSubtitles = new String[snoozeValues.length];
+                for (int j = 0; j < snoozeValues.length; j++) {
+                    try {
+                        long ms = Long.parseLong(snoozeValues[j]);
+                        long mins = ms / 60000;
+                        if (mins < 60) {
+                            snoozeSubtitles[j] = "Snooze alarm for " + mins + " minute" + (mins == 1 ? "" : "s");
+                        } else {
+                            long hrs = mins / 60;
+                            snoozeSubtitles[j] = "Snooze alarm for " + hrs + " hour" + (hrs == 1 ? "" : "s");
+                        }
+                    } catch (NumberFormatException ex) {
+                        snoozeSubtitles[j] = "";
+                    }
+                }
+
                 for (int i = 0; i < snoozeOptions.length; i++) {
                     final int index = i;
                     android.view.View optionView = getLayoutInflater().inflate(R.layout.snooze_option_item,
                             container, false);
                     TextView textView = optionView.findViewById(R.id.snooze_text);
+                    TextView subtitleView = optionView.findViewById(R.id.snooze_subtitle);
                     RadioButton radioButton = optionView.findViewById(R.id.snooze_radio);
+                    android.view.View checkIndicator = optionView.findViewById(R.id.snooze_check_indicator);
 
                     textView.setText(snoozeOptions[i]);
+                    if (subtitleView != null)
+                        subtitleView.setText(snoozeSubtitles[i]);
+
                     boolean isSelected = snoozeValues[i].equals(currentSnooze);
-                    radioButton.setChecked(isSelected);
+                    if (radioButton != null)
+                        radioButton.setChecked(isSelected);
+
+                    if (checkIndicator != null) {
+                        checkIndicator.setVisibility(isSelected ? android.view.View.VISIBLE : android.view.View.GONE);
+                    }
+                    optionView.setBackground(getDrawable(
+                            isSelected
+                                    ? R.drawable.bg_theme_option_selected
+                                    : R.drawable.bg_theme_option_unselected));
 
                     optionView.setOnClickListener(view -> {
                         sharedPreferences.edit().putString("snooze_duration", snoozeValues[index]).apply();

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Light theme preview: white background with a soft colored top bar -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="64dp"
+    android:layout_height="48dp"
+    android:orientation="vertical"
+    android:background="#FFFFFFFF"
+    android:clipToOutline="true">
+
+    <!-- Top bar (simulates status/title bar) -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:background="#FF319499" />
+
+    <!-- Content lines -->
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:background="#FFE0E0E0"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="6dp" />
+    <View
+        android:layout_width="26dp"
+        android:layout_height="4dp"
+        android:background="#FFEEEEEE"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="4dp" />
+
+</LinearLayout>

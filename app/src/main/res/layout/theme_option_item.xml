@@ -1,40 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="52dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="8dp"
-    android:background="@drawable/dialog_option_bg"
-    android:layout_marginBottom="8dp"
+    android:padding="14dp"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/bg_theme_option_unselected"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
 
-    <TextView
-        android:id="@+id/theme_text"
+    <!-- Theme icon swatch -->
+    <FrameLayout
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_settings_icon_purple"
+        android:id="@+id/theme_icon_bg">
+
+        <ImageView
+            android:id="@+id/theme_icon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_theme_light"
+            app:tint="#FF7B54E8" />
+
+    </FrameLayout>
+
+    <!-- Hidden color_circle kept for code compatibility -->
+    <View
+        android:id="@+id/color_circle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
+
+    <!-- Text column -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Light"
-        android:textSize="16sp"
-        android:textColor="?attr/colorOnSurface" />
+        android:orientation="vertical"
+        android:layout_marginStart="14dp">
 
-    <View
-        android:id="@+id/color_circle"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:background="@drawable/color_circle"
-        android:layout_marginEnd="12dp"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/theme_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Light"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface" />
 
+        <TextView
+            android:id="@+id/theme_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginTop="2dp" />
+
+    </LinearLayout>
+
+    <!-- Gradient check indicator (visible when selected) -->
+    <FrameLayout
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:background="@drawable/bg_theme_check"
+        android:id="@+id/check_indicator"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_check_white" />
+
+    </FrameLayout>
+
+    <!-- Radio button hidden — kept for data binding compatibility -->
     <RadioButton
         android:id="@+id/theme_radio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:button="@null"
         android:focusable="false"
-        android:clickable="false" />
+        android:clickable="false"
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -10,11 +10,13 @@
     <!-- ═══ Gradient Hero Header ═══ -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="220dp"
+        android:layout_height="185dp"
         android:background="@drawable/bg_settings_header"
         android:orientation="vertical"
         android:gravity="top"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:elevation="12dp"
+        android:translationZ="12dp">
 
         <!-- Back row -->
         <LinearLayout
@@ -70,10 +72,13 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="188dp"
+        android:layout_marginTop="185dp"
         android:overScrollMode="never"
         android:clipToPadding="false"
-        android:paddingBottom="40dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="40dp"
+        android:requiresFadingEdge="vertical"
+        android:fadingEdgeLength="40dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -235,7 +240,7 @@
                                 android:layout_height="22dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_github"
-                                app:tint="#FF7B54E8" />
+                                app:tint="#FF6366F1" />
                         </FrameLayout>
 
                         <LinearLayout
@@ -296,7 +301,7 @@
                                 android:layout_height="22dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_instagram"
-                                app:tint="#FFEF5FA8" />
+                                app:tint="#FFF43F5E" />
                         </FrameLayout>
 
                         <LinearLayout
@@ -356,7 +361,7 @@
                                 android:layout_height="22dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_linkedin"
-                                app:tint="#FF319499" />
+                                app:tint="#FF3B82F6" />
                         </FrameLayout>
 
                         <LinearLayout

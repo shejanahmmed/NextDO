@@ -72,9 +72,9 @@ public class SettingsActivity extends AppCompatActivity {
         };
         // Tint colour per theme icon
         int[] iconTints = {
-                android.graphics.Color.parseColor("#FF319499"), // auto → teal
-                android.graphics.Color.parseColor("#FFFFA500"), // light → warm amber (sun)
-                android.graphics.Color.parseColor("#FF7B54E8") // dark → purple (moon)
+                android.graphics.Color.parseColor("#FF3B82F6"), // auto → teal
+                android.graphics.Color.parseColor("#FFF59E0B"), // light → warm amber (sun)
+                android.graphics.Color.parseColor("#FF6366F1") // dark → purple (moon)
         };
         // Background bubble per theme
         int[] iconBgs = {

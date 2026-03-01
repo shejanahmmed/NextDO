@@ -8,15 +8,17 @@
     android:fitsSystemWindows="false"
     tools:context=".SettingsActivity">
 
-    <!-- === Gradient Header Banner (edge-to-edge behind status bar) === -->
+    <!-- === Gradient Header Banner (hovering above content with shadow) === -->
     <LinearLayout
         android:id="@+id/settings_header_banner"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="115dp"
         android:background="@drawable/bg_settings_header"
         android:orientation="vertical"
         android:gravity="top"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:elevation="12dp"
+        android:translationZ="12dp">
 
         <!-- Back arrow + Title in one horizontal row -->
         <LinearLayout
@@ -51,26 +53,23 @@
 
         </LinearLayout>
 
-        <!-- Subtitle below the row -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Personalize your experience"
-            android:textSize="13sp"
-            android:textColor="#CCffffff"
-            android:layout_marginTop="4dp"
-            android:layout_marginStart="56dp" />
-
     </LinearLayout>
 
 
-    <!-- === Scrollable Content (overlaps header) === -->
+    <!-- === Scrollable Content === -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="115dp"
+        android:background="@drawable/bg_fade_mask"
+        android:elevation="10dp"
+        android:translationZ="10dp" />
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="158dp"
+        android:layout_marginTop="115dp"
         android:clipToPadding="false"
-        android:paddingTop="8dp"
+        android:paddingTop="16dp"
         android:paddingBottom="32dp"
         android:overScrollMode="never">
 
@@ -99,7 +98,9 @@
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -129,7 +130,7 @@
                                 android:layout_height="22dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_settings"
-                                app:tint="#FF7B54E8" />
+                                app:tint="#FF6366F1" />
                         </FrameLayout>
 
                         <!-- Text Column -->
@@ -162,7 +163,7 @@
                             android:layout_height="wrap_content"
                             android:text="Auto"
                             android:textSize="13sp"
-                            android:textColor="#FF7B54E8"
+                            android:textColor="#FF6366F1"
                             android:layout_marginEnd="6dp" />
 
                         <ImageView
@@ -194,7 +195,9 @@
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -223,7 +226,7 @@
                                 android:layout_height="22dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_snooze"
-                                app:tint="#FF319499" />
+                                app:tint="#FF3B82F6" />
                         </FrameLayout>
 
                         <LinearLayout
@@ -277,7 +280,9 @@
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -361,7 +366,9 @@
                 android:layout_marginBottom="10dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:id="@+id/setting_about"
@@ -383,7 +390,7 @@
                             android:layout_height="22dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_info"
-                            app:tint="#FF319499" />
+                            app:tint="#FF3B82F6" />
                     </FrameLayout>
 
                     <LinearLayout
@@ -424,7 +431,9 @@
                 android:layout_marginBottom="10dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:id="@+id/setting_releases"
@@ -446,7 +455,7 @@
                             android:layout_height="22dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_github"
-                            app:tint="#FF7B54E8" />
+                            app:tint="#FF6366F1" />
                     </FrameLayout>
 
                     <LinearLayout
@@ -487,7 +496,9 @@
                 android:layout_marginBottom="10dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:id="@+id/setting_license"
@@ -509,7 +520,7 @@
                             android:layout_height="22dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_info"
-                            app:tint="#FFFFD180" />
+                            app:tint="#FFF59E0B" />
                     </FrameLayout>
 
                     <LinearLayout
@@ -550,7 +561,9 @@
                 android:layout_marginBottom="10dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:id="@+id/setting_help"
@@ -572,7 +585,7 @@
                             android:layout_height="22dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_help"
-                            app:tint="#FF319499" />
+                            app:tint="#FF3B82F6" />
                     </FrameLayout>
 
                     <LinearLayout

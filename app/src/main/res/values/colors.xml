@@ -24,8 +24,8 @@
     <!-- Light Theme Colors -->
     <color name="light_primary">#FF000000</color>
     <color name="light_on_primary">#FFFFFFFF</color>
-    <color name="light_background">#fff9eb</color>
-    <color name="light_surface">#ffe5c8</color>
+    <color name="light_background">#EEF2FF</color>
+    <color name="light_surface">#FFFFFF</color>
     <color name="light_on_surface">#FF000000</color>
     <color name="light_on_surface_variant">#FF000000</color>
     <color name="task_card_bg">#d5e5ff</color>
@@ -52,7 +52,7 @@
     <color name="cheerful_pastel_pink">#ff8da1</color>
     <color name="reminder_type_active">@color/cheerful_pastel_pink</color>
     
-    <color name="page_background">#FFF9EB</color>
+    <color name="page_background">#EEF2FF</color>
     
     <color name="very_light_blush">#ffeadd</color>
     <color name="reminder_type_inactive">@color/very_light_blush</color>

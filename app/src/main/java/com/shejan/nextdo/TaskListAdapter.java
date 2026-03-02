@@ -19,6 +19,8 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
 
     private static final String REPEAT_NEVER = "NEVER";
 
+    public int expandedPosition = RecyclerView.NO_POSITION;
+
     private final OnTaskInteractionListener listener;
 
     // Cache SimpleDateFormat
@@ -30,6 +32,8 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
         void onTaskClicked(Task task);
 
         void onTaskLongClicked(Task task);
+
+        void onTaskDelete(Task task);
     }
 
     public TaskListAdapter(@NonNull DiffUtil.ItemCallback<Task> diffCallback, OnTaskInteractionListener listener) {
@@ -48,11 +52,33 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task current = getItem(position);
-        holder.bind(current, listener);
+        holder.bind(current, listener, this);
     }
 
     public Task getTaskAt(int position) {
         return getItem(position);
+    }
+
+    @Override
+    public void submitList(java.util.List<Task> list) {
+        expandedPosition = RecyclerView.NO_POSITION;
+        super.submitList(list);
+    }
+
+    public void expandView(View view) {
+        view.setVisibility(View.VISIBLE);
+        view.setAlpha(0f);
+        view.animate().alpha(1f).setDuration(200).setListener(null);
+    }
+
+    public void collapseView(View view) {
+        view.animate().alpha(0f).setDuration(200).setListener(new android.animation.AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(android.animation.Animator animation) {
+                view.setVisibility(View.GONE);
+                view.setAlpha(1f);
+            }
+        });
     }
 
     public static class TaskDiff extends DiffUtil.ItemCallback<Task> {
@@ -81,13 +107,9 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             this.binding = binding;
             this.dateFormat = dateFormat;
 
-            // Set initial accent color
-            int accentColor = androidx.core.content.ContextCompat.getColor(binding.getRoot().getContext(),
-                    R.color.action_button_color);
-            binding.checkboxCompleted.setButtonTintList(android.content.res.ColorStateList.valueOf(accentColor));
         }
 
-        public void bind(final Task task, final OnTaskInteractionListener listener) {
+        public void bind(final Task task, final OnTaskInteractionListener listener, TaskListAdapter adapter) {
             if (task == null)
                 return;
 
@@ -131,14 +153,22 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             boolean hasDetails = isRecurring || (task.reminderTime > 0);
             binding.detailsLayout.setVisibility(hasDetails ? View.VISIBLE : View.GONE);
 
-            // Checkbox - Use static accent color
-            int accentColor = androidx.core.content.ContextCompat.getColor(binding.getRoot().getContext(),
-                    R.color.action_button_color);
-            binding.checkboxCompleted.setButtonTintList(android.content.res.ColorStateList.valueOf(accentColor));
+            // Expandable Layout Logic
+            int adapterPosition = getBindingAdapterPosition();
+            boolean isExpanded = adapterPosition == adapter.expandedPosition;
+
+            binding.layoutExpandable.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+            binding.layoutExpandable.setAlpha(isExpanded ? 1f : 0f);
+
+            if (task.description != null && !task.description.isEmpty()) {
+                binding.textTaskDescription.setText(task.description);
+                binding.textTaskDescription.setVisibility(View.VISIBLE);
+            } else {
+                binding.textTaskDescription.setVisibility(View.GONE);
+            }
 
             // Alternating Background Colors
             int colorResId;
-            int adapterPosition = getBindingAdapterPosition();
             if (adapterPosition == RecyclerView.NO_POSITION) {
                 adapterPosition = 0;
             }
@@ -175,24 +205,42 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
                 binding.taskCardContainer.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
             }
 
-            binding.checkboxCompleted.setOnCheckedChangeListener(null);
-            binding.checkboxCompleted.setChecked(task.isCompleted);
-            binding.checkboxCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (listener != null) {
-                    // Update timestamp on completion toggle
-                    if (isChecked) {
-                        task.completedTimestamp = System.currentTimeMillis();
-                    } else {
-                        task.completedTimestamp = 0;
+            // Click Listeners
+            binding.taskCardContainer.setOnClickListener(v -> {
+                int currentPosition = getBindingAdapterPosition();
+                if (currentPosition == RecyclerView.NO_POSITION)
+                    return;
+
+                int previousExpandedPosition = adapter.expandedPosition;
+                if (adapter.expandedPosition == currentPosition) {
+                    adapter.expandedPosition = RecyclerView.NO_POSITION;
+                    adapter.collapseView(binding.layoutExpandable);
+                } else {
+                    adapter.expandedPosition = currentPosition;
+                    adapter.expandView(binding.layoutExpandable);
+                    if (previousExpandedPosition != RecyclerView.NO_POSITION) {
+                        adapter.notifyItemChanged(previousExpandedPosition);
                     }
-                    listener.onTaskCompleted(task, isChecked);
                 }
             });
 
-            // Click Listeners
-            itemView.setOnClickListener(v -> {
-                if (listener != null) {
+            binding.btnEdit.setOnClickListener(v -> {
+                if (listener != null)
                     listener.onTaskClicked(task);
+            });
+
+            binding.btnDone.setOnClickListener(v -> {
+                if (listener != null) {
+                    adapter.expandedPosition = RecyclerView.NO_POSITION;
+                    task.completedTimestamp = System.currentTimeMillis();
+                    listener.onTaskCompleted(task, true);
+                }
+            });
+
+            binding.btnDeleteTask.setOnClickListener(v -> {
+                if (listener != null) {
+                    adapter.expandedPosition = RecyclerView.NO_POSITION;
+                    listener.onTaskDelete(task);
                 }
             });
 

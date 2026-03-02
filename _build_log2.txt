@@ -1,0 +1,42 @@
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :app:compileDebugKotlin NO-SOURCE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+
+> Task :app:compileDebugJavaWithJavac FAILED
+C:\Users\ShejanAhmmed\Documents\All My Projects\Apps\NextDO\app\src\main\java\com\shejan\nextdo\CompletedTasksActivity.java:61: error: <anonymous com.shejan.nextdo.CompletedTasksActivity$1> is not abstract and does not override abstract method onTaskDelete(Task) in OnTaskInteractionListener
+                new TaskListAdapter.OnTaskInteractionListener() {
+                                                                ^
+Note: C:\Users\ShejanAhmmed\Documents\All My Projects\Apps\NextDO\app\src\main\java\com\shejan\nextdo\DashboardActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+1 error
+
+[Incubating] Problems report is available at: file:///C:/Users/ShejanAhmmed/Documents/All%20My%20Projects/Apps/NextDO/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler output below.
+  Note: C:\Users\ShejanAhmmed\Documents\All My Projects\Apps\NextDO\app\src\main\java\com\shejan\nextdo\DashboardActivity.java uses or overrides a deprecated API.
+  Note: Recompile with -Xlint:deprecation for details.
+  C:\Users\ShejanAhmmed\Documents\All My Projects\Apps\NextDO\app\src\main\java\com\shejan\nextdo\CompletedTasksActivity.java:61: error: <anonymous com.shejan.nextdo.CompletedTasksActivity$1> is not abstract and does not override abstract method onTaskDelete(Task) in OnTaskInteractionListener
+                  new TaskListAdapter.OnTaskInteractionListener() {
+                                                                  ^
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 1s
+10 actionable tasks: 1 executed, 9 up-to-date

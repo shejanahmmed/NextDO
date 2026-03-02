@@ -74,6 +74,15 @@ public class CompletedTasksActivity extends AppCompatActivity {
                     public void onTaskLongClicked(Task task) {
                         // Optional: Show options
                     }
+
+                    @Override
+                    public void onTaskDelete(Task task) {
+                        // Optional: Implement delete for completed tasks if needed
+                        taskViewModel.delete(task);
+                        com.google.android.material.snackbar.Snackbar.make(binding.getRoot(),
+                                "Task deleted permanently", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT)
+                                .show();
+                    }
                 });
         binding.recyclerviewCompletedTasks.setAdapter(adapter);
         binding.recyclerviewCompletedTasks.setLayoutManager(new LinearLayoutManager(this));

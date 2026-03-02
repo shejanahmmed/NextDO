@@ -11,88 +11,172 @@
         android:id="@+id/task_card_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:background="@drawable/bg_task_card_home"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:padding="20dp"
+        android:elevation="4dp"
+        android:outlineSpotShadowColor="?attr/colorPrimary"
+        android:outlineAmbientShadowColor="?attr/colorPrimary"
+        android:layout_marginBottom="6dp"
+        android:layout_marginHorizontal="2dp">
 
-        <!-- Custom Checkbox -->
-        <CheckBox
-            android:id="@+id/checkbox_completed"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:button="@null"
-            android:background="@drawable/checkbox_minimal"
-            android:layout_marginEnd="16dp" />
-
-        <!-- Task Info -->
+        <!-- Top Row -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/text_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Task Title"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="14sp"
-                android:fontFamily="monospace"
-                android:textAllCaps="true"
-                android:maxLines="2"
-                android:ellipsize="end" />
-
+            <!-- Task Info -->
             <LinearLayout
-                android:id="@+id/details_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/text_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Task Title"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
+
+                <LinearLayout
+                    android:id="@+id/details_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/text_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="10:00 AM"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:textAllCaps="true"
+                        android:layout_marginEnd="8dp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/text_category"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WORK"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:textAllCaps="true"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Icons (Priority, Repeat) -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="4dp"
                 android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/text_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="10:00 AM"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="10sp"
-                    android:fontFamily="monospace"
-                    android:textAllCaps="true"
-                    android:layout_marginEnd="8dp"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/text_category"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="WORK"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="10sp"
-                    android:fontFamily="monospace"
-                    android:textAllCaps="true"
+                
+                <ImageView
+                    android:id="@+id/icon_repeat"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_repeat"
+                    app:tint="?attr/colorOnSurfaceVariant"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Icons (Priority, Repeat) -->
+        <!-- Expandable Content (Description + Buttons) -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/layout_expandable"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-            
+            android:orientation="vertical"
+            android:visibility="gone">
 
+            <TextView
+                android:id="@+id/text_task_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Task description goes here"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:fontFamily="sans-serif"
+                android:layout_marginTop="12dp"
+                android:lineSpacingExtra="4dp" />
 
-            <ImageView
-                android:id="@+id/icon_repeat"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_repeat"
-                app:tint="?attr/colorOnSurfaceVariant"
-                android:visibility="gone" />
+            <LinearLayout
+                android:id="@+id/layout_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp"
+                android:gravity="end">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_edit"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="34dp"
+                    android:text="Edit"
+                    android:textSize="10sp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:textColor="?attr/colorOnSurface"
+                    app:strokeColor="?attr/colorOnSurface"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="8dp"
+                    android:layout_marginEnd="6dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_delete_task"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="34dp"
+                    android:text="Delete"
+                    android:textSize="10sp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:textColor="?attr/colorOnSurface"
+                    app:strokeColor="?attr/colorOnSurface"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="8dp"
+                    android:layout_marginEnd="6dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_done"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="34dp"
+                    android:text="Done"
+                    android:textSize="10sp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:backgroundTint="?attr/colorOnSurface"
+                    android:textColor="?attr/colorSurface"
+                    app:cornerRadius="8dp"
+                    style="@style/Widget.MaterialComponents.Button" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

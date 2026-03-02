@@ -217,31 +217,6 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
             taskActivityLauncher.launch(intent);
         });
 
-        // Task Swipe Swipe Callback
-        setupSwipeGestures();
-    }
-
-    private void setupSwipeGestures() {
-        PremiumSwipeCallback swipeCallback = new PremiumSwipeCallback(this, adapter,
-                new PremiumSwipeCallback.SwipeActionListener() {
-                    @Override
-                    public void onSwipeRight(Task task, int position) {
-                        // Edit Action
-                        onTaskClicked(task);
-                    }
-
-                    @Override
-                    public void onSwipeLeft(Task task, int position) {
-                        // Delete Action
-                        taskViewModel.softDelete(task);
-                        Snackbar.make(binding.getRoot(), "Task moved to Recycle Bin", Snackbar.LENGTH_LONG)
-                                .setAction("UNDO", v -> taskViewModel.restore(task))
-                                .show();
-                    }
-                });
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeCallback);
-        itemTouchHelper.attachToRecyclerView(binding.recyclerview);
     }
 
     private void askNotificationPermission() {
@@ -303,6 +278,14 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
         intent.putExtra(NewTaskActivity.EXTRA_REPEAT, task.repeat);
         intent.putExtra(NewTaskActivity.EXTRA_REMINDER_TYPE, task.reminderType);
         taskActivityLauncher.launch(intent);
+    }
+
+    @Override
+    public void onTaskDelete(Task task) {
+        taskViewModel.softDelete(task);
+        Snackbar.make(binding.getRoot(), "Task moved to Recycle Bin", Snackbar.LENGTH_LONG)
+                .setAction("UNDO", v -> taskViewModel.restore(task))
+                .show();
     }
 
     @Override

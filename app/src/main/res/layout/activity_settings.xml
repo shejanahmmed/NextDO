@@ -470,7 +470,7 @@
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:src="@drawable/ic_chevron_right"
+                        android:src="@drawable/ic_open_in_browser"
                         app:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
@@ -535,7 +535,7 @@
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:src="@drawable/ic_chevron_right"
+                        android:src="@drawable/ic_open_in_browser"
                         app:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>
@@ -662,7 +662,7 @@
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:src="@drawable/ic_chevron_right"
+                        android:src="@drawable/ic_open_in_browser"
                         app:tint="?attr/colorOnSurfaceVariant" />
 
                 </LinearLayout>

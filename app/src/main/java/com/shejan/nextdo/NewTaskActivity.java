@@ -118,18 +118,6 @@ public class NewTaskActivity extends AppCompatActivity {
         // Enable Edge-to-Edge to remove black nav bar box
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
-        // Apply insets to the Root Layout (handles both Status Bar and Nav Bar)
-        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout, (v, windowInsets) -> {
-            androidx.core.graphics.Insets insets = windowInsets
-                    .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
-
-            // Apply padding to root so content sits inside system bars
-            // Background will still draw behind the padding (Edge-to-Edge)
-            v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
-
-            return androidx.core.view.WindowInsetsCompat.CONSUMED;
-        });
-
         // binding.buttonSetReminder.setOnClickListener(v -> showDateTimePicker());
         binding.warmReminderView.setOnClickListener(v -> showDateTimePicker());
 

@@ -39,7 +39,7 @@ public class RecycleBinAdapter extends ListAdapter<Task, RecycleBinAdapter.TaskV
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task current = getItem(position);
-        holder.bind(current, listener);
+        holder.bind(current, listener, position);
     }
 
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
@@ -47,6 +47,7 @@ public class RecycleBinAdapter extends ListAdapter<Task, RecycleBinAdapter.TaskV
         private final TextView taskDescriptionView;
         private final View btnRestore;
         private final View btnDelete;
+        private final androidx.cardview.widget.CardView cardRoot;
 
         public TaskViewHolder(View itemView) {
             super(itemView);
@@ -54,10 +55,26 @@ public class RecycleBinAdapter extends ListAdapter<Task, RecycleBinAdapter.TaskV
             taskDescriptionView = itemView.findViewById(R.id.text_description);
             btnRestore = itemView.findViewById(R.id.btn_restore);
             btnDelete = itemView.findViewById(R.id.btn_delete);
+            cardRoot = itemView.findViewById(R.id.card_root);
         }
 
-        // Revised bind method to accept listener
-        public void bind(Task task, OnTaskActionListener listener) {
+        public void bind(Task task, OnTaskActionListener listener, int position) {
+            // Apply same rotating card background colors as My Reminders page
+            int colorResId;
+            switch (position % 3) {
+                case 0:
+                    colorResId = R.color.task_card_bg_1;
+                    break;
+                case 1:
+                    colorResId = R.color.task_card_bg_2;
+                    break;
+                default:
+                    colorResId = R.color.task_card_bg_3;
+                    break;
+            }
+            int color = androidx.core.content.ContextCompat.getColor(itemView.getContext(), colorResId);
+            cardRoot.setCardBackgroundColor(color);
+
             taskItemView.setText(task.title);
 
             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd, yyyy",
@@ -72,10 +89,6 @@ public class RecycleBinAdapter extends ListAdapter<Task, RecycleBinAdapter.TaskV
 
             Context context = itemView.getContext();
             taskDescriptionView.setText(context.getString(R.string.deleted_task_description, deletedDate, daysLeft));
-
-            // Strike through title
-            taskItemView.setPaintFlags(taskItemView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            taskItemView.setAlpha(0.7f);
 
             btnRestore.setOnClickListener(v -> {
                 if (listener != null)

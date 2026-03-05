@@ -4,17 +4,33 @@
     android:layout_width="330dp"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog_minimal"
+    android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="28dp">
+
+    <!-- Danger Icon at top -->
+    <FrameLayout
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_settings_icon_orange"
+        android:layout_marginBottom="20dp">
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_delete_outline"
+            app:tint="#EF5350" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/dialog_title"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Empty Recycle Bin?"
         android:textColor="?attr/colorOnSurface"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textStyle="bold"
+        android:gravity="center"
         android:layout_marginBottom="12dp" />
 
     <TextView
@@ -23,33 +39,44 @@
         android:layout_height="wrap_content"
         android:text="Are you sure you want to permanently delete all items? This action cannot be undone."
         android:textColor="?attr/colorOnSurfaceVariant"
-        android:textSize="16sp"
-        android:lineSpacingMultiplier="1.2"
-        android:layout_marginBottom="24dp" />
+        android:textSize="14sp"
+        android:lineSpacingMultiplier="1.4"
+        android:gravity="center"
+        android:layout_marginBottom="28dp" />
 
+    <!-- Button Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="end">
+        android:weightSum="2">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_cancel"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_weight="1"
             android:text="Cancel"
             android:textColor="?attr/colorOnSurface"
+            android:textSize="15sp"
+            app:strokeColor="?attr/colorOnSurfaceVariant"
+            app:strokeWidth="1dp"
+            app:cornerRadius="16dp"
             android:layout_marginEnd="8dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_confirm_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_weight="1"
             android:text="Delete All"
             android:textColor="#FFFFFF"
+            android:textSize="15sp"
             android:backgroundTint="#EF5350"
-            app:cornerRadius="28dp" />
+            app:cornerRadius="16dp"
+            android:layout_marginStart="8dp" />
 
     </LinearLayout>
 

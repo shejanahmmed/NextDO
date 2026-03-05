@@ -25,19 +25,6 @@ public class CompletedTasksActivity extends AppCompatActivity {
         // Enable Edge-to-Edge
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
-        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
-            androidx.core.graphics.Insets systemBars = windowInsets
-                    .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
-
-            // Apply padding to the main content container only (matching My Reminders page)
-            android.view.View content = binding.mainContentContainer;
-            if (content != null) {
-                content.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            }
-
-            return androidx.core.view.WindowInsetsCompat.CONSUMED;
-        });
-
         // Initialize ViewModel
         TaskViewModelFactory factory = new TaskViewModelFactory(getApplication());
         TaskViewModel taskViewModel = new androidx.lifecycle.ViewModelProvider(this, factory).get(TaskViewModel.class);

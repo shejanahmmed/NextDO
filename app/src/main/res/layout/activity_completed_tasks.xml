@@ -7,63 +7,36 @@
     android:background="?android:attr/windowBackground"
     tools:context=".CompletedTasksActivity">
 
-    <!-- AppBar Layout for the modern, scrolling header -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
+    <!-- === Gradient Header Banner (same style as Settings / About / Help & FAQ) === -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:elevation="0dp">
+        android:layout_height="90dp"
+        android:background="@drawable/bg_settings_header"
+        android:fitsSystemWindows="true"
+        android:elevation="12dp"
+        android:translationZ="12dp"
+        app:navigationIcon="@null">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar"
+        <!-- Centred title matching other pages -->
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:contentScrim="?android:attr/windowBackground"
-            app:statusBarScrim="?android:attr/windowBackground"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
-            
-            <!-- Header Content -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="48dp"
-                android:paddingBottom="12dp"
-                android:paddingHorizontal="24dp"
-                app:layout_collapseMode="parallax">
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Completed Tasks"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFFFF"
+            android:letterSpacing="-0.02" />
 
-                <TextView
-                    android:id="@+id/main_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Completed Tasks"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
-                    android:letterSpacing="-0.02" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Review your finished tasks"
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="sans-serif-medium" />
-            </LinearLayout>
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <!-- Content below the header -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main_content_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-
+        android:layout_marginTop="90dp">
 
         <!-- The RecyclerView needs a solid background for the Fading Edge alpha mask to work correctly -->
         <com.shejan.nextdo.TopFadeRecyclerView
@@ -72,6 +45,7 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingHorizontal="20dp"
+            android:paddingTop="16dp"
             android:paddingBottom="100dp"
             android:requiresFadingEdge="vertical"
             android:fadingEdgeLength="60dp" />

@@ -23,41 +23,16 @@ public class RecycleBinActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ThemeManager.applyTheme(this);
+        // Edge-to-edge so gradient header fills behind status bar
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         binding = ActivityRecycleBinBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
-
-        // Enable Edge-to-Edge
-        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-
-        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
-            androidx.core.graphics.Insets systemBars = windowInsets
-                    .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
-
-            // Apply top inset to toolbar (padding)
-            binding.toolbar.setPadding(
-                    binding.toolbar.getPaddingLeft(),
-                    systemBars.top,
-                    binding.toolbar.getPaddingRight(),
-                    binding.toolbar.getPaddingBottom());
-
-            // Apply bottom inset to RecyclerView (padding)
-            binding.recyclerviewRecycleBin.setPadding(
-                    binding.recyclerviewRecycleBin.getPaddingLeft(),
-                    binding.recyclerviewRecycleBin.getPaddingTop(),
-                    binding.recyclerviewRecycleBin.getPaddingRight(),
-                    16 + systemBars.bottom // Original 16dp + inset
-            );
-
-            return windowInsets;
-        });
-
-        binding.toolbar.setNavigationOnClickListener(v -> finish());
 
         // Initialize ViewModel
         TaskViewModelFactory factory = new TaskViewModelFactory(getApplication());

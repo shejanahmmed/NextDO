@@ -117,11 +117,11 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
             // Title
             binding.textTitle.setText(task.title != null ? task.title : "");
 
-            // Strike through if completed
+            // Visual indication if completed
             if (task.isCompleted) {
                 binding.textTitle.setPaintFlags(
-                        binding.textTitle.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
-                binding.textTitle.setAlpha(0.5f);
+                        binding.textTitle.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+                binding.textTitle.setAlpha(0.6f);
             } else {
                 binding.textTitle.setPaintFlags(
                         binding.textTitle.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));

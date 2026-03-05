@@ -127,13 +127,8 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         applyThemePreference();
         setContentView(R.layout.activity_dashboard);
 
-        // Fix status bar color to match dashboard background
-        getWindow().setStatusBarColor(androidx.core.content.ContextCompat.getColor(this, R.color.dashboard_background));
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    getWindow().getDecorView().getSystemUiVisibility()
-                            | android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
+        // Enable Edge-to-Edge so content flows under the status bar natively
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         // Initialize Views
         recyclerDates = findViewById(R.id.recycler_dates);

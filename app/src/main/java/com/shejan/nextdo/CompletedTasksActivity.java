@@ -76,7 +76,10 @@ public class CompletedTasksActivity extends AppCompatActivity {
         // Observe completed tasks
         taskViewModel.getCompletedTasks().observe(this, tasks -> {
             if (tasks != null) {
-                adapter.submitList(tasks);
+                adapter.submitList(tasks, () -> {
+                    // Force refresh to ensure fading edge and colors apply properly after layout
+                    binding.recyclerviewCompletedTasks.post(() -> adapter.notifyDataSetChanged());
+                });
                 if (tasks.isEmpty()) {
                     binding.emptyView.setVisibility(View.VISIBLE);
                     binding.recyclerviewCompletedTasks.setVisibility(View.GONE);

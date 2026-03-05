@@ -18,8 +18,7 @@ public class AboutActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_about);
 
-        // Back arrow
-        findViewById(R.id.back_arrow).setOnClickListener(v -> finish());
+        // Back navigation handled by system back button
 
         // Version text
         TextView versionText = findViewById(R.id.version_text);

@@ -3,230 +3,376 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/page_background"
-    android:fitsSystemWindows="true">
+    android:background="?android:attr/windowBackground"
+    android:fitsSystemWindows="false">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <!-- === Gradient Header Banner (same style as Settings page) === -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:elevation="0dp">
+        android:layout_height="90dp"
+        android:background="@drawable/bg_settings_header"
+        android:orientation="vertical"
+        android:gravity="top"
+        android:fitsSystemWindows="true"
+        android:elevation="12dp"
+        android:translationZ="12dp">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <!-- Centered Title -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:navigationIconTint="?attr/colorOnSurface">
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Help &amp; FAQ"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-        </androidx.appcompat.widget.Toolbar>
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFFFF"
+                android:letterSpacing="-0.02" />
 
-    </com.google.android.material.appbar.AppBarLayout>
+        </LinearLayout>
 
+    </LinearLayout>
+
+    <!-- === Scrollable Content === -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_marginTop="90dp"
+        android:overScrollMode="never"
+        android:clipToPadding="false"
+        android:paddingBottom="40dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@android:color/transparent"
-            android:padding="24dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_card_minimal"
-                android:padding="20dp">
-
+            <!-- Section label -->
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Frequently Asked Questions"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:text="FREQUENTLY ASKED QUESTIONS"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.12"
                 android:textColor="?attr/colorSecondary"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="14dp" />
 
-            <!-- Q1 -->
-            <TextView
+            <!-- ── FAQ Item 1 ── -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="How do I create a new task?"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp"
-                android:layout_marginTop="8dp" />
-            <TextView
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="18dp"
+                    android:gravity="top">
+
+                    <!-- Icon badge -->
+                    <TextView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:text="➕"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_marginEnd="14dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="How do I create a new task?"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:layout_marginBottom="6dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Tap the ＋ button at the bottom right of the screen. Enter your task details and tap Save."
+                            android:textSize="13sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:lineSpacingMultiplier="1.5" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ── FAQ Item 2 ── -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tap the + button at the bottom right of the screen. Enter your task details and tap Save."
-                android:textColor="?attr/colorOnSurface"
-                android:alpha="0.7"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="16dp"
-                android:background="?attr/colorOnSurface"
-                android:alpha="0.1" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="18dp"
+                    android:gravity="top">
 
-            <!-- Q2 -->
-            <TextView
+                    <TextView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:text="🗑️"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_marginEnd="14dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="How do I delete a task?"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:layout_marginBottom="6dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Swipe the task to the left to move it to the Recycle Bin. You can also long-press a task to open a context menu with more options."
+                            android:textSize="13sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:lineSpacingMultiplier="1.5" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ── FAQ Item 3 ── -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="How do I delete a task?"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp"
-                android:layout_marginTop="8dp" />
-            <TextView
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="18dp"
+                    android:gravity="top">
+
+                    <TextView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:text="✏️"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_marginEnd="14dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="How do I edit a task?"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:layout_marginBottom="6dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Tap on any task card to open the edit screen, or swipe it to the right."
+                            android:textSize="13sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:lineSpacingMultiplier="1.5" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ── FAQ Item 4 ── -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Swipe the task to the left to delete it properly."
-                android:textColor="?attr/colorOnSurface"
-                android:alpha="0.7"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="16dp"
-                android:background="?attr/colorOnSurface"
-                android:alpha="0.1" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="18dp"
+                    android:gravity="top">
 
-            <!-- Q3 -->
-            <TextView
+                    <TextView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:text="🎨"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_marginEnd="14dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Can I change the app theme?"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:layout_marginBottom="6dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Yes! Go to Settings and choose between Light, Dark, or System default themes."
+                            android:textSize="13sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:lineSpacingMultiplier="1.5" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ── FAQ Item 5 ── -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="How do I edit a task?"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp"
-                android:layout_marginTop="8dp" />
-            <TextView
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="18dp"
+                    android:gravity="top">
+
+                    <TextView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:text="✅"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_marginEnd="14dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Where are my completed tasks?"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:layout_marginBottom="6dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Completed tasks are moved to the 'Completed Tasks' page. They are automatically deleted after 15 days."
+                            android:textSize="13sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:lineSpacingMultiplier="1.5" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ── FAQ Item 6 ── -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tap on any task to open the edit screen or swipe it to the right."
-                android:textColor="?attr/colorOnSurface"
-                android:alpha="0.7"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="16dp"
-                android:background="?attr/colorOnSurface"
-                android:alpha="0.1" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="18dp"
+                    android:gravity="top">
 
-            <!-- Q4 -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Can I change the app theme?"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp"
-                android:layout_marginTop="8dp" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Yes! Go to Settings from the menu and choose your preferred accent color and background."
-                android:textColor="?attr/colorOnSurface"
-                android:alpha="0.7"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
+                    <TextView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:text="♻️"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:layout_marginEnd="14dp" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="16dp"
-                android:background="?attr/colorOnSurface"
-                android:alpha="0.1" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-            <!-- Q5 -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Where are my completed tasks?"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp"
-                android:layout_marginTop="8dp" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Completed tasks are moved to the 'Completed Tasks' page in the side menu. They are automatically deleted after 15 days."
-                android:textColor="?attr/colorOnSurface"
-                android:alpha="0.7"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="How does the Recycle Bin work?"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:layout_marginBottom="6dp" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="16dp"
-                android:background="?attr/colorOnSurface"
-                android:alpha="0.1" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Deleted tasks go to the Recycle Bin where they can be restored or permanently deleted. Items are auto-purged after 30 days."
+                            android:textSize="13sp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:lineSpacingMultiplier="1.5" />
 
-            <!-- Q6 -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="How does the Recycle Bin work?"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp"
-                android:layout_marginTop="8dp" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Deleted tasks are moved to the Recycle Bin. They can be restored or permanently deleted. Items in the Recycle Bin are automatically permanently deleted after 30 days."
-                android:textColor="?attr/colorOnSurface"
-                android:alpha="0.7"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="16dp"
-                android:background="?attr/colorOnSurface"
-                android:alpha="0.1" />
-
-            <!-- Q7 -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Does the app have widgets?"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp"
-                android:layout_marginTop="8dp" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Yes! You can add the 'Upcoming Tasks' widget to your home screen. It comes in both Dark and Light themes to match your style."
-                android:textColor="?attr/colorOnSurface"
-                android:alpha="0.7"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
-
-            </LinearLayout>
 
         </LinearLayout>
 

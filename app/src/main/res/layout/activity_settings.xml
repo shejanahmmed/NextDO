@@ -12,7 +12,7 @@
     <LinearLayout
         android:id="@+id/settings_header_banner"
         android:layout_width="match_parent"
-        android:layout_height="115dp"
+        android:layout_height="90dp"
         android:background="@drawable/bg_settings_header"
         android:orientation="vertical"
         android:gravity="top"
@@ -23,19 +23,18 @@
         <!-- Back arrow + Title in one horizontal row -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:paddingTop="12dp">
+            android:paddingEnd="24dp">
 
             <TextView
                 android:id="@+id/settings_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Settings"
-                android:textSize="28sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFFFF"
                 android:letterSpacing="-0.02" />
@@ -48,14 +47,14 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginTop="115dp"
+        android:layout_marginTop="90dp"
         android:background="@drawable/bg_fade_mask"
         android:elevation="10dp"
         android:translationZ="10dp" />
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="115dp"
+        android:layout_marginTop="90dp"
         android:clipToPadding="false"
         android:paddingTop="16dp"
         android:paddingBottom="32dp"

@@ -30,16 +30,6 @@
             android:paddingEnd="24dp"
             android:paddingTop="12dp">
 
-            <ImageView
-                android:id="@+id/back_arrow"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/ic_arrow_back"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                app:tint="#FFFFFFFF" />
-
             <TextView
                 android:id="@+id/settings_title"
                 android:layout_width="wrap_content"
@@ -48,13 +38,11 @@
                 android:textSize="28sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFFFF"
-                android:letterSpacing="-0.02"
-                android:layout_marginStart="10dp" />
+                android:letterSpacing="-0.02" />
 
         </LinearLayout>
 
     </LinearLayout>
-
 
     <!-- === Scrollable Content === -->
     <View

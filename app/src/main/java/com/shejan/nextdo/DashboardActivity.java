@@ -489,15 +489,15 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         }
 
         // update UI based on count
-        TextView textEmptyState = findViewById(R.id.text_empty_state);
+        View emptyStateScroll = findViewById(R.id.empty_state_scroll);
         if (filteredTasks.isEmpty()) {
             recyclerTasks.setVisibility(View.GONE);
-            if (textEmptyState != null)
-                textEmptyState.setVisibility(View.VISIBLE);
+            if (emptyStateScroll != null)
+                emptyStateScroll.setVisibility(View.VISIBLE);
         } else {
             recyclerTasks.setVisibility(View.VISIBLE);
-            if (textEmptyState != null)
-                textEmptyState.setVisibility(View.GONE);
+            if (emptyStateScroll != null)
+                emptyStateScroll.setVisibility(View.GONE);
         }
 
         // Sort by time (ASC) - Upcoming soon at top

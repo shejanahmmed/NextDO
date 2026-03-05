@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.color.MaterialColors;
 import com.shejan.nextdo.databinding.ItemTaskMinimalBinding;
 
 import java.text.SimpleDateFormat;
@@ -229,11 +230,31 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
                     listener.onTaskClicked(task);
             });
 
+            // Set button text based on completion status (Styling remains the same for
+            // both)
+            if (task.isCompleted) {
+                binding.btnDone.setText("Undone");
+            } else {
+                binding.btnDone.setText("Done");
+            }
+
+            // Set uniform style for both Done and Undone states
+            binding.btnDone.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                    MaterialColors.getColor(binding.btnDone, com.google.android.material.R.attr.colorOnSurface)));
+            binding.btnDone.setTextColor(
+                    MaterialColors.getColor(binding.btnDone, com.google.android.material.R.attr.colorSurface));
+
             binding.btnDone.setOnClickListener(v -> {
                 if (listener != null) {
                     adapter.expandedPosition = RecyclerView.NO_POSITION;
-                    task.completedTimestamp = System.currentTimeMillis();
-                    listener.onTaskCompleted(task, true);
+
+                    if (task.isCompleted) {
+                        task.completedTimestamp = 0;
+                        listener.onTaskCompleted(task, false);
+                    } else {
+                        task.completedTimestamp = System.currentTimeMillis();
+                        listener.onTaskCompleted(task, true);
+                    }
                 }
             });
 

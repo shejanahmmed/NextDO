@@ -35,17 +35,12 @@ public class SettingsActivity extends AppCompatActivity {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        setupBackButton();
         setupThemeSettings();
 
         setupNotificationSettings();
         setupDataManagementSettings();
         setupMoreInfoSettings();
 
-    }
-
-    private void setupBackButton() {
-        binding.backArrow.setOnClickListener(v -> finish());
     }
 
     private void setupThemeSettings() {

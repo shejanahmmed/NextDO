@@ -19,11 +19,8 @@ public class CompletedTasksActivity extends AppCompatActivity {
         binding = ActivityCompletedTasksBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setSupportActionBar(binding.toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
+        // Toolbar removed, using custom scrolling title. System back handles
+        // navigation.
 
         // Enable Edge-to-Edge
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
@@ -32,25 +29,14 @@ public class CompletedTasksActivity extends AppCompatActivity {
             androidx.core.graphics.Insets systemBars = windowInsets
                     .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
 
-            // Apply top inset to toolbar (padding)
-            binding.toolbar.setPadding(
-                    binding.toolbar.getPaddingLeft(),
-                    systemBars.top,
-                    binding.toolbar.getPaddingRight(),
-                    binding.toolbar.getPaddingBottom());
+            // Apply padding to the main content container only (matching My Reminders page)
+            android.view.View content = binding.mainContentContainer;
+            if (content != null) {
+                content.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            }
 
-            // Apply bottom inset to RecyclerView (padding)
-            binding.recyclerviewCompletedTasks.setPadding(
-                    binding.recyclerviewCompletedTasks.getPaddingLeft(),
-                    binding.recyclerviewCompletedTasks.getPaddingTop(),
-                    binding.recyclerviewCompletedTasks.getPaddingRight(),
-                    16 + systemBars.bottom // Original 16dp + inset
-            );
-
-            return windowInsets;
+            return androidx.core.view.WindowInsetsCompat.CONSUMED;
         });
-
-        binding.toolbar.setNavigationOnClickListener(v -> finish());
 
         // Initialize ViewModel
         TaskViewModelFactory factory = new TaskViewModelFactory(getApplication());

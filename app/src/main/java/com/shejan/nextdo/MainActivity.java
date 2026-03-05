@@ -154,15 +154,11 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
 
         // Enable Edge-to-Edge
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        ViewCompat.setOnApplyWindowInsetsListener(binding.mainRoot, (v, windowInsets) -> {
-            androidx.core.graphics.Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            // Apply padding to the main content container only
-            View content = findViewById(R.id.main_content_container);
-            if (content != null) {
-                content.setPadding(insets.left, insets.top, insets.right, insets.bottom);
-            }
-            return WindowInsetsCompat.CONSUMED;
-        });
+
+        setSupportActionBar(binding.toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
 
         // Initialize AlarmScheduler
         alarmScheduler = new AlarmScheduler(this);
@@ -228,25 +224,6 @@ public class MainActivity extends AppCompatActivity implements TaskListAdapter.O
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

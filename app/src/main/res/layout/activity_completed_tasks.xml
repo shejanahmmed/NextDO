@@ -39,7 +39,7 @@
         android:layout_marginTop="90dp">
 
         <!-- The RecyclerView needs a solid background for the Fading Edge alpha mask to work correctly -->
-        <com.shejan.nextdo.TopFadeRecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_completed_tasks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

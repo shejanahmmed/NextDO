@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <strong>A modern, minimalist to-do app inspired by dot-matrix aesthetics.</strong>
+  <strong>A modern, minimalist to-do app with a clean, intuitive design.</strong>
   <br>
   Built with Java, MVVM, and Room Database.
   <br>
@@ -26,12 +26,12 @@
 
 ## 📱 Overview
 
-**NextDO** redefines task management with a unique, retro-futuristic "Nothing OS" inspired design. It strips away clutter to focus on what matters: your tasks. Featuring a high-contrast dot-matrix dashboard, fluid animations, and intuitive gesture controls, it makes productivity feel premium.
+**NextDO** redefines task management with a clean, modern design. It strips away clutter to focus on what matters: your tasks. Featuring a minimalist dashboard, fluid animations, and intuitive gesture controls, it makes productivity feel premium.
 
 ## ✨ Features
 
-*   **🎨 Minimalist Dashboard**: A clean, grid-based interface with a dynamic task counter and greeting.
-*   **🎹 Dot-Matrix Typography**: Distinctive design language that stands out from standard Material apps.
+*   **🎨 Minimalist Dashboard**: A clean, organized interface with a dynamic task counter and greeting.
+*   **🎹 Clean Typography**: Distinctive design language that focuses on readability and modern aesthetics.
 *   **👆 Gesture Controls**: 
     *   **Swipe Left**: Delete tasks with a custom animation.
     *   **Swipe Right**: Quick edit mode.
@@ -71,7 +71,7 @@ This project follows modern Android development practices:
 *   **Database**: [Room Database](https://developer.android.com/training/data-storage/room) 2.6.1 with complete migration chain (v1→v6)
 *   **UI**: 
     *   XML Layouts with ViewBinding
-    *   Custom `Canvas` drawing for dotted patterns
+    *   Custom `Canvas` drawing for fluid animations and effects
     *   `ConstraintLayout` for responsive UI
 *   **Components**: 
     *   `RecyclerView` with `ListAdapter` and `DiffUtil`

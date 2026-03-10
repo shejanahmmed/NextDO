@@ -53,7 +53,7 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
     private DashboardTaskAdapter taskAdapter;
     private FloatingActionButton fab;
     private ProgressBar progressCircle;
-    private ProgressBar progressCircleSecondary;
+
     private TextView textSummary;
     private TextView textProgressPercent;
 
@@ -109,11 +109,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
                 }
             });
 
-    // Countdown and Timer fields
-    private Handler countdownHandler = new Handler(Looper.getMainLooper());
-    private Task nextUpcomingTask = null;
-    private Runnable countdownRunnable;
-
     // Data tracking
     private Calendar selectedDate = Calendar.getInstance();
     private List<Task> currentActiveTasks = new ArrayList<>();
@@ -135,7 +130,7 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         recyclerTasks = findViewById(R.id.recycler_tasks);
         fab = findViewById(R.id.fab_dashboard);
         progressCircle = findViewById(R.id.progress_bar_circle);
-        progressCircleSecondary = findViewById(R.id.progress_bar_circle_secondary);
+
         textSummary = findViewById(R.id.text_summary_line1);
         textProgressPercent = findViewById(R.id.text_progress_percent);
         TextView textMonthYear = findViewById(R.id.text_month_year);
@@ -313,33 +308,32 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
                         public void onGlobalLayout() {
                             collapsingToolbar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                            int titleSpacerHeight = (int) (80 * getResources().getDisplayMetrics().density); // Matches
+                            int titleSpacerHeight = (int) (45 * getResources().getDisplayMetrics().density); // 45dp Top
+                                                                                                             // gap
+                                                                                                             // matching
                                                                                                              // XML
-                                                                                                             // spacer
+                            int bottomGapSpacer = (int) (60 * getResources().getDisplayMetrics().density); // 60dp
+                                                                                                           // Bottom
+                                                                                                           // explicit
+                                                                                                           // gap
+
                             int headerCardHeight = (layoutHeaderCollapsed != null) ? layoutHeaderCollapsed.getHeight()
                                     : 0;
                             if (headerCardHeight == 0)
-                                headerCardHeight = (int) (100 * getResources().getDisplayMetrics().density);
+                                headerCardHeight = (int) (74 * getResources().getDisplayMetrics().density);
 
                             View timelineHeader = findViewById(R.id.text_timeline_header);
                             int timelineHeaderHeight = (timelineHeader != null) ? timelineHeader.getHeight() : 0;
                             if (timelineHeaderHeight == 0)
                                 timelineHeaderHeight = (int) (50 * getResources().getDisplayMetrics().density);
 
-                            // minHeight = Title + Pinned Header + Timeline Header
-                            // Actually, the Toolbar (pinned) inside XML handles the pinning.
-                            // We just need to make sure the Toolbar's minHeight is large enough OR
-                            // the CollapsingToolbar's scrimVisibleHeightTrigger is set.
-
-                            // The Toolbar in XML has `android:minHeight="140dp"` which is fixed.
-                            // Let's adjust it dynamically to match perfectly the items we pinned.
+                            // Calculate total pinned height using symmetric 60dp gaps around the sticky
+                            // header card
+                            int totalPinnedHeight = titleSpacerHeight + headerCardHeight + bottomGapSpacer
+                                    + timelineHeaderHeight;
 
                             androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
                             if (toolbar != null) {
-                                int totalPinnedHeight = titleSpacerHeight + headerCardHeight + timelineHeaderHeight;
-                                // Add some buffer for margins
-                                totalPinnedHeight += (int) (16 * getResources().getDisplayMetrics().density);
-
                                 toolbar.setMinimumHeight(totalPinnedHeight);
                                 collapsingToolbar.setMinimumHeight(totalPinnedHeight);
                                 collapsingToolbar.setScrimVisibleHeightTrigger(totalPinnedHeight);
@@ -405,24 +399,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         if (textHeaderCountDone != null) {
             textHeaderCountDone.setText(String.valueOf(todayCompleted));
         }
-
-        // 2. Identify Next Upcoming Task (Secondary Circle)
-        long now = System.currentTimeMillis();
-        nextUpcomingTask = null;
-        long minDiff = Long.MAX_VALUE;
-
-        for (Task task : activeTasks) {
-            if (task.reminderTime > now) {
-                long diff = task.reminderTime - now;
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    nextUpcomingTask = task;
-                }
-            }
-        }
-
-        // Start Countdown for Secondary Circle
-        startCountdown();
 
         // After updating dashboard, filter tasks for the currently selected date
         filterAndShowTasks();
@@ -502,64 +478,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         taskAdapter.setTasks(filteredTasks);
     }
 
-    private void startCountdown() {
-        countdownHandler.removeCallbacksAndMessages(null);
-
-        if (nextUpcomingTask == null) {
-            if (progressCircleSecondary != null)
-                progressCircleSecondary.setProgress(0);
-            if (textHeaderPill != null)
-                textHeaderPill.setText("00:00");
-            return;
-        }
-
-        countdownRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (nextUpcomingTask == null) {
-                    if (textHeaderPill != null)
-                        textHeaderPill.setText("00:00");
-                    return;
-                }
-
-                long now = System.currentTimeMillis();
-                long timeLeft = nextUpcomingTask.reminderTime - now;
-
-                if (timeLeft <= 0) {
-                    if (progressCircleSecondary != null)
-                        progressCircleSecondary.setProgress(0);
-                    if (textHeaderPill != null)
-                        textHeaderPill.setText("00:00");
-                    return;
-                }
-
-                // Format HH:mm
-                long hours = java.util.concurrent.TimeUnit.MILLISECONDS.toHours(timeLeft);
-                long minutes = java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(timeLeft) % 60;
-                String timeString = String.format(java.util.Locale.getDefault(), "%02d:%02d", hours, minutes);
-
-                if (textHeaderPill != null)
-                    textHeaderPill.setText(timeString);
-
-                // Scale: 100% = 60 Minutes (3600000 ms)
-                long maxScale = 60 * 60 * 1000;
-
-                int progress = 100;
-                if (timeLeft < maxScale) {
-                    progress = (int) (((float) timeLeft / maxScale) * 100);
-                }
-
-                if (progressCircleSecondary != null)
-                    progressCircleSecondary.setProgress(progress);
-
-                // Update every second
-                countdownHandler.postDelayed(this, 1000);
-            }
-        };
-
-        countdownHandler.post(countdownRunnable);
-    }
-
     private void applyThemePreference() {
         android.content.SharedPreferences prefs = androidx.preference.PreferenceManager
                 .getDefaultSharedPreferences(this);
@@ -637,7 +555,6 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        countdownHandler.removeCallbacksAndMessages(null);
     }
 
     private int blendColors(int from, int to, float ratio) {

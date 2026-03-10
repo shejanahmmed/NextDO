@@ -16,7 +16,7 @@
         android:text="MON"
         android:textSize="10sp"
         android:textStyle="bold"
-        android:textColor="#662C3E50"
+        android:textColor="@color/dashboard_text_navy"
         android:textAllCaps="true" />
 
     <TextView

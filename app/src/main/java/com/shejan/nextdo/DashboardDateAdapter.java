@@ -101,7 +101,8 @@ public class DashboardDateAdapter extends RecyclerView.Adapter<RecyclerView.View
             dateHolder.textDate.setAlpha(1.0f);
         } else {
             dateHolder.itemView.setBackground(null);
-            dateHolder.textDay.setTextColor(0xFF2C3E50); // Navy
+            dateHolder.textDay.setTextColor(
+                    dateHolder.itemView.getContext().getResources().getColor(R.color.dashboard_text_navy));
             dateHolder.textDay.setAlpha(0.6f);
             dateHolder.textDate.setAlpha(0.6f);
         }

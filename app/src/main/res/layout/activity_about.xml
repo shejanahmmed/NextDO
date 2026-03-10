@@ -103,7 +103,7 @@
                         android:textColor="#FFFFFFFF"
                         android:paddingHorizontal="14dp"
                         android:paddingVertical="4dp"
-                        android:background="@drawable/bg_settings_header" />
+                        android:background="@drawable/bg_version_pill" />
 
                     <!-- Tagline -->
                     <TextView

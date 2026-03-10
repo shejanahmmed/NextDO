@@ -396,7 +396,7 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
 
         int todayLeft = todayTotal - todayCompleted;
         if (textSummary != null) {
-            String summaryText = todayCompleted + " Done, <font color='#FF9AA2'><b>" + todayLeft + " Left</b></font>";
+            String summaryText = todayCompleted + " Done, <font color='#c7082f'><b>" + todayLeft + " Left</b></font>";
             textSummary.setText(Html.fromHtml(summaryText, Html.FROM_HTML_MODE_LEGACY));
         }
 

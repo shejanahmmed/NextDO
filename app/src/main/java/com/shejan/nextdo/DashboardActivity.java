@@ -284,6 +284,15 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
                         layoutHeaderCollapsed.setVisibility(percentage > 0.1f ? View.VISIBLE : View.INVISIBLE);
                     }
 
+                    // Dynamically set empty state padding to keep it centered in the visible
+                    // timeline area
+                    if (textEmptyState != null) {
+                        int baseBottomPadding = (int) (100 * getResources().getDisplayMetrics().density); // bottom nav
+                                                                                                          // + padding
+                        int offscreenAmount = totalScrollRange - Math.abs(verticalOffset);
+                        textEmptyState.setPadding(0, 0, 0, baseBottomPadding + offscreenAmount);
+                    }
+
                     // Quick-snap: debounce scroll stop, then snap at 25% threshold
                     if (snapRunnable[0] != null)
                         snapHandler.removeCallbacks(snapRunnable[0]);

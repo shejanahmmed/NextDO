@@ -323,18 +323,18 @@
                 android:id="@+id/empty_state_scroll"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fillViewport="true"
                 android:visibility="gone">
 
                 <TextView
                     android:id="@+id/text_empty_state"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:text="@string/no_reminders_today"
                     android:textSize="18sp"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:fontFamily="sans-serif-light"
-                    android:textAlignment="center"
-                    android:layout_marginTop="70dp" />
+                    android:gravity="center" />
             </androidx.core.widget.NestedScrollView>
         </FrameLayout>
 

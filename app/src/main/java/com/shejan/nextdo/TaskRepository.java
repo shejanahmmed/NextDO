@@ -29,6 +29,10 @@ public class TaskRepository {
         return taskDao.getCompletedTasks();
     }
 
+    LiveData<List<Task>> getAllNonDeletedTasks() {
+        return taskDao.getAllNonDeletedTasks();
+    }
+
     void insert(Task task) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             taskDao.insert(task);

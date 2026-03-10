@@ -22,6 +22,10 @@ public class TaskViewModel extends AndroidViewModel {
         return repository.getCompletedTasks();
     }
 
+    public LiveData<List<Task>> getAllNonDeletedTasks() {
+        return repository.getAllNonDeletedTasks();
+    }
+
     public void insert(Task task) {
         repository.insert(task);
     }

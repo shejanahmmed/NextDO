@@ -27,9 +27,14 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
     }
 
     private final OnTaskActionListener actionListener;
+    private boolean showTimeline = true;
 
     public DashboardTaskAdapter(OnTaskActionListener actionListener) {
         this.actionListener = actionListener;
+    }
+
+    public void setShowTimeline(boolean showTimeline) {
+        this.showTimeline = showTimeline;
     }
 
     public void setTasks(List<Task> newTasks) {
@@ -49,9 +54,22 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task task = tasks.get(position);
 
-        // Reset any leftover animation properties
-        holder.cardContainer.animate().cancel();
-        holder.cardContainer.setAlpha(1f);
+        // Show/Hide Timeline based on flag
+        if (holder.timelineLine != null) {
+            holder.timelineLine.setVisibility(showTimeline ? View.VISIBLE : View.GONE);
+        }
+        if (holder.timelineDot != null) {
+            holder.timelineDot.setVisibility(showTimeline ? View.VISIBLE : View.GONE);
+        }
+
+        // Adjust card margin if timeline is hidden
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) holder.cardContainer.getLayoutParams();
+        if (!showTimeline) {
+            params.setMarginStart(0);
+        } else {
+            params.setMarginStart(dpToPx(24));
+        }
+        holder.cardContainer.setLayoutParams(params);
 
         // Match hollow circle to task completion state
         if (task.isCompleted) {
@@ -240,7 +258,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         LinearLayout layoutExpandable;
         com.google.android.material.button.MaterialButton btnEdit, btnDone, btnDeleteBtn;
 
-        View timelineDot;
+        View timelineDot, timelineLine;
 
         TaskViewHolder(View itemView) {
             super(itemView);
@@ -251,6 +269,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             imgCheck = itemView.findViewById(R.id.img_check);
             cardContainer = itemView.findViewById(R.id.card_container);
             timelineDot = itemView.findViewById(R.id.timeline_dot);
+            timelineLine = itemView.findViewById(R.id.timeline_line);
             hollowCircle = itemView.findViewById(R.id.hollow_circle_indicator);
 
             layoutExpandable = itemView.findViewById(R.id.layout_expandable);

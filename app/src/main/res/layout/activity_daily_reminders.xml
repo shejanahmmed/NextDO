@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground"
+    tools:context=".DailyRemindersActivity">
+
+    <!-- === Header Banner (Blue Gradient Style) === -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:background="@drawable/bg_settings_header"
+            android:fitsSystemWindows="true"
+            android:elevation="12dp"
+            android:translationZ="12dp"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIconTint="#FFFFFF">
+
+            <TextView
+                android:id="@+id/text_toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Reminders"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:letterSpacing="-0.02" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Content below the header -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="16dp">
+
+            <!-- Undone Section -->
+            <TextView
+                android:id="@+id/text_undone_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Undone"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_undone_tasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <!-- Done Section -->
+            <TextView
+                android:id="@+id/text_done_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Done"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_done_tasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <!-- Empty state (within ScrollView to center properly if needed, but let's keep logic simple) -->
+            <LinearLayout
+                android:id="@+id/empty_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="100dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:alpha="0.15"
+                    android:src="@drawable/ic_info"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="No reminders found"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Nothing scheduled for this date"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -35,6 +35,9 @@ public interface TaskDao {
     @Query("SELECT * FROM tasks WHERE isDeleted = 0 AND isCompleted = 1 ORDER BY id DESC")
     LiveData<List<Task>> getCompletedTasks();
 
+    @Query("SELECT * FROM tasks WHERE isDeleted = 0 ORDER BY id DESC")
+    LiveData<List<Task>> getAllNonDeletedTasks();
+
     @Query("SELECT * FROM tasks WHERE isDeleted = 0")
     List<Task> getAllTasksSync();
 

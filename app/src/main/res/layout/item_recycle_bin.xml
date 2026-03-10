@@ -35,7 +35,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
+                    android:textColor="#000000"
                     android:maxLines="2"
                     android:ellipsize="end"
                     tools:text="Assignment" />
@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:textSize="12sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textColor="#000000"
                     tools:text="Deleted on Nov 28, 2025 • 30 days left" />
 
             </LinearLayout>
@@ -67,14 +67,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:text="Restore"
-                android:textColor="#34C759"
+                android:textColor="#000000"
                 android:textSize="13sp"
                 android:layout_marginEnd="10dp"
-                app:strokeColor="#34C759"
+                app:strokeColor="#000000"
                 app:strokeWidth="1.5dp"
                 app:cornerRadius="10dp"
+                app:elevation="0dp"
                 app:icon="@drawable/ic_refresh"
-                app:iconTint="#34C759"
+                app:iconTint="#000000"
                 app:iconSize="16dp"
                 app:iconPadding="4dp" />
 
@@ -85,13 +86,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:text="Delete"
-                android:textColor="#EF5350"
+                android:textColor="#000000"
                 android:textSize="13sp"
-                app:strokeColor="#EF5350"
+                app:strokeColor="#000000"
                 app:strokeWidth="1.5dp"
                 app:cornerRadius="10dp"
+                app:elevation="0dp"
                 app:icon="@drawable/ic_delete_outline"
-                app:iconTint="#EF5350"
+                app:iconTint="#000000"
                 app:iconSize="16dp"
                 app:iconPadding="4dp" />
 

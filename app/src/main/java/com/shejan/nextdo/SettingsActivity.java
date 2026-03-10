@@ -308,6 +308,12 @@ public class SettingsActivity extends AppCompatActivity {
             android.content.Intent intent = new android.content.Intent(this, HelpFAQActivity.class);
             startActivity(intent);
         });
+
+        binding.cardPrivacyPolicy.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
+            intent.setData(android.net.Uri.parse("https://www.farjan.me/NEXTDOPrivacyPolicy/"));
+            startActivity(intent);
+        });
     }
 
 }

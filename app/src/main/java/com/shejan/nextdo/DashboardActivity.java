@@ -139,6 +139,9 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
             textMonthYear.setText(sdf.format(selectedDate.getTime()));
         }
         TextView textViewAll = findViewById(R.id.text_view_all);
+        if (textViewAll != null) {
+            textViewAll.setOnClickListener(v -> showCalendarPicker());
+        }
 
         // New Animation Views
         layoutHeaderExpanded = findViewById(R.id.layout_header_expanded);
@@ -190,18 +193,26 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         recyclerDates.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         dateAdapter = new DashboardDateAdapter();
         dateAdapter.setDates(generateDates());
-        dateAdapter.setOnDateClickListener((date, position) -> {
-            selectedDate.setTimeInMillis(date.timestamp);
-            dateAdapter.setSelectedDate(date.timestamp);
+        dateAdapter.setOnDateClickListener(new DashboardDateAdapter.OnDateClickListener() {
+            @Override
+            public void onDateClicked(DashboardDateAdapter.DateItem date, int position) {
+                selectedDate.setTimeInMillis(date.timestamp);
+                dateAdapter.setSelectedDate(date.timestamp);
 
-            // Update UI for the selected date
-            TextView txtMonth = findViewById(R.id.text_month_year);
-            if (txtMonth != null) {
-                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMMM yyyy",
-                        java.util.Locale.getDefault());
-                txtMonth.setText(sdf.format(selectedDate.getTime()));
+                // Update UI for the selected date
+                TextView txtMonth = findViewById(R.id.text_month_year);
+                if (txtMonth != null) {
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMMM yyyy",
+                            java.util.Locale.getDefault());
+                    txtMonth.setText(sdf.format(selectedDate.getTime()));
+                }
+                filterAndShowTasks();
             }
-            filterAndShowTasks();
+
+            @Override
+            public void onArrowClicked() {
+                showCalendarPicker();
+            }
         });
         recyclerDates.setAdapter(dateAdapter);
 
@@ -564,6 +575,17 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    private void showCalendarPicker() {
+        ModernCalendarBottomSheet calendarSheet = ModernCalendarBottomSheet
+                .newInstance(selectedDate.getTimeInMillis());
+        calendarSheet.setOnDateSelectedListener(dateInMillis -> {
+            Intent intent = new Intent(DashboardActivity.this, DailyRemindersActivity.class);
+            intent.putExtra("SELECTED_TIMESTAMP", dateInMillis);
+            startActivity(intent);
+        });
+        calendarSheet.show(getSupportFragmentManager(), "calendar_sheet");
     }
 
     private int blendColors(int from, int to, float ratio) {

@@ -108,6 +108,10 @@
             android:exported="false"
             android:parentActivityName=".DashboardActivity" />
         <activity
+            android:name=".DailyRemindersActivity"
+            android:exported="false"
+            android:parentActivityName=".DashboardActivity" />
+        <activity
             android:name=".DashboardActivity"
             android:exported="true"
             android:label="@string/app_name">

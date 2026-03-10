@@ -506,7 +506,7 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/ic_info"
+                            android:src="@drawable/ic_check_circle"
                             app:tint="#FFF59E0B" />
                     </FrameLayout>
 
@@ -628,11 +628,17 @@
                     android:paddingTop="14dp"
                     android:paddingBottom="14dp">
 
-                    <ImageView
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
-                        android:src="@drawable/ic_info"
-                        app:tint="?attr/colorPrimary" />
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_settings_icon_pink">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_info"
+                            app:tint="#FFFF8A80" />
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"

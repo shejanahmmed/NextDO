@@ -21,6 +21,8 @@ public class DashboardDateAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public interface OnDateClickListener {
         void onDateClicked(DateItem item, int position);
+
+        void onArrowClicked();
     }
 
     public void setOnDateClickListener(OnDateClickListener listener) {
@@ -75,7 +77,11 @@ public class DashboardDateAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ArrowViewHolder) {
-            // Arrow logic (currently non-clickable)
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onArrowClicked();
+                }
+            });
             return;
         }
 

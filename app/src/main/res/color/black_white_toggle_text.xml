@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Checked State: White Text (on Pink Button) -->
-    <item android:state_checked="true" android:color="@android:color/white" />
+    <!-- Checked State: Black Text (on Light White Button) -->
+    <item android:state_checked="true" android:color="@android:color/black" />
     <!-- Unchecked State: Black Text -->
     <item android:color="@color/reminder_text_unchecked" />
 </selector>

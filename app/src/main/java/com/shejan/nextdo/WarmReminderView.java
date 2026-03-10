@@ -38,7 +38,7 @@ public class WarmReminderView extends LinearLayout {
 
     // Color Palette - Dark (High Contrast)
     private static final int COLOR_ACCENT_DARK = 0xFFFFFFFF; // White
-    private static final int COLOR_BACKGROUND_DARK = 0xFF252525; // Visible Dark Grey
+    private static final int COLOR_BACKGROUND_DARK = 0xFF2C2C2C; // Light Dark Gray
     private static final int COLOR_ICON_BG_DARK = 0xFF333333; // Dark Gray
     private static final int COLOR_TEXT_DARK = 0xFFFFFFFF; // White
     private static final int COLOR_SUBTITLE_DARK = 0xFFB0B0B0; // Light Gray

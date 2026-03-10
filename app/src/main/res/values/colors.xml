@@ -50,7 +50,7 @@
     <color name="input_background_color">@color/peach_puff</color>
     
     <color name="cheerful_pastel_pink">#ff8da1</color>
-    <color name="reminder_type_active">@color/cheerful_pastel_pink</color>
+    <color name="reminder_type_active">#F5F5F5</color>
     
     <color name="page_background">#EEF2FF</color>
     
@@ -93,8 +93,8 @@
     <color name="preset_icon_tint">#333333</color>
     <color name="info_box_background">#F1EEE7</color>
     <color name="info_box_text">#666666</color>
-    <color name="dialog_cancel_text">#333333</color>
-    <color name="dialog_cancel_stroke">#E0E0E0</color>
+    <color name="dialog_cancel_text">#FF0033</color>
+    <color name="dialog_cancel_stroke">#FF0033</color>
     <color name="dialog_cancel_bg">#FFFFFF</color>
     
     <color name="preset_bg_peach">#FFD4B5</color>

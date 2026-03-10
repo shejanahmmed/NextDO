@@ -7,6 +7,21 @@
     <color name="dashboard_grey">#B0B0B0</color>
     <!-- Keep other colors same or define if needed -->
 
+    <color name="page_background">#000000</color>
+    <color name="input_background_color">#1E1E1E</color>
+    <color name="reminder_type_inactive">#2C2C2C</color>
+    <color name="reminder_type_active">#E0E0E0</color>
+    <color name="reminder_text_unchecked">#FFFFFF</color>
+    <color name="dialog_title_text">#FFFFFF</color>
+    <color name="info_box_text">#B0B0B0</color>
+    <color name="weekday_inactive_bg">#333333</color>
+    <color name="weekday_inactive_text">#FFFFFF</color>
+    <color name="dialog_cancel_bg">#1E1E1E</color>
+    <color name="dialog_cancel_stroke">#FF0033</color>
+    <color name="dialog_cancel_text">#FF0033</color>
+    <color name="hint_text_color">#808080</color>
+    <color name="bottom_sheet_bg">#1E1E1E</color>
+
     <!-- Widget Colors -->
     <color name="widget_title_text">@android:color/white</color>
     <color name="widget_time_text">@color/text_secondary</color>

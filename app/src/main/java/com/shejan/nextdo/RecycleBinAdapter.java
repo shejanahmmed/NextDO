@@ -45,21 +45,25 @@ public class RecycleBinAdapter extends ListAdapter<Task, RecycleBinAdapter.TaskV
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
         private final TextView taskItemView;
         private final TextView taskDescriptionView;
+        private final TextView textCountdownVal;
         private final View btnRestore;
         private final View btnDelete;
         private final androidx.cardview.widget.CardView cardRoot;
+        private final View iconContainer;
 
         public TaskViewHolder(View itemView) {
             super(itemView);
             taskItemView = itemView.findViewById(R.id.text_title);
             taskDescriptionView = itemView.findViewById(R.id.text_description);
+            textCountdownVal = itemView.findViewById(R.id.text_countdown_val);
             btnRestore = itemView.findViewById(R.id.btn_restore);
             btnDelete = itemView.findViewById(R.id.btn_delete);
             cardRoot = itemView.findViewById(R.id.card_root);
+            iconContainer = itemView.findViewById(R.id.icon_container);
         }
 
         public void bind(Task task, OnTaskActionListener listener, int position) {
-            // Apply same rotating card background colors as My Reminders page
+            // Apply rotating background colors to the card for a professional yet fresh look
             int colorResId;
             switch (position % 3) {
                 case 0:
@@ -73,7 +77,9 @@ public class RecycleBinAdapter extends ListAdapter<Task, RecycleBinAdapter.TaskV
                     break;
             }
             int color = androidx.core.content.ContextCompat.getColor(itemView.getContext(), colorResId);
-            cardRoot.setCardBackgroundColor(color);
+            if (cardRoot != null) {
+                cardRoot.setCardBackgroundColor(color);
+            }
 
             taskItemView.setText(task.title);
 
@@ -87,8 +93,10 @@ public class RecycleBinAdapter extends ListAdapter<Task, RecycleBinAdapter.TaskV
             if (daysLeft < 0)
                 daysLeft = 0;
 
-            Context context = itemView.getContext();
-            taskDescriptionView.setText(context.getString(R.string.deleted_task_description, deletedDate, daysLeft));
+            taskDescriptionView.setText("Deleted on " + deletedDate);
+            if (textCountdownVal != null) {
+                textCountdownVal.setText(daysLeft + " days left");
+            }
 
             btnRestore.setOnClickListener(v -> {
                 if (listener != null)

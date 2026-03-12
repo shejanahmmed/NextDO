@@ -1,104 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_marginHorizontal="2dp"
+    android:layout_marginBottom="8dp"
     app:cardCornerRadius="20dp"
-    app:cardElevation="0dp"
-    app:cardBackgroundColor="?attr/colorSurface">
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/task_card_bg">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="18dp">
+        android:padding="16dp">
 
-        <!-- Top row: title & date -->
+        <TextView
+            android:id="@+id/text_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/dashboard_text_navy"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="Task Title" />
+
+        <TextView
+            android:id="@+id/text_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:alpha="0.7"
+            android:textColor="@color/dashboard_grey"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="@id/text_title"
+            app:layout_constraintTop_toBottomOf="@id/text_title"
+            android:text="Deleted on Mar 12, 2026" />
+
+        <TextView
+            android:id="@+id/text_separator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:alpha="0.5"
+            android:text="•"
+            android:textColor="@color/dashboard_grey"
+            app:layout_constraintBottom_toBottomOf="@id/text_description"
+            app:layout_constraintStart_toEndOf="@id/text_description"
+            app:layout_constraintTop_toTopOf="@id/text_description" />
+
+        <TextView
+            android:id="@+id/text_countdown_val"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/dashboard_grey"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/text_description"
+            app:layout_constraintStart_toEndOf="@id/text_separator"
+            app:layout_constraintTop_toTopOf="@id/text_description"
+            android:text="30 days left" />
+
         <LinearLayout
+            android:id="@+id/action_area"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_description">
 
-            <!-- Title & date -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/text_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/task_card_text_primary"
-                    android:maxLines="2"
-                    android:ellipsize="end"
-                    tools:text="Assignment" />
-
-                <TextView
-                    android:id="@+id/text_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:textSize="12sp"
-                    android:textColor="@color/task_card_text_primary"
-                    tools:text="Deleted on Nov 28, 2025 • 30 days left" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Action buttons row -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <!-- Restore button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_restore"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Restore"
-                android:textColor="@color/task_card_text_primary"
-                android:textSize="13sp"
-                android:layout_marginEnd="10dp"
-                app:strokeColor="@color/task_card_text_primary"
-                app:strokeWidth="1.5dp"
-                app:cornerRadius="10dp"
-                app:elevation="0dp"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/dashboard_matte_teal"
+                app:cornerRadius="12dp"
                 app:icon="@drawable/ic_refresh"
-                app:iconTint="@color/task_card_text_primary"
-                app:iconSize="16dp"
-                app:iconPadding="4dp" />
+                app:iconPadding="8dp"
+                app:iconSize="18dp"
+                app:iconTint="#FFFFFF"
+                android:minWidth="0dp" />
 
-            <!-- Delete button -->
+            <View
+                android:layout_width="16dp"
+                android:layout_height="1dp" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_delete"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Delete"
-                android:textColor="@color/task_card_text_primary"
-                android:textSize="13sp"
-                app:strokeColor="@color/task_card_text_primary"
-                app:strokeWidth="1.5dp"
-                app:cornerRadius="10dp"
-                app:elevation="0dp"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:backgroundTint="#EF5350"
+                app:cornerRadius="12dp"
                 app:icon="@drawable/ic_delete_outline"
-                app:iconTint="@color/task_card_text_primary"
-                app:iconSize="16dp"
-                app:iconPadding="4dp" />
+                app:iconPadding="8dp"
+                app:iconSize="18dp"
+                app:iconTint="#FFFFFF"
+                android:minWidth="0dp" />
 
         </LinearLayout>
 
-    </LinearLayout>
+        <!-- Hidden view for backwards compatibility -->
+        <View
+            android:id="@+id/icon_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

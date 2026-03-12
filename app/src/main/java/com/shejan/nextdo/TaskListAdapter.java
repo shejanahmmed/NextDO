@@ -238,9 +238,11 @@ public class TaskListAdapter extends ListAdapter<Task, TaskListAdapter.TaskViewH
                 binding.btnDone.setText("Done");
             }
 
-            // Set uniform style: Black background, White text
-            binding.btnDone.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF000000));
-            binding.btnDone.setTextColor(0xFFFFFFFF);
+            // Set adaptive style using resources
+            int btnBgColor = androidx.core.content.ContextCompat.getColor(binding.btnDone.getContext(), R.color.task_card_btn_done_bg);
+            int btnTextColor = androidx.core.content.ContextCompat.getColor(binding.btnDone.getContext(), R.color.task_card_btn_done_text);
+            binding.btnDone.setBackgroundTintList(android.content.res.ColorStateList.valueOf(btnBgColor));
+            binding.btnDone.setTextColor(btnTextColor);
 
             binding.btnDone.setOnClickListener(v -> {
                 if (listener != null) {

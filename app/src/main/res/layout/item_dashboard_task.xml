@@ -59,7 +59,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_check_circle"
-            app:tint="#000000"
+            app:tint="@color/task_card_text_primary"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:visibility="gone" />
@@ -70,7 +70,7 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:src="@drawable/ic_delete"
-            app:tint="#000000"
+            app:tint="@color/task_card_text_primary"
             android:alpha="0.6"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
@@ -100,7 +100,7 @@
                     android:text="Task Title"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#000000" />
+                    android:textColor="@color/task_card_text_primary" />
             </LinearLayout>
 
             <LinearLayout
@@ -115,7 +115,7 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:src="@drawable/ic_clock"
-                    app:tint="#000000"
+                    app:tint="@color/task_card_text_primary"
                     android:layout_marginEnd="4dp" />
 
                 <TextView
@@ -124,7 +124,7 @@
                     android:layout_height="wrap_content"
                     android:text="10:00 AM"
                     android:textSize="14sp"
-                    android:textColor="#000000" />
+                    android:textColor="@color/task_card_text_primary" />
 
                 <TextView
                     android:id="@+id/text_reminder_type"
@@ -133,7 +133,7 @@
                     android:text="Pill"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="@color/task_card_text_primary"
                     android:layout_marginStart="12dp"
                     android:visibility="gone" />
             </LinearLayout>
@@ -152,7 +152,7 @@
                     android:layout_height="wrap_content"
                     android:text="Task description goes here"
                     android:textSize="14sp"
-                    android:textColor="#000000"
+                    android:textColor="@color/task_card_text_primary"
                     android:layout_marginTop="8dp"
                     android:alpha="0.7" />
 
@@ -176,8 +176,8 @@
                         android:insetRight="0dp"
                         android:insetBottom="0dp"
                         android:backgroundTint="@android:color/transparent"
-                        android:textColor="#000000"
-                        app:strokeColor="#000000"
+                        android:textColor="@color/task_card_text_primary"
+                        app:strokeColor="@color/task_card_text_primary"
                         app:strokeWidth="1dp"
                         app:cornerRadius="8dp"
                         app:elevation="0dp"
@@ -196,8 +196,8 @@
                         android:insetRight="0dp"
                         android:insetBottom="0dp"
                         android:backgroundTint="@android:color/transparent"
-                        android:textColor="#000000"
-                        app:strokeColor="#000000"
+                        android:textColor="@color/task_card_text_primary"
+                        app:strokeColor="@color/task_card_text_primary"
                         app:strokeWidth="1dp"
                         app:cornerRadius="8dp"
                         app:elevation="0dp"
@@ -215,8 +215,8 @@
                         android:insetTop="0dp"
                         android:insetRight="0dp"
                         android:insetBottom="0dp"
-                        android:backgroundTint="#000000"
-                        android:textColor="#FFFFFF"
+                        android:backgroundTint="@color/task_card_btn_done_bg"
+                        android:textColor="@color/task_card_btn_done_text"
                         app:cornerRadius="8dp"
                         app:elevation="0dp"
                         style="@style/Widget.MaterialComponents.Button" />

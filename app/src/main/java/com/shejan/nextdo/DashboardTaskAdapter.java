@@ -191,6 +191,12 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             }
         });
 
+        // Set adaptive style using resources
+        int btnBgColor = androidx.core.content.ContextCompat.getColor(holder.btnDone.getContext(), R.color.task_card_btn_done_bg);
+        int btnTextColor = androidx.core.content.ContextCompat.getColor(holder.btnDone.getContext(), R.color.task_card_btn_done_text);
+        holder.btnDone.setBackgroundTintList(android.content.res.ColorStateList.valueOf(btnBgColor));
+        holder.btnDone.setTextColor(btnTextColor);
+
         holder.btnDone.setOnClickListener(v -> {
             // "Mark as Done" implies setting checked to true
             if (!task.isCompleted) {

@@ -35,7 +35,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="@color/task_card_text_primary"
                     android:maxLines="2"
                     android:ellipsize="end"
                     tools:text="Assignment" />
@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:textSize="12sp"
-                    android:textColor="#000000"
+                    android:textColor="@color/task_card_text_primary"
                     tools:text="Deleted on Nov 28, 2025 • 30 days left" />
 
             </LinearLayout>
@@ -67,15 +67,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:text="Restore"
-                android:textColor="#000000"
+                android:textColor="@color/task_card_text_primary"
                 android:textSize="13sp"
                 android:layout_marginEnd="10dp"
-                app:strokeColor="#000000"
+                app:strokeColor="@color/task_card_text_primary"
                 app:strokeWidth="1.5dp"
                 app:cornerRadius="10dp"
                 app:elevation="0dp"
                 app:icon="@drawable/ic_refresh"
-                app:iconTint="#000000"
+                app:iconTint="@color/task_card_text_primary"
                 app:iconSize="16dp"
                 app:iconPadding="4dp" />
 
@@ -86,14 +86,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:text="Delete"
-                android:textColor="#000000"
+                android:textColor="@color/task_card_text_primary"
                 android:textSize="13sp"
-                app:strokeColor="#000000"
+                app:strokeColor="@color/task_card_text_primary"
                 app:strokeWidth="1.5dp"
                 app:cornerRadius="10dp"
                 app:elevation="0dp"
                 app:icon="@drawable/ic_delete_outline"
-                app:iconTint="#000000"
+                app:iconTint="@color/task_card_text_primary"
                 app:iconSize="16dp"
                 app:iconPadding="4dp" />
 

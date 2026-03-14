@@ -28,8 +28,8 @@
     <!-- Hollow Circle Indicator (Initially Hidden) -->
     <ImageView
         android:id="@+id/hollow_circle_indicator"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:src="@drawable/hollow_circle_indicator"
         android:scaleType="center"
         android:visibility="gone"

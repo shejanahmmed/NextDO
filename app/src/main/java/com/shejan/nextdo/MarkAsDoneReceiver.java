@@ -29,6 +29,7 @@ public class MarkAsDoneReceiver extends BroadcastReceiver {
             notificationManager.cancel(taskId);
         }
 
+        final PendingResult pendingResult = goAsync();
         // Update Task in Background
         AppDatabase.databaseWriteExecutor.execute(() -> {
             try {
@@ -39,6 +40,7 @@ public class MarkAsDoneReceiver extends BroadcastReceiver {
                 if (task != null) {
                     // Mark as completed
                     task.isCompleted = true;
+                    task.completedTimestamp = System.currentTimeMillis();
                     taskDao.update(task);
 
                     // Cancel any scheduled alarms for this task
@@ -52,6 +54,8 @@ public class MarkAsDoneReceiver extends BroadcastReceiver {
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error marking task as done: " + e.getMessage());
+            } finally {
+                pendingResult.finish();
             }
         });
 

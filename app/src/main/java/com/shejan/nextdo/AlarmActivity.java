@@ -103,6 +103,7 @@ public class AlarmActivity extends AppCompatActivity {
                         snoozeIntent.putExtra("task_title", taskTitle);
                         snoozeIntent.putExtra("task_description", taskDescription);
                         snoozeIntent.putExtra("alarm_id", getIntent().getIntExtra("alarm_id", 0));
+                        snoozeIntent.putExtra("reminder_type", "alarm"); // CRITICAL BUG FIX 1: Always "alarm" here
                         sendBroadcast(snoozeIntent);
 
                         finish();

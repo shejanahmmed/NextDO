@@ -67,11 +67,16 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                                 foundTask.reminderTime, foundTask.repeat);
                         if (nextTime > System.currentTimeMillis()) {
                             foundTask.reminderTime = nextTime;
+                            
+                            // CRITICAL BUG FIX 2: Reset completed state for the next occurrence
+                            foundTask.isCompleted = false;
+                            foundTask.completedTimestamp = 0;
+                            
                             taskDao.update(foundTask);
 
                             // Schedule the next alarm
                             new AlarmScheduler(context).schedule(foundTask);
-                            Log.d(TAG, "Auto-rescheduled task " + taskId + " to " + nextTime);
+                            Log.d(TAG, "Auto-rescheduled task " + taskId + " to " + nextTime + " and reset completed state");
                         } else {
                             Log.d(TAG, "No valid future occurrence found for repeat pattern: " + foundTask.repeat);
                         }
@@ -166,7 +171,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 snoozeIntent.putExtra(EXTRA_TASK_TITLE, taskTitle);
                 snoozeIntent.putExtra("alarm_id", alarmId);
                 snoozeIntent.putExtra("task_description", taskDescription);
-                snoozeIntent.putExtra("reminder_type", reminderType);
+                snoozeIntent.putExtra("reminder_type", reminderType); // CRITICAL BUG FIX 1: Pass reminder_type forward
                 PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(context, taskId + 20000, snoozeIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 

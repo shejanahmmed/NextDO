@@ -35,12 +35,26 @@ public class BootCompletedReceiver extends BroadcastReceiver {
                     int rescheduledCount = 0;
                     
                     for (Task task : allTasks) {
-                        // Reschedule only if:
-                        // 1. Task has a reminder time set
-                        // 2. Reminder time is in the future
-                        // 3. Task is not completed
-                        // 4. Task has a valid alarmId
-                        if (task.reminderTime > currentTime && !task.isCompleted && task.alarmId != 0) {
+                        // CRITICAL BUG FIX 3: Recovery for repeating tasks
+                        // If task is repeating and time has passed, calculate next occurrence
+                        if (!task.isCompleted && task.alarmId != 0 && !android.text.TextUtils.isEmpty(task.repeat)) {
+                             if (task.reminderTime < currentTime) {
+                                 long nextTime = AlarmScheduler.getNextOccurrence(currentTime, task.reminderTime, task.repeat);
+                                 if (nextTime > currentTime) {
+                                     Log.d(TAG, "Boot Recovery: Missed repeating task " + task.id + ", rescheduling for " + nextTime);
+                                     task.reminderTime = nextTime;
+                                     taskDao.update(task);
+                                     alarmScheduler.schedule(task);
+                                     rescheduledCount++;
+                                 }
+                             } else {
+                                 // Future repeating task
+                                 Log.d(TAG, "Rescheduling future repeating task " + task.id);
+                                 alarmScheduler.schedule(task);
+                                 rescheduledCount++;
+                             }
+                        } else if (task.reminderTime > currentTime && !task.isCompleted && task.alarmId != 0) {
+                            // Non-repeating future task
                             Log.d(TAG, "Rescheduling alarm for task " + task.id);
                             alarmScheduler.schedule(task);
                             rescheduledCount++;

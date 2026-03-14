@@ -62,6 +62,9 @@ public class SnoozeReceiver extends BroadcastReceiver {
             reminderIntent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_ID, taskId);
             reminderIntent.putExtra("alarm_id", intent.getIntExtra("alarm_id", 0)); // Pass it forward again
             reminderIntent.putExtra("task_description", taskDescription);
+            
+            String reminderType = intent.getStringExtra("reminder_type"); // CRITICAL BUG FIX 1
+            reminderIntent.putExtra("reminder_type", reminderType);
 
             // Use the original alarmId if available, otherwise fallback to taskId
             int alarmId = intent.getIntExtra("alarm_id", 0);

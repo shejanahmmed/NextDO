@@ -211,14 +211,15 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         holder.btnDone.setBackgroundTintList(android.content.res.ColorStateList.valueOf(btnBgColor));
         holder.btnDone.setTextColor(btnTextColor);
 
+        // Toggle text and logic based on completion
+        holder.btnDone.setText(task.isCompleted ? "Undone" : "Done");
+
         holder.btnDone.setOnClickListener(v -> {
-            // "Mark as Done" implies setting checked to true
-            if (!task.isCompleted) {
-                task.isCompleted = true;
-                notifyItemChanged(position);
-                if (actionListener != null) {
-                    actionListener.onTaskChecked(task, true);
-                }
+            boolean newStatus = !task.isCompleted;
+            task.isCompleted = newStatus;
+            notifyItemChanged(position);
+            if (actionListener != null) {
+                actionListener.onTaskChecked(task, newStatus);
             }
         });
 

@@ -34,62 +34,62 @@ public class SnoozeReceiver extends BroadcastReceiver {
             notificationManager.cancel(taskId);
         }
 
-        // CRITICAL: Check if task still exists and is not deleted
-        try {
-            AppDatabase db = AppDatabase.getDatabase(context);
-            Task task = db.taskDao().getTaskById(taskId);
-            if (task == null || task.isDeleted || task.isCompleted) {
-                Log.d(TAG, "Task " + taskId + " is deleted/completed, not snoozing");
-                return;
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error checking task status: " + e.getMessage());
-            return;
-        }
-
-        // Get snooze duration from preferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String durationStr = prefs.getString("snooze_duration", "300000"); // Default 5 mins
-        long duration = Long.parseLong(durationStr);
-
-        // Schedule new alarm
-        long triggerTime = System.currentTimeMillis() + duration;
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        if (alarmManager != null) {
-            Intent reminderIntent = new Intent(context, ReminderBroadcastReceiver.class);
-            reminderIntent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_TITLE, taskTitle);
-            reminderIntent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_ID, taskId);
-            reminderIntent.putExtra("alarm_id", intent.getIntExtra("alarm_id", 0)); // Pass it forward again
-            reminderIntent.putExtra("task_description", taskDescription);
-            
-            String reminderType = intent.getStringExtra("reminder_type"); // CRITICAL BUG FIX 1
-            reminderIntent.putExtra("reminder_type", reminderType);
-
-            // Use the original alarmId if available, otherwise fallback to taskId
-            int alarmId = intent.getIntExtra("alarm_id", 0);
-            int requestCode = (alarmId != 0) ? alarmId : taskId;
-
-            // We use the same ID as the original alarm to overwrite it effectively for this
-            // task
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, reminderIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
+        final PendingResult pendingResult = goAsync();
+        // Process in background
+        AppDatabase.databaseWriteExecutor.execute(() -> {
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
-                } else {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+                // CRITICAL: Check if task still exists and is not deleted
+                AppDatabase db = AppDatabase.getDatabase(context);
+                Task task = db.taskDao().getTaskById(taskId);
+                if (task == null || task.isDeleted || task.isCompleted) {
+                    Log.d(TAG, "Task " + taskId + " is deleted/completed, not snoozing");
+                    return;
                 }
 
-                // Calculate minutes for toast message
-                long minutes = duration / 60000;
-                Toast.makeText(context, "Snoozed for " + minutes + " minutes", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "Snoozed task " + taskId + " for " + duration + "ms");
-            } catch (SecurityException e) {
-                Log.e(TAG, "Permission error scheduling snooze: " + e.getMessage());
-                Toast.makeText(context, "Failed to snooze: Permission denied", Toast.LENGTH_SHORT).show();
+                // Get snooze duration from preferences
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                String durationStr = prefs.getString("snooze_duration", "300000"); // Default 5 mins
+                long duration = Long.parseLong(durationStr);
+
+                // Schedule new alarm
+                long triggerTime = System.currentTimeMillis() + duration;
+
+                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                if (alarmManager != null) {
+                    Intent reminderIntent = new Intent(context, ReminderBroadcastReceiver.class);
+                    reminderIntent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_TITLE, taskTitle);
+                    reminderIntent.putExtra(ReminderBroadcastReceiver.EXTRA_TASK_ID, taskId);
+                    reminderIntent.putExtra("alarm_id", intent.getIntExtra("alarm_id", 0));
+                    reminderIntent.putExtra("task_description", taskDescription);
+
+                    String reminderType = intent.getStringExtra("reminder_type");
+                    reminderIntent.putExtra("reminder_type", reminderType);
+
+                    int alarmId = intent.getIntExtra("alarm_id", 0);
+                    int requestCode = (alarmId != 0) ? alarmId : taskId;
+
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, reminderIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                        alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+                    } else {
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+                    }
+
+                    Log.d(TAG, "Snoozed task " + taskId + " for " + duration + "ms");
+                    
+                    // Show toast on UI thread
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                        long minutes = duration / 60000;
+                        Toast.makeText(context, "Snoozed for " + minutes + " minutes", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error during snooze: " + e.getMessage());
+            } finally {
+                pendingResult.finish();
             }
-        }
+        });
     }
 }

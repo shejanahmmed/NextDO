@@ -171,6 +171,10 @@
                         android:layout_height="34dp"
                         android:text="Edit"
                         android:textSize="10sp"
+                        android:textAllCaps="false"
+                        android:padding="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
                         android:insetLeft="0dp"
                         android:insetTop="0dp"
                         android:insetRight="0dp"
@@ -181,7 +185,7 @@
                         app:strokeWidth="1dp"
                         app:cornerRadius="8dp"
                         app:elevation="0dp"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginEnd="4dp"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
                     <com.google.android.material.button.MaterialButton
@@ -191,6 +195,10 @@
                         android:layout_height="34dp"
                         android:text="Delete"
                         android:textSize="10sp"
+                        android:textAllCaps="false"
+                        android:padding="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
                         android:insetLeft="0dp"
                         android:insetTop="0dp"
                         android:insetRight="0dp"
@@ -201,7 +209,7 @@
                         app:strokeWidth="1dp"
                         app:cornerRadius="8dp"
                         app:elevation="0dp"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginEnd="4dp"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
                     <com.google.android.material.button.MaterialButton
@@ -211,6 +219,10 @@
                         android:layout_height="34dp"
                         android:text="Done"
                         android:textSize="10sp"
+                        android:textAllCaps="false"
+                        android:padding="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
                         android:insetLeft="0dp"
                         android:insetTop="0dp"
                         android:insetRight="0dp"

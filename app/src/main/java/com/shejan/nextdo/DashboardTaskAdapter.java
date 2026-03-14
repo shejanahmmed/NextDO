@@ -196,7 +196,7 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
         };
 
         holder.hollowCircle.setOnClickListener(completionClickListener);
-        holder.imgCheck.setOnClickListener(completionClickListener);
+        // holder.imgCheck is no longer clickable as per user request
 
         // Buttons
         holder.btnEdit.setOnClickListener(v -> {

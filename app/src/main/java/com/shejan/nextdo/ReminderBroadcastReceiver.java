@@ -54,58 +54,52 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     db = AppDatabase.getDatabase(context);
                     TaskDao taskDao = db.taskDao();
                     foundTask = taskDao.getTaskById(taskId);
-
-                    if (foundTask != null && (foundTask.isCompleted || foundTask.isDeleted)) {
-                        Log.d(TAG, "Task " + taskId + " is completed or deleted, not showing notification");
-                        return;
-                    }
-
-                    // Auto-Reschedule logic for repeating tasks (only if not deleted)
-                    if (foundTask != null && !foundTask.isDeleted
-                            && !android.text.TextUtils.isEmpty(foundTask.repeat)) {
-                        long nextTime = AlarmScheduler.getNextOccurrence(System.currentTimeMillis(),
-                                foundTask.reminderTime, foundTask.repeat);
-                        if (nextTime > System.currentTimeMillis()) {
-                            foundTask.reminderTime = nextTime;
-                            
-                            // CRITICAL BUG FIX 2: Reset completed state for the next occurrence
-                            foundTask.isCompleted = false;
-                            foundTask.completedTimestamp = 0;
-                            
-                            taskDao.update(foundTask);
-
-                            // Schedule the next alarm
-                            new AlarmScheduler(context).schedule(foundTask);
-                            Log.d(TAG, "Auto-rescheduled task " + taskId + " to " + nextTime + " and reset completed state");
-                        } else {
-                            Log.d(TAG, "No valid future occurrence found for repeat pattern: " + foundTask.repeat);
+                    
+                    if (foundTask != null) {
+                        Log.d(TAG, "Found task in DB: " + foundTask.title + " with type: " + foundTask.reminderType);
+                        
+                        if (foundTask.isCompleted || foundTask.isDeleted) {
+                            Log.d(TAG, "Task " + taskId + " is already completed or deleted, not showing notification");
+                            return;
                         }
+
+                        // Auto-Reschedule logic for repeating tasks
+                        if (!android.text.TextUtils.isEmpty(foundTask.repeat)) {
+                            long nextTime = AlarmScheduler.getNextOccurrence(System.currentTimeMillis(),
+                                    foundTask.reminderTime, foundTask.repeat);
+                            if (nextTime > System.currentTimeMillis()) {
+                                foundTask.reminderTime = nextTime;
+                                foundTask.isCompleted = false;
+                                foundTask.completedTimestamp = 0;
+                                taskDao.update(foundTask);
+                                new AlarmScheduler(context).schedule(foundTask);
+                                Log.d(TAG, "Auto-rescheduled task " + taskId + " to " + nextTime);
+                            }
+                        }
+                    } else {
+                        Log.w(TAG, "Task with ID " + taskId + " NOT found in database!");
                     }
                 } catch (Exception e) {
-                    Log.w(TAG, "Database error in receiver: " + e.getMessage());
+                    Log.w(TAG, "Database access failed in receiver: " + e.getMessage());
                 }
 
+                // Ensure channels are created (especially the new v2 alarm channel)
+                NotificationHelper.createNotificationChannel(context);
+
                 // Handle voice reminders BEFORE showing notification
-                if ("voice".equals(reminderType)) {
-                    Log.d(TAG, "Voice reminder detected from intent for task " + taskId);
-                    // Get full task from database for voice playback
-                    try {
-                        AppDatabase voiceDb = AppDatabase.getDatabase(context);
-                        TaskDao voiceTaskDao = voiceDb.taskDao();
-                        Task voiceTask = voiceTaskDao.getTaskById(taskId);
-                        if (voiceTask != null) {
-                            speakVoiceReminder(context, voiceTask);
-                            return; // Don't show notification for voice reminders
-                        } else {
-                            Log.w(TAG, "Task not found in database, cannot speak");
-                        }
-                    } catch (Exception e) {
-                        Log.w(TAG, "Error loading task for voice: " + e.getMessage());
+                // Use database task as source of truth for reminder type if available
+                String finalReminderType = (foundTask != null) ? foundTask.reminderType : reminderType;
+                
+                if ("voice".equals(finalReminderType)) {
+                    Log.d(TAG, "Voice reminder detected for task " + taskId);
+                    if (foundTask != null) {
+                        speakVoiceReminder(context, foundTask);
+                        return; // Don't show notification for voice reminders
                     }
                 }
 
                 // Show Notification (for notification and alarm reminders)
-                Log.d(TAG, "Showing notification for task " + taskId + " with type: " + reminderType);
+                Log.d(TAG, "Showing notification for task " + taskId + " with type: " + finalReminderType);
 
                 Intent mainIntent = new Intent(context, MainActivity.class);
                 mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -117,25 +111,33 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     contentText = taskTitle + ": " + taskDescription;
                 }
 
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
-                        NotificationHelper.CHANNEL_ID)
+                // Choose Channel based on type
+                String channelId = "alarm".equals(finalReminderType) ? 
+                        NotificationHelper.ALARM_CHANNEL_ID : NotificationHelper.CHANNEL_ID;
+                
+                Log.d(TAG, "Using channel: " + channelId + " for type: " + finalReminderType);
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                         .setSmallIcon(R.drawable.ic_alarm)
                         .setContentTitle("NextDO Reminder")
                         .setContentText(contentText)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText))
-                        .setPriority(NotificationCompat.PRIORITY_MAX)
-                        .setCategory(NotificationCompat.CATEGORY_ALARM)
                         .setContentIntent(pendingIntent)
                         .setAutoCancel(true)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
+                // Default notification behavior (only for non-alarms)
+                if (!"alarm".equals(finalReminderType)) {
+                    builder.setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                            .setDefaults(NotificationCompat.DEFAULT_ALL);
+                }
+
                 // For ALARM type: Use Full-Screen Intent (Standard Android 10+ way)
-                // We do NOT try to startActivity() directly as it fails in background
-                // For ALARM type: Use Full-Screen Intent (Standard Android 10+ way)
-                if ("alarm".equals(reminderType)) {
+                if ("alarm".equals(finalReminderType)) {
                     Log.d(TAG, "Setting up full-screen alarm for task " + taskId);
 
-                    // CRITICAL FIX: Launch AlarmActivity, not MainActivity
+                    // Launch AlarmActivity
                     Intent fullScreenIntent = new Intent(context, AlarmActivity.class);
                     fullScreenIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -150,9 +152,13 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
                     builder.setFullScreenIntent(fullScreenPendingIntent, true)
                             .setCategory(NotificationCompat.CATEGORY_ALARM)
-                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setPriority(NotificationCompat.PRIORITY_MAX)
+                            .setOngoing(true) // Keeps notification until dismissed via Alarm UI
+                            .setAutoCancel(false) // Alarms shouldn't auto-cancel
                             .setSound(android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI)
-                            .setVibrate(new long[] { 0, 1000, 500, 1000 });
+                            .setVibrate(new long[] { 0, 1000, 500, 1000, 500, 1000 });
+                    
+                    Log.d(TAG, "Full-screen intent set for task " + taskId + " on channel " + channelId);
                 }
 
                 // Add Mark as Done Action
@@ -171,27 +177,26 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 snoozeIntent.putExtra(EXTRA_TASK_TITLE, taskTitle);
                 snoozeIntent.putExtra("alarm_id", alarmId);
                 snoozeIntent.putExtra("task_description", taskDescription);
-                snoozeIntent.putExtra("reminder_type", reminderType); // CRITICAL BUG FIX 1: Pass reminder_type forward
+                snoozeIntent.putExtra("reminder_type", finalReminderType);
                 PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(context, taskId + 20000, snoozeIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
                 builder.addAction(R.drawable.ic_snooze, "Snooze", snoozePendingIntent);
 
-                // Standard notification behavior
-                builder.setOngoing(false)
-                        .setOnlyAlertOnce(true)
-                        .setDefaults(NotificationCompat.DEFAULT_LIGHTS | NotificationCompat.DEFAULT_SOUND
-                                | NotificationCompat.DEFAULT_VIBRATE)
-                        .setSound(android.media.RingtoneManager
-                                .getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION))
-                        .setVibrate(new long[] { 0, 500, 250, 500 });
-
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
                 if (ActivityCompat.checkSelfPermission(context,
                         android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                    notificationManager.notify(taskId, builder.build());
-                    Log.d(TAG, "Notification displayed successfully for task " + taskId);
+                    
+                    android.app.Notification notification = builder.build();
+                    
+                    // CRITICAL: Make the alarm sound loop until the user interacts with it
+                    if ("alarm".equals(finalReminderType)) {
+                        notification.flags |= android.app.Notification.FLAG_INSISTENT;
+                    }
+                    
+                    notificationManager.notify(taskId, notification);
+                    Log.d(TAG, "Notification displayed successfully for task " + taskId + " with flags: " + notification.flags);
                 } else {
                     Log.w(TAG, "POST_NOTIFICATIONS permission not granted");
                 }

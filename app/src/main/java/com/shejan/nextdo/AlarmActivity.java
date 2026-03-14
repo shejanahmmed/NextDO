@@ -2,14 +2,8 @@ package com.shejan.nextdo;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -18,12 +12,8 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
-import java.io.IOException;
-
 public class AlarmActivity extends AppCompatActivity {
     private static final String TAG = "AlarmActivity";
-    private MediaPlayer mediaPlayer;
-    private Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,22 +46,19 @@ public class AlarmActivity extends AppCompatActivity {
         // Setup UI
         TextView titleText = findViewById(R.id.alarm_title);
         TextView descText = findViewById(R.id.alarm_description);
-        Button dismissButton = findViewById(R.id.btn_dismiss);
+        Button doneButton = findViewById(R.id.btn_done);
         Button snoozeButton = findViewById(R.id.btn_snooze);
 
         titleText.setText(taskTitle != null ? taskTitle : "Reminder");
         // Description is now hidden by default in XML as requested
         descText.setVisibility(android.view.View.GONE);
 
-        // Start alarm sound and vibration
-        startAlarmSound();
-        startVibration();
+        // NOTE: Sound and vibration are managed by the notification system (FLAG_INSISTENT)
+        // launched via ReminderBroadcastReceiver. cancelNotification() below stops it.
 
-        // Dismiss button
-        dismissButton.setOnClickListener(v -> {
-            stopAlarmSound();
-            stopVibration();
-            finish();
+        // Done button (Mark as Done logic)
+        doneButton.setOnClickListener(v -> {
+            markTaskAsDone(taskId);
         });
 
         // Snooze button
@@ -83,10 +70,9 @@ public class AlarmActivity extends AppCompatActivity {
                     Task task = db.taskDao().getTaskById(taskId);
                     if (task == null || task.isDeleted) {
                         runOnUiThread(() -> {
+                            cancelNotification(taskId);
                             android.widget.Toast.makeText(this, "This reminder has been deleted",
                                     android.widget.Toast.LENGTH_SHORT).show();
-                            stopAlarmSound();
-                            stopVibration();
                             finish();
                         });
                         return;
@@ -94,8 +80,7 @@ public class AlarmActivity extends AppCompatActivity {
 
                     // Proceed with snooze
                     runOnUiThread(() -> {
-                        stopAlarmSound();
-                        stopVibration();
+                        cancelNotification(taskId);
 
                         // Send broadcast to SnoozeReceiver
                         Intent snoozeIntent = new Intent(this, SnoozeReceiver.class);
@@ -103,7 +88,7 @@ public class AlarmActivity extends AppCompatActivity {
                         snoozeIntent.putExtra("task_title", taskTitle);
                         snoozeIntent.putExtra("task_description", taskDescription);
                         snoozeIntent.putExtra("alarm_id", getIntent().getIntExtra("alarm_id", 0));
-                        snoozeIntent.putExtra("reminder_type", "alarm"); // CRITICAL BUG FIX 1: Always "alarm" here
+                        snoozeIntent.putExtra("reminder_type", "alarm");
                         sendBroadcast(snoozeIntent);
 
                         finish();
@@ -111,8 +96,7 @@ public class AlarmActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Log.e(TAG, "Error checking task status: " + e.getMessage());
                     runOnUiThread(() -> {
-                        stopAlarmSound();
-                        stopVibration();
+                        cancelNotification(taskId);
                         finish();
                     });
                 }
@@ -129,69 +113,59 @@ public class AlarmActivity extends AppCompatActivity {
         });
     }
 
-    private void startAlarmSound() {
+    private void markTaskAsDone(int taskId) {
+        cancelNotification(taskId);
+        
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            try {
+                AppDatabase db = AppDatabase.getDatabase(this);
+                TaskDao taskDao = db.taskDao();
+                Task task = taskDao.getTaskById(taskId);
+
+                if (task != null) {
+                    // Mark as completed
+                    task.isCompleted = true;
+                    task.completedTimestamp = System.currentTimeMillis();
+                    taskDao.update(task);
+
+                    // Cancel any scheduled alarms for this task
+                    AlarmScheduler alarmScheduler = new AlarmScheduler(this);
+                    alarmScheduler.cancel(task);
+
+                    // Notify widgets/UI
+                    UpcomingTasksWidgetProvider.sendRefreshBroadcast(this);
+
+                    Log.d(TAG, "Task " + taskId + " marked as done from Alarm Screen");
+                    
+                    runOnUiThread(() -> {
+                        android.widget.Toast.makeText(this, "Task marked as done", android.widget.Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                } else {
+                    runOnUiThread(this::finish);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error marking task as done: " + e.getMessage());
+                runOnUiThread(this::finish);
+            }
+        });
+    }
+
+    private void cancelNotification(int taskId) {
         try {
-            Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-            if (alarmUri == null) {
-                alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (nm != null) {
+                nm.cancel(taskId);
+                Log.d(TAG, "Alarm notification " + taskId + " cancelled");
             }
-
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(this, alarmUri);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                AudioAttributes attributes = new AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ALARM)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .build();
-                mediaPlayer.setAudioAttributes(attributes);
-            } else {
-                mediaPlayer.setAudioStreamType(android.media.AudioManager.STREAM_ALARM);
-            }
-
-            mediaPlayer.setLooping(true);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to start alarm sound", e);
-        }
-    }
-
-    private void stopAlarmSound() {
-        if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-            }
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-    }
-
-    private void startVibration() {
-        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        if (vibrator != null && vibrator.hasVibrator()) {
-            long[] pattern = { 0, 1000, 500, 1000, 500, 1000 };
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                VibrationEffect effect = VibrationEffect.createWaveform(pattern, 0);
-                vibrator.vibrate(effect);
-            } else {
-                vibrator.vibrate(pattern, 0);
-            }
-        }
-    }
-
-    private void stopVibration() {
-        if (vibrator != null) {
-            vibrator.cancel();
+        } catch (Exception e) {
+            Log.e(TAG, "Error cancelling notification: " + e.getMessage());
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopAlarmSound();
-        stopVibration();
+        // Notification is already cancelled in dismiss/snooze handlers
     }
-
 }

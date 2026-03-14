@@ -54,6 +54,13 @@ public class SnoozeReceiver extends BroadcastReceiver {
                 // Schedule new alarm
                 long triggerTime = System.currentTimeMillis() + duration;
 
+                // Update Task in DB so UI shows the correct next reminder time
+                task.reminderTime = triggerTime;
+                task.isCompleted = false;
+                task.completedTimestamp = 0;
+                db.taskDao().update(task);
+                Log.d(TAG, "Updated task " + taskId + " in DB with snoozed time: " + triggerTime);
+
                 AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                 if (alarmManager != null) {
                     Intent reminderIntent = new Intent(context, ReminderBroadcastReceiver.class);
@@ -62,8 +69,9 @@ public class SnoozeReceiver extends BroadcastReceiver {
                     reminderIntent.putExtra("alarm_id", intent.getIntExtra("alarm_id", 0));
                     reminderIntent.putExtra("task_description", taskDescription);
 
-                    String reminderType = intent.getStringExtra("reminder_type");
-                    reminderIntent.putExtra("reminder_type", reminderType);
+                    // Use task from DB as source of truth for reminder type
+                    String finalReminderType = task.reminderType;
+                    reminderIntent.putExtra("reminder_type", finalReminderType);
 
                     int alarmId = intent.getIntExtra("alarm_id", 0);
                     int requestCode = (alarmId != 0) ? alarmId : taskId;
@@ -71,13 +79,18 @@ public class SnoozeReceiver extends BroadcastReceiver {
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, reminderIntent,
                             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                    if ("alarm".equals(finalReminderType)) {
+                        // Use setAlarmClock for snoozed alarms to maintain high priority
+                        Log.d(TAG, "Using setAlarmClock for snoozed alarm " + taskId);
+                        AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(triggerTime, pendingIntent);
+                        alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
                         alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
                     } else {
                         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
                     }
 
-                    Log.d(TAG, "Snoozed task " + taskId + " for " + duration + "ms");
+                    Log.d(TAG, "Snoozed task " + taskId + " for " + duration + "ms with type " + finalReminderType);
                     
                     // Show toast on UI thread
                     new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {

@@ -528,6 +528,7 @@ public class DashboardActivity extends AppCompatActivity implements DashboardTas
         // Edit Action
         Intent intent = new Intent(DashboardActivity.this, NewTaskActivity.class);
         intent.putExtra(NewTaskActivity.EXTRA_ID, task.id);
+        intent.putExtra(NewTaskActivity.EXTRA_ALARM_ID, task.alarmId);
         intent.putExtra(NewTaskActivity.EXTRA_TITLE, task.title);
         intent.putExtra(NewTaskActivity.EXTRA_DESCRIPTION, task.description);
         try {

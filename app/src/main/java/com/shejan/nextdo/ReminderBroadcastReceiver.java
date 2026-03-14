@@ -86,20 +86,14 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 // Ensure channels are created (especially the new v2 alarm channel)
                 NotificationHelper.createNotificationChannel(context);
 
-                // Handle voice reminders BEFORE showing notification
+                // Handle voice reminders and alarms using full-screen intent
                 // Use database task as source of truth for reminder type if available
                 String finalReminderType = (foundTask != null) ? foundTask.reminderType : reminderType;
                 
-                if ("voice".equals(finalReminderType)) {
-                    Log.d(TAG, "Voice reminder detected for task " + taskId);
-                    if (foundTask != null) {
-                        speakVoiceReminder(context, foundTask);
-                        return; // Don't show notification for voice reminders
-                    }
-                }
+                boolean isFullScreenRequired = "alarm".equals(finalReminderType) || "voice".equals(finalReminderType);
 
-                // Show Notification (for notification and alarm reminders)
-                Log.d(TAG, "Showing notification for task " + taskId + " with type: " + finalReminderType);
+                // Show Notification / Activity (for notification, alarm, and voice reminders)
+                Log.d(TAG, "Processing task " + taskId + " with type: " + finalReminderType);
 
                 Intent mainIntent = new Intent(context, MainActivity.class);
                 mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -111,9 +105,10 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     contentText = taskTitle + ": " + taskDescription;
                 }
 
-                // Choose Channel based on type
-                String channelId = "alarm".equals(finalReminderType) ? 
-                        NotificationHelper.ALARM_CHANNEL_ID : NotificationHelper.CHANNEL_ID;
+                // Choose Channel based on type (Voice and Alarm use different channels)
+                boolean isVoice = "voice".equals(finalReminderType);
+                String channelId = isVoice ? NotificationHelper.VOICE_CHANNEL_ID : 
+                        (isFullScreenRequired ? NotificationHelper.ALARM_CHANNEL_ID : NotificationHelper.CHANNEL_ID);
                 
                 Log.d(TAG, "Using channel: " + channelId + " for type: " + finalReminderType);
 
@@ -126,16 +121,16 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                         .setAutoCancel(true)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
-                // Default notification behavior (only for non-alarms)
-                if (!"alarm".equals(finalReminderType)) {
+                // Default notification behavior (only for non-full-screen types)
+                if (!isFullScreenRequired) {
                     builder.setPriority(NotificationCompat.PRIORITY_DEFAULT)
                             .setCategory(NotificationCompat.CATEGORY_REMINDER)
                             .setDefaults(NotificationCompat.DEFAULT_ALL);
                 }
 
-                // For ALARM type: Use Full-Screen Intent (Standard Android 10+ way)
-                if ("alarm".equals(finalReminderType)) {
-                    Log.d(TAG, "Setting up full-screen alarm for task " + taskId);
+                // For ALARM and VOICE type: Use Full-Screen Intent
+                if (isFullScreenRequired) {
+                    Log.d(TAG, "Setting up full-screen UI for task " + taskId + " (Type: " + finalReminderType + ")");
 
                     // Launch AlarmActivity
                     Intent fullScreenIntent = new Intent(context, AlarmActivity.class);
@@ -145,6 +140,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     fullScreenIntent.putExtra("task_id", taskId);
                     fullScreenIntent.putExtra("task_title", taskTitle);
                     fullScreenIntent.putExtra("task_description", taskDescription);
+                    fullScreenIntent.putExtra("reminder_type", finalReminderType);
                     fullScreenIntent.putExtra("alarm_id", intent.getIntExtra("alarm_id", 0));
 
                     PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(context, taskId + 10000,
@@ -153,10 +149,14 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                     builder.setFullScreenIntent(fullScreenPendingIntent, true)
                             .setCategory(NotificationCompat.CATEGORY_ALARM)
                             .setPriority(NotificationCompat.PRIORITY_MAX)
-                            .setOngoing(true) // Keeps notification until dismissed via Alarm UI
-                            .setAutoCancel(false) // Alarms shouldn't auto-cancel
-                            .setSound(android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI)
-                            .setVibrate(new long[] { 0, 1000, 500, 1000, 500, 1000 });
+                            .setOngoing(true) // Keeps notification until dismissed via UI
+                            .setAutoCancel(false); // Alarms/Voice shouldn't auto-cancel
+
+                    // ONLY set sound/vibration for regular alarms. Voice is handled by AlarmActivity TTS.
+                    if (!isVoice) {
+                        builder.setSound(android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI)
+                                .setVibrate(new long[] { 0, 1000, 500, 1000, 500, 1000 });
+                    }
                     
                     Log.d(TAG, "Full-screen intent set for task " + taskId + " on channel " + channelId);
                 }
@@ -184,14 +184,14 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 builder.addAction(R.drawable.ic_snooze, "Snooze", snoozePendingIntent);
 
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-
                 if (ActivityCompat.checkSelfPermission(context,
                         android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                     
                     android.app.Notification notification = builder.build();
                     
                     // CRITICAL: Make the alarm sound loop until the user interacts with it
-                    if ("alarm".equals(finalReminderType)) {
+                    // Voice reminders don't need this as TTS is handled by the activity
+                    if (isFullScreenRequired && !isVoice) {
                         notification.flags |= android.app.Notification.FLAG_INSISTENT;
                     }
                     
@@ -206,103 +206,5 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
                 pendingResult.finish();
             }
         }).start();
-    }
-
-    private void speakVoiceReminder(Context context, Task task) {
-        final TextToSpeech[] ttsWrapper = new TextToSpeech[1];
-        ttsWrapper[0] = new TextToSpeech(context, status -> {
-            if (status == TextToSpeech.SUCCESS) {
-                TextToSpeech tts = ttsWrapper[0];
-                tts.setLanguage(Locale.US);
-
-                // Set male voice
-                setMaleVoice(tts);
-
-                String textToSpeak = "Reminder: " + task.title;
-                if (task.description != null && !task.description.isEmpty()) {
-                    textToSpeak += ". " + task.description;
-                }
-
-                Log.d(TAG, "Speaking voice reminder: " + textToSpeak);
-                tts.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null, "reminder");
-
-                // Cleanup after speaking (give enough time for speech)
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    tts.stop();
-                    tts.shutdown();
-                }, 10000); // 10 seconds should be enough for most reminders
-            } else {
-                Log.e(TAG, "TTS initialization failed, falling back to notification");
-                // Fallback to showing notification if TTS fails
-                showNotificationForVoiceReminder(context, task);
-            }
-        });
-    }
-
-    private void setMaleVoice(TextToSpeech tts) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            try {
-                java.util.Set<android.speech.tts.Voice> voices = tts.getVoices();
-                if (voices != null) {
-                    for (android.speech.tts.Voice voice : voices) {
-                        // Look for English (US) Male voice
-                        if (voice.getLocale().equals(Locale.US)) {
-                            String voiceName = voice.getName().toLowerCase();
-                            if (voiceName.contains("male") && !voiceName.contains("female")) {
-                                tts.setVoice(voice);
-                                Log.d(TAG, "Selected male voice: " + voice.getName());
-                                return;
-                            }
-                        }
-                    }
-
-                    // Fallback: try any English male voice
-                    for (android.speech.tts.Voice voice : voices) {
-                        if (voice.getLocale().getLanguage().equals("en")) {
-                            String voiceName = voice.getName().toLowerCase();
-                            if (voiceName.contains("male") && !voiceName.contains("female")) {
-                                tts.setVoice(voice);
-                                Log.d(TAG, "Selected fallback male voice: " + voice.getName());
-                                return;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error setting male voice: " + e.getMessage());
-            }
-        }
-    }
-
-    private void showNotificationForVoiceReminder(Context context, Task task) {
-        // Simple notification as fallback when TTS fails
-        Intent mainIntent = new Intent(context, MainActivity.class);
-        mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, task.id, mainIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        String contentText = "Voice Reminder: " + task.title;
-        if (task.description != null && !task.description.isEmpty()) {
-            contentText += ": " + task.description;
-        }
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
-                NotificationHelper.CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_alarm)
-                .setContentTitle("NextDO Voice Reminder")
-                .setContentText(contentText)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText))
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setCategory(NotificationCompat.CATEGORY_REMINDER)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .setDefaults(NotificationCompat.DEFAULT_ALL);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        if (ActivityCompat.checkSelfPermission(context,
-                android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-            notificationManager.notify(task.id, builder.build());
-            Log.d(TAG, "Fallback notification shown for voice reminder");
-        }
     }
 }

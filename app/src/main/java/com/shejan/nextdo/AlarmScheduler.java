@@ -53,7 +53,7 @@ public class AlarmScheduler {
                     // Trigger immediately for past times
                     Log.d(TAG, "Reminder time in past, triggering immediately");
                     alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, currentTime + 100, pendingIntent);
-                } else if ("alarm".equals(task.reminderType)) {
+                } else if ("alarm".equals(task.reminderType) || "voice".equals(task.reminderType)) {
                     // Use setAlarmClock for maximum reliability (Doze proof + System Alarm volume)
                     Log.d(TAG, "Using setAlarmClock for type: " + task.reminderType);
                     AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(

@@ -12,8 +12,19 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
+import android.speech.tts.TextToSpeech;
+import android.os.Handler;
+import android.os.Looper;
+import java.util.Locale;
+
 public class AlarmActivity extends AppCompatActivity {
     private static final String TAG = "AlarmActivity";
+    private TextToSpeech tts;
+    private Handler ttsHandler;
+    private Runnable ttsRunnable;
+    private int repeatCount = 0;
+    private static final int MAX_REPEATS = 5;
+    private static final long REPEAT_INTERVAL = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +53,7 @@ public class AlarmActivity extends AppCompatActivity {
         String taskTitle = getIntent().getStringExtra("task_title");
         String taskDescription = getIntent().getStringExtra("task_description");
         int taskId = getIntent().getIntExtra("task_id", 0);
+        String reminderType = getIntent().getStringExtra("reminder_type");
 
         // Setup UI
         TextView titleText = findViewById(R.id.alarm_title);
@@ -53,16 +65,23 @@ public class AlarmActivity extends AppCompatActivity {
         // Description is now hidden by default in XML as requested
         descText.setVisibility(android.view.View.GONE);
 
+        // Handle Voice Reminder
+        if ("voice".equals(reminderType)) {
+            setupVoiceReminder(taskTitle, taskDescription);
+        }
+
         // NOTE: Sound and vibration are managed by the notification system (FLAG_INSISTENT)
         // launched via ReminderBroadcastReceiver. cancelNotification() below stops it.
 
         // Done button (Mark as Done logic)
         doneButton.setOnClickListener(v -> {
+            stopVoice();
             markTaskAsDone(taskId);
         });
 
         // Snooze button
         snoozeButton.setOnClickListener(v -> {
+            stopVoice();
             // CRITICAL: Check if task is still valid (not deleted) before snoozing
             new Thread(() -> {
                 try {
@@ -88,7 +107,7 @@ public class AlarmActivity extends AppCompatActivity {
                         snoozeIntent.putExtra("task_title", taskTitle);
                         snoozeIntent.putExtra("task_description", taskDescription);
                         snoozeIntent.putExtra("alarm_id", getIntent().getIntExtra("alarm_id", 0));
-                        snoozeIntent.putExtra("reminder_type", "alarm");
+                        snoozeIntent.putExtra("reminder_type", reminderType != null ? reminderType : "alarm");
                         sendBroadcast(snoozeIntent);
 
                         finish();
@@ -111,6 +130,63 @@ public class AlarmActivity extends AppCompatActivity {
                 // User must explicitly dismiss or snooze
             }
         });
+    }
+
+    private void setupVoiceReminder(String title, String description) {
+        final String textToSpeak = "Reminder: " + title + (description != null && !description.isEmpty() ? ". " + description : "");
+        
+        tts = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                tts.setLanguage(Locale.US);
+                setMaleVoice(tts);
+                
+                ttsHandler = new Handler(Looper.getMainLooper());
+                ttsRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (repeatCount < MAX_REPEATS) {
+                            Log.d(TAG, "Speaking voice reminder (Attempt " + (repeatCount + 1) + "): " + textToSpeak);
+                            tts.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null, "reminder_" + repeatCount);
+                            repeatCount++;
+                            ttsHandler.postDelayed(this, REPEAT_INTERVAL);
+                        }
+                    }
+                };
+                ttsHandler.post(ttsRunnable);
+            } else {
+                Log.e(TAG, "TTS Initialization failed");
+            }
+        });
+    }
+
+    private void setMaleVoice(TextToSpeech tts) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                java.util.Set<android.speech.tts.Voice> voices = tts.getVoices();
+                if (voices != null) {
+                    for (android.speech.tts.Voice voice : voices) {
+                        if (voice.getLocale().equals(Locale.US)) {
+                            String voiceName = voice.getName().toLowerCase();
+                            if (voiceName.contains("male") && !voiceName.contains("female")) {
+                                tts.setVoice(voice);
+                                return;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting male voice: " + e.getMessage());
+            }
+        }
+    }
+
+    private void stopVoice() {
+        if (ttsHandler != null && ttsRunnable != null) {
+            ttsHandler.removeCallbacks(ttsRunnable);
+        }
+        if (tts != null) {
+            tts.stop();
+        }
     }
 
     private void markTaskAsDone(int taskId) {
@@ -165,7 +241,10 @@ public class AlarmActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        stopVoice();
+        if (tts != null) {
+            tts.shutdown();
+        }
         super.onDestroy();
-        // Notification is already cancelled in dismiss/snooze handlers
     }
 }

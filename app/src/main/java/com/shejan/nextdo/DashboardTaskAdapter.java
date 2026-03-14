@@ -159,6 +159,20 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
             color = 0xFFA2D2FF;
         }
 
+        // Apply 80% transparency (20% opacity) in Dark Mode
+        int nightModeFlags = holder.cardContainer.getContext().getResources().getConfiguration().uiMode & 
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+        if (nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+            if (holder.cardContainer.getBackground() != null) {
+                holder.cardContainer.getBackground().mutate().setAlpha(51); // 20% of 255 is ~51
+            }
+        } else {
+            // Ensure full opacity in Light Mode (alpha 255)
+            if (holder.cardContainer.getBackground() != null) {
+                holder.cardContainer.getBackground().mutate().setAlpha(255);
+            }
+        }
+
         holder.timelineDot.setBackgroundResource(R.drawable.circle_black);
         holder.timelineDot.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color));
         holder.hollowCircle.setColorFilter(color);

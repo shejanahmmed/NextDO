@@ -14,8 +14,8 @@
         android:layout_height="90dp"
         android:background="@drawable/bg_settings_header"
         android:fitsSystemWindows="true"
-        android:elevation="12dp"
-        android:translationZ="12dp"
+        android:elevation="0dp"
+        android:translationZ="0dp"
         app:navigationIcon="@null">
 
         <!-- Centred title matching other pages -->
@@ -46,9 +46,7 @@
             android:clipToPadding="false"
             android:paddingHorizontal="20dp"
             android:paddingTop="16dp"
-            android:paddingBottom="100dp"
-            android:requiresFadingEdge="vertical"
-            android:fadingEdgeLength="60dp" />
+            android:paddingBottom="100dp" />
 
         <!-- Enhanced Empty state -->
         <LinearLayout
